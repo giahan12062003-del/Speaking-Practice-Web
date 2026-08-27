@@ -867,8 +867,94 @@ function renderStudentResult(){
 }
 function finishStudentRecord(){const blob=new Blob(chunks,{type:'audio/webm'});currentRecord=blob;
  $('studentAudio').src=URL.createObjectURL(blob);$('studentAudio').style.display='block';$('recordBtn').textContent='🎙️';$('stopBtn').disabled=true;$('recState').className='record-status success';$('recState').textContent='✅ Ghi âm thành công. Đang phân tích…';$('rerecordBtn')?.classList.remove('hidden');
- analyseBlob(blob).then(a=>{const q=practiceTask.mockQuestions?practiceTask.mockQuestions[practiceTask.index]:(state.questions[practiceTask.questionIds[practiceTask.index]]||{});const r=autoScore(transcript,Math.max(1,(Date.now()-recordStart)/1000),a,q);practiceTask.lastScore=r;practiceTask.wordFixes=practiceTask.wordFixes||{};renderStudentResult();$('submitSpeaking').disabled=false;$('recState').className='record-status success';$('recState').textContent='✅ Phân tích xong. Bạn có thể nộp. Bé có thể ghi âm lại nếu muốn.';if($('submitSpeaking'))$('submitSpeaking').textContent=practiceTask?.isMock?'✅ LƯU CÂU & TIẾP TỤC':'📤 LƯU & NỘP'});}
-async function submitPracticeRecording(){if(!currentRecord||!practiceTask?.lastScore)return;const q=practiceTask.mockQuestions? (practiceTask.mockQuestions[practiceTask.index]||{}):(state.questions[practiceTask.questionIds[practiceTask.index]]||{});let audioUrl='';try{const name=`audio/${currentStudent.uid}/${Date.now()}.webm`,snap=await storage.ref(name).put(currentRecord,{contentType:'audio/webm'});audioUrl=await snap.ref.getDownloadURL()}catch(e){toast('Không tải được audio lên Storage, bài vẫn sẽ lưu điểm.','info')}const id=key(),r=practiceTask.lastScore,a=practiceTask;const obj={studentId:currentStudent.uid,studentCode:currentStudent.studentCode,studentName:currentStudent.name,classId:currentStudent.classId,assignmentId:a.id||'',taskTitle:a.title||'Practice',question:q.text,level:q.level,part:q.part,topic:q.topic,audioUrl,transcript,score:r.overall,topic:r.topic,fluency:r.fluency,pronunciation:r.pronunciation,language:r.topic,interaction:r.fluency,teacherScore:null,aiComment:r.comment,transcriptOriginal:transcript,transcriptCorrected:correctedTranscript(),wordFixes:practiceTask.wordFixes||{},status:'pending',createdAt:Date.now()};try{await db.ref('submissions/'+id).set(obj);await db.ref('history/'+key()).set({...obj,action:'Học sinh nộp bài',time:Date.now(),timeDate:new Date().toISOString().slice(0,10)});toast('Đã nộp bài thành công!');$('submitSpeaking').disabled=true;$('nextSpeaking').classList.remove('hidden');if(practiceTask.index===practiceTask.questionIds.length-1){setTimeout(()=>showCelebrate(obj.score,0,'Hoàn thành bài luyện!'),450)}}catch(e){toast('Không thể lưu bài: '+e.message,'err'); throw e }}
+ analyseBlob(blob).then(a=>{const q=practiceTask.mockQuestions?practiceTask.mockQuestions[practiceTask.index]:(state.questions[practiceTask.questionIds[practiceTask.index]]||{});const r=autoScore(transcript,Math.max(1,(Date.now()-recordStart)/1000),a,q);practiceTask.lastScore=r;practiceTask.wordFixes=practiceTask.wordFixes||{};renderStudentResult();$('submitSpeaking').disabled=false;$('recState').className='record-status success';$('recState').textContent='✅ Phân tích xong. Bé có thể nộp hoặc ghi âm lại.';if($('submitSpeaking'))$('submitSpeaking').textContent=practiceTask?.isMock?'✅ LƯU CÂU & TIẾP TỤC':'📤 LƯU & NỘP'});}
+
+async function submitPracticeRecording(){
+  const submit=$('submitSpeaking');
+  if(!currentRecord||!practiceTask?.lastScore){
+    toast('Hãy ghi âm và chờ hệ thống phân tích trước khi lưu nhé.','info');
+    return;
+  }
+  if(submit?.dataset.busy==='1') return;
+  if(submit){submit.dataset.busy='1';submit.disabled=true;submit.textContent='⏳ Đang lưu...';}
+
+  const q=practiceTask.mockQuestions
+    ? (practiceTask.mockQuestions[practiceTask.index]||{})
+    : (state.questions[practiceTask.questionIds[practiceTask.index]]||{});
+  const id=key(), r=practiceTask.lastScore, a=practiceTask;
+  const baseObj={
+    id,
+    studentId:currentStudent.uid,
+    studentCode:currentStudent.studentCode,
+    studentName:currentStudent.name,
+    classId:currentStudent.classId,
+    assignmentId:a.id||'',
+    taskTitle:a.title||'Practice',
+    question:q.text||'',
+    level:q.level||'',
+    part:q.part||'',
+    topic:q.topic||'',
+    audioUrl:'',
+    transcript,
+    score:r.overall,
+    topic:r.topic,
+    fluency:r.fluency,
+    pronunciation:r.pronunciation,
+    language:r.topic,
+    interaction:r.fluency,
+    aiComment:r.comment,
+    transcriptOriginal:transcript,
+    transcriptCorrected:correctedTranscript(),
+    wordFixes:a.wordFixes||{},
+    status:'pending',
+    createdAt:Date.now()
+  };
+
+  // Save the result first so the child does not wait for audio upload.
+  try{
+    $('recState').className='record-status info';
+    $('recState').textContent='💾 Đang lưu kết quả...';
+    await Promise.all([
+      db.ref('submissions/'+id).set(baseObj),
+      db.ref('history/'+key()).set({...baseObj,action:'Học sinh nộp bài',time:Date.now(),timeDate:new Date().toISOString().slice(0,10)})
+    ]);
+
+    toast('✅ Đã lưu bài. Đang tải audio...');
+    if(submit) submit.textContent='☁️ Đang tải audio...';
+
+    // Upload audio after the submission metadata is safely stored.
+    try{
+      const name=`audio/${currentStudent.uid}/${id}.webm`;
+      const snap=await storage.ref(name).put(currentRecord,{contentType:'audio/webm'});
+      const audioUrl=await snap.ref.getDownloadURL();
+      await db.ref('submissions/'+id).update({audioUrl});
+      await db.ref('history').orderByChild('id').equalTo(id).once('value').then(async snap2=>{
+        const updates={};
+        snap2.forEach(child=>updates[child.key+'/audioUrl']=audioUrl);
+        if(Object.keys(updates).length) await db.ref('history').update(updates);
+      }).catch(()=>{});
+      toast('✅ Đã lưu bài và audio thành công!');
+    }catch(e){
+      toast('✅ Bài đã lưu. Audio chưa tải xong; cô có thể xem bài trước.','info');
+    }
+
+    $('submitSpeaking').disabled=true;
+    if($('nextSpeaking')) $('nextSpeaking').classList.remove('hidden');
+    if(a.index===a.questionIds.length-1){
+      setTimeout(()=>showCelebrate(baseObj.score,0,'Hoàn thành bài luyện!'),450);
+    }
+    return;
+  }catch(e){
+    toast('Không thể lưu bài: '+(e?.message||e),'err');
+  }finally{
+    if(submit){
+      submit.dataset.busy='0';
+      if(document.body.contains(submit) && !practiceTask?.isMock){
+        submit.textContent='📤 ĐÃ LƯU';
+      }
+    }
+  }
+}
 function nextPracticeQuestion(){if(practiceTask.index<practiceTask.questionIds.length-1)renderPracticeQuestion(practiceTask.index+1);else renderStudent()}
 function buildMockQuestionItems(m){
  const parts=mockBlueprintData(m.level).map(x=>x[0]);
