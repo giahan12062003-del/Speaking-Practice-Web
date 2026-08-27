@@ -349,7 +349,7 @@ function buildBetterAnswer(q,r){
   if(/story|continue/.test(text)) return 'First, … Then, … After that, … Finally, ….';
   if(/why/.test(text)) return 'I think … because …. For example, ….';
   if(/what .* like|favourite|favorite/.test(text)) return 'My favourite … is …. I like it because ….';
-  if((r?.topic||0)<4) return `Start by answering the main question about ${topic} directly, then add one small detail.`;
+  if((r?.topic||0)<4) return `Trả lời đúng câu hỏi trước, rồi thêm một chi tiết nhỏ.`;
   if((r?.fluency||0)<4) return 'Try 2–3 short sentences instead of one long sentence. Speak → pause → continue.';
   if((r?.pronunciation||0)<4) return 'Use familiar words that you can pronounce clearly, and slow down on difficult words.';
   return 'Answer the question directly, then add one reason, example, or personal detail.';
@@ -516,78 +516,112 @@ function pauseStats(text,duration){
   return {fillers,repeats,pace};
 }
 
-function autoScore(text,duration,analysis,q){
-  const a=analyzeTranscript(text), words=wordTokens(text), n=words.length;
-  const stats=pauseStats(text,duration);
-  const lower=text.toLowerCase();
 
-  // TOPIC: reward answering the actual question/topic, but do not require long answers.
+function topicKeywords(q){
+  const topic=String(q?.topic||'').toLowerCase();
+  const text=String(q?.text||'').toLowerCase();
+  const map={
+    family:['family','mother','mum','mom','father','dad','brother','sister','parents','grandma','grandfather','home'],
+    'my family':['family','mother','mum','mom','father','dad','brother','sister','parents','grandma','grandfather','home'],
+    school:['school','teacher','class','classroom','subject','lesson','student','friend','homework'],
+    'daily routines':['wake','morning','school','homework','play','eat','dinner','sleep','bed','usually'],
+    people:['boy','girl','man','woman','friend','person','people','family','brother','sister'],
+    'free time':['play','football','game','watch','read','music','weekend','swim','ride','hobby'],
+    'past activities':['yesterday','last','weekend','went','did','played','visited','watched','ate','saw'],
+    future:['future','want','will','going','dream','job','become','would like'],
+    food:['food','eat','like','favourite','favorite','pizza','rice','fruit','drink','meal'],
+    places:['place','park','school','home','shop','beach','city','town','restaurant'],
+    animals:['animal','dog','cat','bird','fish','horse','zoo','pet'],
+    friends:['friend','best friend','play','together','boy','girl'],
+    birthday:['birthday','party','present','cake','candles','age'],
+    holidays:['holiday','vacation','travel','trip','visit','beach','mountain'],
+    hobbies:['hobby','play','read','draw','sing','dance','swim','football','music']
+  };
+  const bag=new Set();
+  Object.keys(map).forEach(k=>{if(topic.includes(k)||text.includes(k))map[k].forEach(x=>bag.add(x))});
+  if(!bag.size){
+    (topic+' '+text).split(/\s+/).map(x=>x.replace(/[^a-z'-]/g,'')).filter(x=>x.length>=4)
+      .filter(x=>!['what','tell','about','your','would','could','please','look','describe','answer'].includes(x))
+      .slice(0,10).forEach(x=>bag.add(x));
+  }
+  return [...bag];
+}
+
+function pauseStats(text,duration){
+  const fillers=(text.match(/\b(um|uh|er|hmm|you know|like)\b/gi)||[]).length;
+  const repeats=(text.match(/\b([A-Za-z']+)(?:\s+\1\b)+/gi)||[]).length;
+  const pace=duration?wordTokens(text).length/(duration/60):0;
+  return {fillers,repeats,pace};
+}
+
+function autoScore(text,duration,analysis,q){
+  const a=analyzeTranscript(text), n=a.count, lower=text.toLowerCase();
+  const stats=pauseStats(text,duration);
   const keys=topicKeywords(q);
   const hits=keys.filter(k=>lower.includes(k.toLowerCase())).length;
-  const topicRatio=keys.length?hits/Math.min(keys.length,5):0.5;
   const qText=String(q?.text||'').toLowerCase();
-  let directBonus=0;
-  if(/\b(what|where|who|when|why|how|which)\b/.test(qText) && n>=2) directBonus=8;
-  if(/\bwhy\b/.test(qText) && /\b(because|so|as)\b/.test(lower)) directBonus+=10;
-  if(/\bwhat .* like\b|\bfavourite\b|\bfavorite\b/.test(qText) && /\b(like|love|prefer|favourite|favorite)\b/.test(lower)) directBonus+=8;
-  if(/\bhow many\b/.test(qText) && /\b(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b/.test(lower)) directBonus+=7;
-  if(/difference/.test(qText) && /\b(but|whereas|while|different)\b/.test(lower)) directBonus+=7;
-  if(/story|continue/.test(qText) && /\b(first|then|next|after|finally)\b/.test(lower)) directBonus+=7;
-  let topicBase=40 + Math.round(topicRatio*45) + directBonus;
-  if(n===0) topicBase=0;
-  else if(n<=2) topicBase=Math.min(topicBase,62); // short is okay, but limited evidence
-  const topic=Math.max(0,Math.min(5,Math.round(topicBase/20)));
 
-  // FLUENCY: based on flow, repetitions, fillers and workable pace — NOT response length.
-  const paceBonus=(stats.pace>=35&&stats.pace<=145)?12:(stats.pace>=25&&stats.pace<=165?5:0);
-  const fluencyBase=72 + paceBonus - Math.min(28,stats.fillers*7) - Math.min(30,stats.repeats*9);
-  const fluency=Math.max(0,Math.min(5,Math.round(fluencyBase/20)));
+  // For young learners, a short but relevant answer is acceptable.
+  // Topic score is intentionally generous unless the answer clearly goes off-topic.
+  let topicScore=5;
+  const topicEvidence = keys.length ? hits : 0;
+  const clearlyOffTopic = n>=3 && keys.length && topicEvidence===0;
+  if(!n) topicScore=0;
+  else if(clearlyOffTopic) topicScore=3;
+  else if(n<=2) topicScore=4;
+  else if(topicEvidence===0 && /family|school|food|friends|hobbies|holiday|weekend/.test(qText)) topicScore=4;
+  if(/\bwhy\b/.test(qText) && /\bbecause\b/.test(lower)) topicScore=Math.min(5,topicScore+0);
+  topicScore=Math.max(0,Math.min(5,topicScore));
 
-  // PRONUNCIATION: recognition confidence + consistency. Never use loudness as pronunciation.
+  // Fluency is gentle: only noticeably repeated / filler-heavy speech is penalized.
+  let fluencyScore=5;
+  const roughness = stats.repeats*2 + stats.fillers;
+  if(roughness>=6) fluencyScore=3;
+  else if(roughness>=3) fluencyScore=4;
+  if(stats.pace>0 && (stats.pace<20 || stats.pace>190)) fluencyScore=Math.max(3,fluencyScore-1);
+  if(n<2 && stats.fillers===0) fluencyScore=Math.max(4,fluencyScore);
+
+  // Pronunciation: penalize mainly when recognition confidence is clearly low.
   const confs=recognitionConfidence.map(x=>Number(x.confidence)||0).filter(x=>x>0);
-  const confAvg=confs.length?confs.reduce((s,x)=>s+x,0)/confs.length:0.62;
-  const uncertain=Math.min(20,(recognitionConfidence.filter(x=>Number(x.confidence)>0&&Number(x.confidence)<0.55).length)*2);
-  const pronBase=48 + confAvg*46 - uncertain - Math.min(18,stats.repeats*4);
-  const pronunciation=Math.max(0,Math.min(5,Math.round(pronBase/20)));
+  const confAvg=confs.length?confs.reduce((s,x)=>s+x,0)/confs.length:0.72;
+  const lowCount=recognitionConfidence.filter(x=>Number(x.confidence)>0&&Number(x.confidence)<0.45).length;
+  let pronunciationScore=5;
+  if(confAvg<0.48 || lowCount>=3) pronunciationScore=3;
+  else if(confAvg<0.58 || lowCount>=1) pronunciationScore=4;
+  // If audio was extremely quiet, make pronunciation harder rather than claiming bad pronunciation.
+  if(Number(analysis?.volume||60)<38) pronunciationScore=Math.min(pronunciationScore,3);
 
-  const overall=topic+fluency+pronunciation;
+  const overall=topicScore+fluencyScore+pronunciationScore;
 
-  const topicComment=topic>=5?'Bé bám rất đúng câu hỏi và chủ đề.':
-    topic>=4?'Bé trả lời đúng chủ đề; chỉ cần thêm một chi tiết nhỏ khi phù hợp.':
-    topic>=3?'Bé đã chạm đúng chủ đề nhưng có thể trả lời sát câu hỏi hơn.':
-    'Bé cần nghe kỹ câu hỏi và tập trung vào đúng chủ đề hơn.';
+  const topicComment=topicScore>=5
+    ?'Bé trả lời đúng chủ đề và đã đáp ứng câu hỏi.'
+    :topicScore===4
+    ?'Bé trả lời đúng hướng của chủ đề; như vậy là tốt rồi.'
+    :'Bé đã nói được nhưng cần bám sát câu hỏi hơn một chút.';
 
-  const fluencyComment=fluency>=5?'Bé nói khá liền mạch, ít ngập ngừng.':
-    fluency>=4?'Bé nói tương đối trôi chảy; đôi lúc còn ngập ngừng hoặc lặp từ.':
-    fluency>=3?'Bé đã nói được nhưng còn vài chỗ ngập ngừng/lặp từ.':
-    'Bé cần nói chậm hơn, chia câu ngắn và giảm lặp hoặc từ đệm.';
+  const fluencyComment=fluencyScore>=5
+    ?'Bé nói khá tự nhiên và trôi chảy.'
+    :fluencyScore===4
+    ?`Bé nói khá ổn; có khoảng ${stats.repeats||0} chỗ lặp/từ đệm cần giảm nhẹ.`
+    :'Bé còn ngập ngừng/lặp từ khá nhiều, nên nói từng câu ngắn và chậm hơn.';
 
-  const pronComment=pronunciation>=5?'Phát âm nhìn chung rõ và dễ nhận diện.':
-    pronunciation>=4?'Phát âm khá rõ; một vài từ cần nói chậm và rõ hơn.':
-    pronunciation>=3?'Có vài từ hệ thống nhận diện chưa chắc; bé nên luyện lại từng từ khó.':
-    'Có khá nhiều từ hệ thống nhận diện chưa chắc; nên luyện từng từ và nói rõ hơn.';
+  const pronComment=pronunciationScore>=5
+    ?'Phát âm nhìn chung rõ và hệ thống nhận diện khá tốt.'
+    :pronunciationScore===4
+    ?'Phát âm khá rõ; có vài từ nên nói chậm và rõ hơn.'
+    :'Một số từ được hệ thống nhận diện chưa rõ; bé nên luyện lại từng từ khó và nói to hơn.';
 
   let comment=[topicComment,fluencyComment,pronComment].join(' ');
-  if(overall>=13) comment='Rất tốt! '+comment;
-  else if(overall>=10) comment='Khá tốt! '+comment;
-  else if(overall>=7) comment='Bé đã hoàn thành bài. '+comment;
+  if(overall>=14) comment='Xuất sắc! '+comment;
+  else if(overall>=12) comment='Rất tốt! '+comment;
+  else if(overall>=9) comment='Khá tốt! '+comment;
   else comment='Mình luyện thêm một chút nhé. '+comment;
 
-  const pronunciationWarnings=[...new Set(
-    recognitionConfidence
-      .filter(x=>Number(x.confidence)>0&&Number(x.confidence)<0.55)
-      .flatMap(x=>wordTokens(x.text).map(w=>w.toLowerCase()))
-  )];
-
   return {
-    overall, topic, fluency, pronunciation,
-    volume:analysis.volume||60,
-    pace:Math.round(stats.pace),
-    comment, words:n,
-    fillers:stats.fillers, repeats:stats.repeats,
-    errors:a.errors, confidence:Math.round(confAvg*100),
-    pronunciationWarnings,
-    topicComment, fluencyComment, pronComment
+    overall,topic:topicScore,fluency:fluencyScore,pronunciation:pronunciationScore,
+    volume:analysis?.volume||60,pace:Math.round(stats.pace),
+    comment,words:n,fillers:stats.fillers,repeats:stats.repeats,errors:a.errors,
+    confidence:Math.round(confAvg*100),topicComment,fluencyComment,pronComment
   };
 }
 function flagTranscriptHTML(text, result){
@@ -627,7 +661,7 @@ function renderStudentResult(){
     <div class="script-actions"><span class="muted small">🔴 Đỏ = từ đệm/lặp · 🟠 Cam = từ nhận diện chưa chắc · bấm từ để sửa.</span></div>
   </div>
   <div class="feedback" style="margin-top:10px"><b>💬 Nhận xét theo chính bài nói:</b><br>${esc(r.comment)}</div>
-  <div class="feedback" style="margin-top:10px"><b>🚀 Muốn tăng điểm lần sau:</b><ul style="margin:7px 0 0 18px;padding:0">${plan.map(x=>`<li style="margin:5px 0;line-height:1.45">${esc(x)}</li>`).join('')}</ul></div>
+  <div class="feedback" style="margin-top:10px"><b>🌟 Gợi ý nhỏ cho lần sau:</b><ul style="margin:7px 0 0 18px;padding:0">${plan.map(x=>`<li style="margin:5px 0;line-height:1.45">${esc(x)}</li>`).join('')}</ul></div>
   <div class="record-actions" style="margin-top:10px">
     <button class="btn secondary" type="button" onclick="resetStudentRecording()">🔄 Ghi âm lại</button>
     <button class="btn secondary" type="button" onclick="toggleSuggestedAnswer()">💡 Xem cách trả lời tốt hơn</button>
