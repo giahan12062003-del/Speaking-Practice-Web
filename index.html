@@ -21,7 +21,6 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}
 .field{display:grid;gap:7px;margin:13px 0}.field label{font-size:13px;color:#c3c9df}.field input,.field textarea,.field select{
 width:100%;padding:12px 13px;border-radius:11px;border:1px solid #30375d;background:#0c1021;color:#fff;outline:none}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--purple)}
-    .login-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#1a2140;border:1px solid #30385f;color:#cdd5f5;font-size:12px}
 .btn{border:0;border-radius:11px;padding:11px 15px;font-weight:650}.primary{background:linear-gradient(135deg,var(--purple),#6f6bff);color:white}.secondary{background:#191f39;color:#e9ebfa;border:1px solid #30385f}.danger{background:#351b2a;color:#ffb4c4;border:1px solid #633148}
 .small{font-size:12px}.muted{color:var(--muted)}.error{color:#ff9ab0;font-size:13px;min-height:20px}
 .shell{display:none;min-height:100vh}.side{position:fixed;inset:0 auto 0 0;width:245px;background:#0c1020e8;border-right:1px solid #242b4b;padding:24px 15px;z-index:10}
@@ -47,21 +46,23 @@ width:100%;padding:12px 13px;border-radius:11px;border:1px solid #30375d;backgro
 <div id="auth" class="auth">
   <div class="authbox">
     <div class="logo">MS <span>HÂN</span> CLASS</div><div class="tag">Speaking Practice Room</div>
-    <h1 id="authTitle">Vào phòng luyện</h1>
+    <h1 id="authTitle">Đăng nhập</h1>
     <div class="tabs"><button id="studentTab" class="active" onclick="setAuthRole('student')">👧 Học sinh</button><button id="teacherTab" onclick="setAuthRole('teacher')">👩🏻‍🏫 Giáo viên</button></div>
 
     <div id="studentLoginFields">
-      <div class="field"><label>Chọn lớp</label><select id="loginClass"><option value="">-- Chọn lớp --</option></select></div>
-      <div class="field"><label>Mã số học sinh</label><input id="studentCode" placeholder="Ví dụ: FLY001" autocomplete="off"></div>
+      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="">Đang tải danh sách lớp...</option></select></div>
+      <div class="field"><label>🔑 Mã học sinh</label><input id="studentCode" autocomplete="off" placeholder="Ví dụ: K01"></div>
+      <div class="small muted">Chỉ cần chọn lớp và nhập mã cô Hân cấp. Không cần email hay mật khẩu.</div>
     </div>
 
     <div id="teacherLoginFields" class="hidden">
-      <div class="field"><label>Mật khẩu giáo viên</label><input id="teacherPassword" type="password" placeholder="Nhập mật khẩu" autocomplete="off"></div>
+      <div class="field"><label>🔐 Mật khẩu giáo viên</label><input id="teacherPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu cô Hân"></div>
+      <div class="small muted">Nhập mật khẩu cô Hân để vào khu vực giáo viên.</div>
     </div>
 
-    <button class="btn primary" style="width:100%;margin-top:8px" onclick="submitAuth()">Vào phòng luyện</button>
+    <button class="btn primary" style="width:100%;margin-top:16px" onclick="submitAuth()">Đăng nhập</button>
     <div id="authError" class="error"></div>
-    <div id="authHint" class="small muted">Học sinh chọn đúng lớp và nhập mã số được cô cung cấp.</div>
+    <div class="small muted" style="margin-top:10px">Học sinh đăng nhập bằng <b>lớp + mã</b>. Giáo viên đăng nhập bằng <b>mật khẩu</b>.</div>
   </div>
 </div>
 
@@ -107,7 +108,7 @@ width:100%;padding:12px 13px;border-radius:11px;border:1px solid #30375d;backgro
 
 <section id="tdashboard" class="page"><div class="hero"><h1>👩🏻‍🏫 Teacher Dashboard</h1><div class="muted">Quản lý lớp, bài học, bài giao và lịch sử của học sinh.</div></div><div class="grid"><div class="card stat"><div class="muted">👥 Học sinh</div><div class="num" id="tStudents">0</div></div><div class="card stat"><div class="muted">📚 Bài giao</div><div class="num" id="tAssignments">0</div></div><div class="card stat"><div class="muted">📤 Bài nộp</div><div class="num" id="tSubmissions">0</div></div><div class="card stat"><div class="muted">⭐ Điểm TB</div><div class="num" id="tAverage">—</div></div></div></section>
 
-<section id="classes" class="page"><div class="card"><div class="between"><h2>👥 Lớp học</h2><button class="btn primary" onclick="openModal('classModal')">+ Tạo lớp</button></div><div id="classList" class="list" style="margin-top:14px"></div></div></section>
+<section id="classes" class="page"><div class="card"><div class="between"><h2>👥 Lớp học</h2><div class="row"><button class="btn secondary" onclick="openModal('studentModal')">+ Thêm học sinh</button><button class="btn primary" onclick="openModal('classModal')">+ Tạo lớp</button></div></div><div id="classList" class="list" style="margin-top:14px"></div><div class="small muted" style="margin-top:12px">Học sinh đăng nhập bằng <b>lớp + mã</b>. Cô có thể cấp mã đơn giản như K01, K02, A01...</div></div></section>
 
 <section id="questions" class="page"><div class="card"><div class="between"><div><h2>📚 Ngân hàng câu hỏi</h2><div class="small muted">Quản lý câu hỏi theo chủ đề/bài học.</div></div><button class="btn primary" onclick="openModal('questionModal')">+ Thêm câu hỏi</button></div><div id="questionList" class="list" style="margin-top:14px"></div></div></section>
 
@@ -121,13 +122,14 @@ width:100%;padding:12px 13px;border-radius:11px;border:1px solid #30375d;backgro
 </main></div>
 
 <div id="classModal" class="modal"><div class="modalbox"><div class="between"><h2>Tạo lớp</h2><button class="btn secondary" onclick="closeModal('classModal')">Đóng</button></div><div class="field"><label>Tên lớp</label><input id="newClassName" placeholder="Flyers A"></div><div class="field"><label>Khối / trình độ</label><input id="newClassLevel" placeholder="Flyers"></div><button class="btn primary" onclick="createClass()">Lưu lớp</button></div></div>
+<div id="studentModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm học sinh</h2><button class="btn secondary" onclick="closeModal('studentModal')">Đóng</button></div><div class="field"><label>Tên học sinh</label><input id="newStudentName" placeholder="Ví dụ: Kevin"></div><div class="field"><label>Lớp</label><select id="studentClassManage"></select></div><div class="field"><label>Mã đăng nhập</label><input id="newStudentCode" placeholder="Ví dụ: K01" autocomplete="off"></div><div class="small muted">Mã chỉ cần đơn giản, ví dụ K01. Học sinh sẽ chọn đúng lớp rồi nhập mã này.</div><button class="btn primary" style="margin-top:12px" onclick="createStudent()">Lưu học sinh</button></div></div>
 <div id="questionModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm câu hỏi</h2><button class="btn secondary" onclick="closeModal('questionModal')">Đóng</button></div><div class="field"><label>Câu hỏi</label><textarea id="newQuestion" rows="3" placeholder="What did you do last weekend?"></textarea></div><div class="field"><label>Topic / bài học</label><input id="newTopic" placeholder="Past activities"></div><button class="btn primary" onclick="createQuestion()">Lưu câu hỏi</button></div></div>
 <div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><h2>Chấm bài</h2><button class="btn secondary" onclick="closeModal('gradeModal')">Đóng</button></div><div id="gradeInfo"></div><div class="field"><label>Điểm tổng /100</label><input id="gradeScore" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation /100</label><input id="gradePron" type="number" min="0" max="100"></div><div class="field"><label>Fluency /100</label><input id="gradeFlu" type="number" min="0" max="100"></div><div class="field"><label>Nhận xét</label><textarea id="gradeFeedback" rows="4" placeholder="Good job! Try to speak louder..."></textarea></div><button class="btn primary" onclick="saveGrade()">Lưu điểm & nhận xét</button></div></div>
 <div id="toast" class="toast"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInAnonymously,signOut} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {getAuth,onAuthStateChanged,signInAnonymously,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import {getDatabase,ref,push,set,onValue,get,update} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 import {getStorage,ref as sRef,uploadBytes,getDownloadURL} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
@@ -155,10 +157,7 @@ const starterQuestions=[
  ["What would you like to be in the future?","Future"],
  ["Tell me about your family.","Family"]
 ];
-let role="student",currentQ=0,lastBlob=null,audioUrl=null,rec=null,user=null,studentSession=null,allQuestions=[],allClasses=[],allAssignments=[],allSubs=[],allHistory=[],selectedSubmission=null;
-const TEACHER_PASSWORD="hanna126";
-function saveLoginRole(r){sessionStorage.setItem("msHanLoginRole",r)}
-function getLoginRole(){return sessionStorage.getItem("msHanLoginRole")||"student"}
+let role="student",currentQ=0,lastBlob=null,audioUrl=null,rec=null,user=null,studentProfile=null,allQuestions=[],allClasses=[],allAssignments=[],allSubs=[],allHistory=[],selectedSubmission=null;\nconst TEACHER_PASSWORD="hanna126";\nconst TEACHER_EMAIL="teacher@ms-han-class.com";
 
 const $=id=>document.getElementById(id);
 function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",2300)}
@@ -171,103 +170,167 @@ function page(id,btn){
  if(id==="assignments")loadStudentAssignments(); if(id==="history")loadStudentHistory(); if(["classes","questions","assign","submissions","historyTeacher","tdashboard"].includes(id))loadTeacherData();
 }
 window.page=page;
-function getSavedStudent(){
-  try{return JSON.parse(localStorage.getItem("msHanStudentSession")||"null")}catch(e){return null}
-}
-function saveStudentSession(data){localStorage.setItem("msHanStudentSession",JSON.stringify(data))}
-function clearStudentSession(){localStorage.removeItem("msHanStudentSession")}
-function populateLoginClasses(){
-  const select=$("loginClass");
-  if(!select)return;
-  const current=select.value;
-  const classes=allClasses.length?allClasses:[
-    {id:"flyers-a",name:"Flyers A",level:"Flyers"},
-    {id:"flyers-b",name:"Flyers B",level:"Flyers"},
-    {id:"movers-a",name:"Movers A",level:"Movers"},
-    {id:"movers-b",name:"Movers B",level:"Movers"}
-  ];
-  select.innerHTML='<option value="">-- Chọn lớp --</option>'+
-    classes.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.level?` · ${esc(c.level)}`:""}</option>`).join("");
-  if(current)select.value=current;
-}
 window.setAuthRole=r=>{
-  role=r;saveLoginRole(r);
+  role=r;
   $("studentTab").classList.toggle("active",r==="student");
   $("teacherTab").classList.toggle("active",r==="teacher");
   $("studentLoginFields").classList.toggle("hidden",r!=="student");
   $("teacherLoginFields").classList.toggle("hidden",r!=="teacher");
-  $("authTitle").textContent=r==="student"?"Vào phòng luyện":"Đăng nhập giáo viên";
+  $("authTitle").textContent=r==="student"?"Học sinh đăng nhập":"Giáo viên đăng nhập";
   $("authError").textContent="";
-  $("authHint").textContent=r==="student"?"Học sinh chọn đúng lớp và nhập mã số được cô cung cấp.":"Giáo viên chỉ cần nhập mật khẩu để quản lý lớp và bài luyện.";
 };
 window.submitAuth=async()=>{
-  $("authError").textContent="";saveLoginRole(role);
+  $("authError").textContent="";
   try{
     if(role==="teacher"){
       const pw=$("teacherPassword").value;
       if(pw!==TEACHER_PASSWORD)return $("authError").textContent="Mật khẩu giáo viên chưa đúng.";
-      studentSession=null;
-      await signInAnonymously(auth);
+      await ensureTeacherAuth();
       return;
     }
-    const classId=$("loginClass").value;
+
+    const classId=$("studentClass").value;
     const code=$("studentCode").value.trim().toUpperCase();
     if(!classId)return $("authError").textContent="Em hãy chọn lớp.";
-    if(!/^[A-Z0-9_-]{2,30}$/.test(code))return $("authError").textContent="Vui lòng nhập mã số học sinh hợp lệ.";
-    const cls=allClasses.find(x=>x.id===classId);
-    const className=cls?.name||$("loginClass").selectedOptions[0]?.textContent?.split(" · ")[0]||"Lớp học";
-    studentSession={classId,className,studentCode:code,name:code};
-    saveStudentSession(studentSession);
-    await signInAnonymously(auth);
+    if(!code)return $("authError").textContent="Em hãy nhập mã học sinh.";
+
+    // Anonymous Auth chỉ tạo phiên Firebase để Database/Storage hoạt động.
+    await ensureAnonymousAuth();
+    const profile=await findStudentByClassAndCode(classId,code);
+    if(!profile)return $("authError").textContent="Không tìm thấy mã này trong lớp. Em kiểm tra lại mã nhé.";
+    studentProfile=profile;
+    role="student";
+    sessionStorage.setItem("studentProfile",JSON.stringify(profile));
+    showStudent(profile);
   }catch(e){
     console.error(e);
-    $("authError").textContent="Không thể đăng nhập. Hãy kiểm tra Firebase Authentication đã bật Anonymous chưa.";
+    $("authError").textContent=friendlyAuthError(e);
   }
 };
+
+async function ensureAnonymousAuth(){
+  if(auth.currentUser)return auth.currentUser;
+  const cred=await signInAnonymously(auth);
+  return cred.user;
+}
+
+async function ensureTeacherAuth(){
+  let cred;
+  try{
+    cred=await signInWithEmailAndPassword(auth,TEACHER_EMAIL,TEACHER_PASSWORD);
+  }catch(e){
+    if(e.code==="auth/user-not-found" || e.code==="auth/invalid-credential"){
+      try{
+        cred=await createUserWithEmailAndPassword(auth,TEACHER_EMAIL,TEACHER_PASSWORD);
+      }catch(e2){
+        if(e2.code==="auth/email-already-in-use") cred=await signInWithEmailAndPassword(auth,TEACHER_EMAIL,TEACHER_PASSWORD);
+        else throw e2;
+      }
+    }else throw e;
+  }
+  await set(ref(db,"users/"+cred.user.uid),{
+    uid:cred.user.uid,name:"Cô Hân",email:TEACHER_EMAIL,role:"teacher",updatedAt:new Date().toISOString()
+  });
+  role="teacher";
+  showTeacher();
+}
+
+function friendlyAuthError(e){
+  const map={
+    "auth/operation-not-allowed":"Firebase chưa bật phương thức đăng nhập cần thiết.",
+    "auth/too-many-requests":"Có quá nhiều lần thử. Em/cô chờ một chút rồi thử lại.",
+    "auth/network-request-failed":"Không kết nối được Firebase. Kiểm tra Internet.",
+    "auth/invalid-credential":"Thông tin đăng nhập chưa đúng."
+  };
+  return map[e.code]||e.message||"Đăng nhập chưa thành công.";
+}
+
 window.logout=async()=>{
-  clearStudentSession();
-  studentSession=null;
-  role="student";sessionStorage.removeItem("msHanLoginRole");
-  $("studentCode").value="";
-  $("teacherPassword").value="";
+  sessionStorage.removeItem("studentProfile");
+  studentProfile=null;
   await signOut(auth);
+  $("studentCode").value="";
 };
+
 onAuthStateChanged(auth,async u=>{
   user=u;
-  role=getLoginRole();
+  // Không tự mở app chỉ vì Anonymous Auth; học sinh phải chọn lớp + mã.
   if(!u){
+    $("auth").style.display="grid";$("shell").style.display="none";return;
+  }
+  const saved=sessionStorage.getItem("studentProfile");
+  if(saved){
+    try{
+      studentProfile=JSON.parse(saved);
+      showStudent(studentProfile);
+      return;
+    }catch(_){}
+  }
+  let snap=await get(ref(db,"users/"+u.uid)),data=snap.val()||{};
+  if(data.role==="teacher") showTeacher();
+  else{
     $("auth").style.display="grid";$("shell").style.display="none";
-    populateLoginClasses();
-    return;
   }
-  if(role==="teacher"){
-    showTeacher();
-    return;
-  }
-  const saved=getSavedStudent();
-  if(!saved){
-    await signOut(auth);
-    return;
-  }
-  studentSession=saved;
-  showStudent(saved);
 });
+
+async function loadLoginClasses(){
+  try{
+    const s=await get(ref(db,"classes"));
+    const d=s.val()||{};
+    allClasses=Object.values(d);
+    const sel=$("studentClass");
+    sel.innerHTML='<option value="">— Chọn lớp của em —</option>'+
+      allClasses.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.level?" · "+esc(c.level):""}</option>`).join("");
+  }catch(e){
+    $("studentClass").innerHTML='<option value="">Không tải được danh sách lớp</option>';
+  }
+}
+
+async function findStudentByClassAndCode(classId,code){
+  // Hỗ trợ cả node "students" mới và "users" cũ để không phải xoá database hiện tại.
+  const [ss,us,cs]=await Promise.all([
+    get(ref(db,"students")),
+    get(ref(db,"users")),
+    get(ref(db,"classes/"+classId+"/students"))
+  ]);
+  const candidates=[];
+  Object.values(ss.val()||{}).forEach(x=>candidates.push(x));
+  Object.values(us.val()||{}).forEach(x=>candidates.push(x));
+  Object.values(cs.val()||{}).forEach(x=>candidates.push({...x,classId:x.classId||classId}));
+  const found=candidates.find(x=>
+    x && (x.role==="student" || !x.role) &&
+    String(x.classId||"")===String(classId) &&
+    String(x.code||x.studentCode||"").trim().toUpperCase()===code
+  );
+  if(!found)return null;
+  const cls=allClasses.find(c=>String(c.id)===String(classId));
+  return {
+    uid:found.uid||found.id||("student_"+classId+"_"+code),
+    id:found.id||found.uid||("student_"+classId+"_"+code),
+    name:found.name||found.displayName||"Học sinh",
+    code,
+    classId,
+    className:found.className||cls?.name||""
+  };
+}
+
 async function showStudent(data){
   $("auth").style.display="none";$("shell").style.display="block";
   $("navStudent").classList.remove("hidden");$("navTeacher").classList.add("hidden");
-  $("who").textContent=(data.name||data.studentCode||"Học sinh")+" · "+(data.studentCode||"");
-  $("roleText").textContent="Học sinh · "+(data.className||"Chưa chọn lớp");
+  $("who").textContent=data.name||"Học sinh";
+  $("roleText").textContent=(data.className?"Học sinh · "+data.className:"Học sinh");
   $("classPill").textContent="● "+(data.className||"Online");
   loadStudentStats();loadStudentAssignments();
 }
+
 async function showTeacher(){
-  let snap=await get(ref(db,"users/"+user.uid)),d=snap.val()||{};
   $("auth").style.display="none";$("shell").style.display="block";
   $("navStudent").classList.add("hidden");$("navTeacher").classList.remove("hidden");
-  $("who").textContent=d.name||"Cô Hân";$("roleText").textContent="Giáo viên";
+  $("who").textContent="Cô Hân";$("roleText").textContent="Giáo viên";
   $("classPill").textContent="● Teacher";
   loadTeacherData();
 }
+
 function drawWave(){let w=$("wave");w.innerHTML="";for(let i=0;i<55;i++){let e=document.createElement("i");e.style.setProperty("--h",(8+Math.random()*46)+"px");w.appendChild(e)}}drawWave();
 window.newQuestion=()=>{currentQ=Math.floor(Math.random()*allQuestions.length||starterQuestions.length);renderQuestion()};
 function renderQuestion(){let q=allQuestions[currentQ]||{text:starterQuestions[currentQ%starterQuestions.length][0]};$("question").textContent=q.text;$("qNo").textContent=currentQ+1}
@@ -285,64 +348,61 @@ window.playLast=()=>{if(!audioUrl)return toast("Chưa có bản ghi.");let a=new
 window.submitPractice=async()=>{
  if(!lastBlob)return toast("Hãy ghi âm câu trả lời trước.");
  try{
-  const id=push(ref(db,"submissions")).key,path=`recordings/${user.uid}/${id}.webm`;await uploadBytes(sRef(storage,path),lastBlob,{contentType:"audio/webm"});let url=await getDownloadURL(sRef(storage,path));
-  await set(ref(db,"submissions/"+id),{
-      id,studentId:user.uid,
-      studentCode:studentSession?.studentCode||"",
-      student:studentSession?.name||studentSession?.studentCode||"Học sinh",
-      classId:studentSession?.classId||"",
-      className:studentSession?.className||"",
-      questionId:allQuestions[currentQ]?.id||"starter"+currentQ,
-      question:$("question").textContent,topic:allQuestions[currentQ]?.topic||"Practice",
-      score:null,pronunciation:null,fluency:null,
-      feedback:"Chờ cô Hân chấm.",audioUrl:url,status:"submitted",
-      submittedAt:new Date().toISOString()
-    });
+  const id=push(ref(db,"submissions")).key,studentId=studentProfile?.id||user.uid,path=`recordings/${studentId}/${id}.webm`;await uploadBytes(sRef(storage,path),lastBlob,{contentType:"audio/webm"});let url=await getDownloadURL(sRef(storage,path));
+  await set(ref(db,"submissions/"+id),{id,studentId:studentProfile?.id||user.uid,student:studentProfile?.name||"Học sinh",classId:studentProfile?.classId||"",className:studentProfile?.className||"",assignmentId:null,questionId:allQuestions[currentQ]?.id||"starter"+currentQ,question:$("question").textContent,topic:allQuestions[currentQ]?.topic||"Practice",score:null,pronunciation:null,fluency:null,feedback:"Chờ cô Hân chấm.",audioUrl:url,status:"submitted",submittedAt:new Date().toISOString()});
   toast("Đã nộp bài và lưu vào hệ thống!");loadStudentStats();
  }catch(e){toast("Không thể lưu. Kiểm tra Firebase Database/Storage Rules.")}
 };
-async function loadStudentStats(){
-  let s=await get(ref(db,"submissions"));
-  let rows=Object.values(s.val()||{}).filter(x=>studentSession&&(x.studentCode===studentSession.studentCode&&x.classId===studentSession.classId));
-  let scores=rows.map(x=>+x.score).filter(Number.isFinite);
-  $("sPractices").textContent=rows.length;$("sSubs").textContent=rows.length;
-  $("sBest").textContent=scores.length?Math.max(...scores):"—";
-  let dates=[...new Set(rows.map(x=>(x.submittedAt||"").slice(0,10)))];
-  $("sStreak").textContent=dates.length;
-}
-async function loadStudentAssignments(){
-  let s=await get(ref(db,"assignments"));let d=s.val()||{};
-  allAssignments=Object.values(d).filter(a=>!studentSession||a.classId===studentSession.classId);
-  $("studentAssignments").innerHTML=allAssignments.length?allAssignments.map(a=>`<div class="item"><div class="between"><b>${esc(a.title)}</b><span class="badge">${esc(a.className||"Class")}</span></div><div class="small muted">${esc(a.lesson||"")} · ${a.questionIds?.length||0} câu · ${esc((a.createdAt||"").slice(0,10))}</div><button class="btn primary" style="margin-top:9px" onclick="startAssignment('${esc(a.id)}')">Bắt đầu</button></div>`).join(""):'<div class="empty">Chưa có bài được giao.</div>'}
+async function loadStudentStats(){let s=await get(ref(db,"submissions"));let rows=Object.values(s.val()||{}).filter(x=>x.studentId===(studentProfile?.id||user.uid));let scores=rows.map(x=>+x.score).filter(Number.isFinite);$("sPractices").textContent=rows.length;$("sSubs").textContent=rows.length;$("sBest").textContent=scores.length?Math.max(...scores):"—";let dates=[...new Set(rows.map(x=>(x.submittedAt||"").slice(0,10)))];$("sStreak").textContent=dates.length}
+async function loadStudentAssignments(){let s=await get(ref(db,"assignments"));let d=s.val()||{};allAssignments=Object.values(d).filter(a=>!studentProfile?.classId||a.classId===studentProfile.classId);$("studentAssignments").innerHTML=allAssignments.length?allAssignments.map(a=>`<div class="item"><div class="between"><b>${esc(a.title)}</b><span class="badge">${esc(a.className||"Class")}</span></div><div class="small muted">${esc(a.lesson||"")} · ${a.questionIds?.length||0} câu · ${esc((a.createdAt||"").slice(0,10))}</div><button class="btn primary" style="margin-top:9px" onclick="startAssignment('${esc(a.id)}')">Bắt đầu</button></div>`).join(""):'<div class="empty">Chưa có bài được giao.</div>'}
 window.startAssignment=async id=>{let a=allAssignments.find(x=>x.id===id);if(a&&a.questionIds?.length){let qid=a.questionIds[0],idx=allQuestions.findIndex(q=>q.id===qid);if(idx>=0)currentQ=idx}page("practice");toast("Bắt đầu bài: "+(a?.title||"Assignment"))};
-async function loadStudentHistory(){let s=await get(ref(db,"submissions"));let rows=Object.values(s.val()||{}).filter(x=>studentSession&&(x.studentCode===studentSession.studentCode&&x.classId===studentSession.classId)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));$("studentHistory").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Bài</th><th>Điểm</th><th>Nhận xét</th></tr>${rows.map(x=>`<tr><td>${esc((x.submittedAt||"").replace("T"," ").slice(0,16))}</td><td>${esc(x.question)}</td><td><b>${x.score??"Chờ chấm"}</b></td><td>${esc(x.feedback||"—")}</td></tr>`).join("")}</table>`:'<div class="empty">Chưa có lịch sử.</div>'}
+async function loadStudentHistory(){let s=await get(ref(db,"submissions"));let rows=Object.values(s.val()||{}).filter(x=>x.studentId===(studentProfile?.id||user.uid)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));$("studentHistory").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Bài</th><th>Điểm</th><th>Nhận xét</th></tr>${rows.map(x=>`<tr><td>${esc((x.submittedAt||"").replace("T"," ").slice(0,16))}</td><td>${esc(x.question)}</td><td><b>${x.score??"Chờ chấm"}</b></td><td>${esc(x.feedback||"—")}</td></tr>`).join("")}</table>`:'<div class="empty">Chưa có lịch sử.</div>'}
 
 async function loadTeacherData(){
  let [u,a,s,q,c,h]=await Promise.all([get(ref(db,"users")),get(ref(db,"assignments")),get(ref(db,"submissions")),get(ref(db,"questions")),get(ref(db,"classes")),get(ref(db,"activityHistory"))]);
  let ud=u.val()||{},ad=a.val()||{},sd=s.val()||{},qd=q.val()||{},cd=c.val()||{},hd=h.val()||{};
  allAssignments=Object.values(ad);allSubs=Object.values(sd);allQuestions=Object.values(qd);allClasses=Object.values(cd);allHistory=Object.values(hd);
- let students=Object.values(ud).filter(x=>x.role==="student");
-  const uniqueStudentKeys=[...new Set(allSubs.map(x=>x.studentCode&&x.classId?x.classId+"::"+x.studentCode:null).filter(Boolean))];
-  let studentCount=Math.max(students.length,uniqueStudentKeys.length);
-  let scores=allSubs.map(x=>+x.score).filter(Number.isFinite);
- $("tStudents").textContent=studentCount;$("tAssignments").textContent=allAssignments.length;$("tSubmissions").textContent=allSubs.length;$("tAverage").textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):"—";
- renderClasses();renderQuestionList();renderAssignQuestions();renderAssignClass();renderFilters();renderSubmissions();renderTeacherHistory();await loadQuestions();
+ let students=Object.values(ud).filter(x=>x.role==="student"),scores=allSubs.map(x=>+x.score).filter(Number.isFinite);
+ $("tStudents").textContent=students.length;$("tAssignments").textContent=allAssignments.length;$("tSubmissions").textContent=allSubs.length;$("tAverage").textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):"—";
+ renderClasses();renderStudentClassManage();renderQuestionList();renderAssignQuestions();renderAssignClass();renderFilters();renderSubmissions();renderTeacherHistory();await loadQuestions();
 }
 function renderClasses(){$("classList").innerHTML=allClasses.length?allClasses.map(c=>`<div class="item"><div class="between"><b>${esc(c.name)}</b><span class="badge">${esc(c.level||"")}</span></div><div class="small muted">${esc(c.createdAt||"").slice(0,10)}</div></div>`).join(""):'<div class="empty">Chưa có lớp. Tạo lớp đầu tiên.</div>'}
 function renderAssignClass(){$("aClass").innerHTML=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}
 function renderFilters(){let opts=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");$("filterClass").innerHTML='<option value="">Tất cả</option>'+opts}
 window.createClass=async()=>{let name=$("newClassName").value.trim();if(!name)return toast("Nhập tên lớp.");let id=push(ref(db,"classes")).key;await set(ref(db,"classes/"+id),{id,name,level:$("newClassLevel").value.trim(),teacherId:user.uid,createdAt:new Date().toISOString()});await logActivity("create_class",{classId:id,name});closeModal("classModal");loadTeacherData();toast("Đã tạo lớp.")};
+window.createStudent=async()=>{
+  const name=$("newStudentName").value.trim(),classId=$("studentClassManage").value,code=$("newStudentCode").value.trim().toUpperCase();
+  if(!name)return toast("Nhập tên học sinh.");
+  if(!classId)return toast("Chọn lớp.");
+  if(!code)return toast("Nhập mã đăng nhập.");
+  const snap=await get(ref(db,"students"));
+  const existing=Object.values(snap.val()||{}).find(x=>String(x.classId)===String(classId)&&String(x.code||"").toUpperCase()===code);
+  if(existing)return toast("Mã này đã có trong lớp.");
+  const c=allClasses.find(x=>x.id===classId),id=push(ref(db,"students")).key;
+  const obj={id,name,code,classId,className:c?.name||"",role:"student",createdAt:new Date().toISOString(),createdBy:user.uid};
+  await set(ref(db,"students/"+id),obj);
+  await logActivity("create_student",obj);
+  closeModal("studentModal");
+  $("newStudentName").value="";$("newStudentCode").value="";
+  loadTeacherData();loadLoginClasses();toast("Đã thêm học sinh. Em ấy đăng nhập bằng lớp + mã.");
+};
+
+function renderStudentClassManage(){
+  const el=$("studentClassManage"); if(!el)return;
+  el.innerHTML=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
+}
+
 window.createQuestion=async()=>{let text=$("newQuestion").value.trim();if(!text)return toast("Nhập câu hỏi.");let id=push(ref(db,"questions")).key;await set(ref(db,"questions/"+id),{id,text,topic:$("newTopic").value.trim()||"General",createdBy:user.uid,createdAt:new Date().toISOString()});await logActivity("create_question",{questionId:id,text});closeModal("questionModal");loadTeacherData();toast("Đã thêm câu hỏi.")};
 window.createAssignment=async()=>{let ids=[...document.querySelectorAll(".qcheck:checked")].map(x=>x.value),cid=$("aClass").value;if(!cid||!ids.length)return toast("Chọn lớp và ít nhất 1 câu.");let c=allClasses.find(x=>x.id===cid),id=push(ref(db,"assignments")).key,obj={id,title:$("aTitle").value.trim()||"Speaking Assignment",classId:cid,className:c?.name||"",lesson:$("aLesson").value.trim(),questionIds:ids,teacherId:user.uid,createdAt:new Date().toISOString()};await set(ref(db,"assignments/"+id),obj);await logActivity("create_assignment",obj);toast("Đã giao bài.");loadTeacherData()};
-function renderSubmissions(){let cls=$("filterClass").value,lesson=$("filterLesson").value.toLowerCase(),date=$("filterDate").value;let rows=allSubs.filter(x=>(!cls||x.classId===cls||allAssignments.some(a=>a.id===x.assignmentId&&a.classId===cls))&&(!lesson||(x.topic||"").toLowerCase().includes(lesson)||(x.question||"").toLowerCase().includes(lesson))&&(!date||(x.submittedAt||"").slice(0,10)>=date)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));$("submissionList").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Học sinh</th><th>Lớp</th><th>Bài học</th><th>Điểm</th><th></th></tr>${rows.map(x=>`<tr><td>${esc((x.submittedAt||"").replace("T"," ").slice(0,16))}</td><td><b>${esc(x.student||x.studentCode||"")}</b><div class="small muted">${esc(x.studentCode||"")}</div></td><td>${esc(x.className||"")}</td><td>${esc(x.topic||"")}</td><td>${x.score??"—"}</td><td><button class="btn secondary" onclick="openGrade('${esc(x.id)}')">Xem / chấm</button></td></tr>`).join("")}</table>`:'<div class="empty">Không có bài phù hợp.</div>'}
-window.openGrade=async id=>{selectedSubmission=allSubs.find(x=>x.id===id);if(!selectedSubmission)return;$("gradeInfo").innerHTML=`<div class="item"><b>${esc(selectedSubmission.student||selectedSubmission.studentCode||"")}</b><div class="small muted">${esc(selectedSubmission.studentCode||"")} · ${esc(selectedSubmission.className||"")}<br>${esc(selectedSubmission.question)}</div>${selectedSubmission.audioUrl?`<audio controls style="width:100%;margin-top:10px" src="${esc(selectedSubmission.audioUrl)}"></audio>`:""}</div>`;$("gradeScore").value=selectedSubmission.score??"";$("gradePron").value=selectedSubmission.pronunciation??"";$("gradeFlu").value=selectedSubmission.fluency??"";$("gradeFeedback").value=selectedSubmission.feedback||"";openModal("gradeModal")};
+function renderSubmissions(){let cls=$("filterClass").value,lesson=$("filterLesson").value.toLowerCase(),date=$("filterDate").value;let rows=allSubs.filter(x=>(!cls||x.classId===cls||allAssignments.some(a=>a.id===x.assignmentId&&a.classId===cls))&&(!lesson||(x.topic||"").toLowerCase().includes(lesson)||(x.question||"").toLowerCase().includes(lesson))&&(!date||(x.submittedAt||"").slice(0,10)>=date)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));$("submissionList").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Học sinh</th><th>Bài học</th><th>Điểm</th><th></th></tr>${rows.map(x=>`<tr><td>${esc((x.submittedAt||"").replace("T"," ").slice(0,16))}</td><td><b>${esc(x.student)}</b></td><td>${esc(x.topic||"")}</td><td>${x.score??"—"}</td><td><button class="btn secondary" onclick="openGrade('${esc(x.id)}')">Xem / chấm</button></td></tr>`).join("")}</table>`:'<div class="empty">Không có bài phù hợp.</div>'}
+window.openGrade=async id=>{selectedSubmission=allSubs.find(x=>x.id===id);if(!selectedSubmission)return;$("gradeInfo").innerHTML=`<div class="item"><b>${esc(selectedSubmission.student)}</b><div class="small muted">${esc(selectedSubmission.question)}</div>${selectedSubmission.audioUrl?`<audio controls style="width:100%;margin-top:10px" src="${esc(selectedSubmission.audioUrl)}"></audio>`:""}</div>`;$("gradeScore").value=selectedSubmission.score??"";$("gradePron").value=selectedSubmission.pronunciation??"";$("gradeFlu").value=selectedSubmission.fluency??"";$("gradeFeedback").value=selectedSubmission.feedback||"";openModal("gradeModal")};
 window.saveGrade=async()=>{if(!selectedSubmission)return;let patch={score:+$("gradeScore").value,pronunciation:+$("gradePron").value,fluency:+$("gradeFlu").value,feedback:$("gradeFeedback").value.trim(),status:"graded",gradedAt:new Date().toISOString(),gradedBy:user.uid};await update(ref(db,"submissions/"+selectedSubmission.id),patch);await logActivity("grade_submission",{submissionId:selectedSubmission.id,student:selectedSubmission.student,...patch});closeModal("gradeModal");toast("Đã lưu điểm và nhận xét.");loadTeacherData()};
 function renderTeacherHistory(){let rows=allHistory.sort((a,b)=>(b.at||"").localeCompare(a.at||""));$("teacherHistory").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Hoạt động</th><th>Chi tiết</th></tr>${rows.map(x=>`<tr><td>${esc((x.at||"").replace("T"," ").slice(0,16))}</td><td>${esc(x.type)}</td><td class="small">${esc(JSON.stringify(x.details||{}))}</td></tr>`).join("")}</table>`:'<div class="empty">Chưa có lịch sử.</div>'}
 async function logActivity(type,details){let id=push(ref(db,"activityHistory")).key;await set(ref(db,"activityHistory/"+id),{id,type,details,teacherId:user.uid,at:new Date().toISOString()})}
 window.openModal=id=>$(id).classList.add("show");window.closeModal=id=>$(id).classList.remove("show");
 window.renderSubmissions=renderSubmissions;
 loadQuestions();
-populateLoginClasses();
+ensureAnonymousAuth().then(loadLoginClasses).catch(()=>loadLoginClasses());
 </script>
 </body>
 </html>
