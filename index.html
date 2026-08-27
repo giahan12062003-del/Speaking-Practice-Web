@@ -132,7 +132,7 @@ input[type="date"]{color-scheme:dark}
     <div class="auth-sub">Chọn đúng khu vực để vào hệ thống. Học sinh dùng lớp + mã; giáo viên dùng mã riêng của cô.</div>
     <div class="tabs"><button id="studentTab" class="active" type="button" onclick="window.showStudentLoginPanel()">👧 Học sinh<br><span class="small muted">Chọn lớp + mã học sinh</span></button><button id="teacherTab" type="button" onclick="window.showTeacherLoginPanel()">👩🏻‍🏫 Giáo viên<br><span class="small muted">Đăng nhập khu vực quản lý</span></button></div>
     <div id="studentLoginPanel">
-      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="">Đang tải lớp…</option></select></div>
+      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="demo-class">Lớp mẫu · Thử giao diện</option></select></div>
       <div class="field"><label>🔑 Mã học sinh</label><input id="studentCode" autocomplete="off" placeholder="Ví dụ: K01"></div>
       <button id="loginBtn" class="btn primary" style="width:100%;margin-top:8px">Vào phòng Speaking</button>
       <div id="authError" class="status" role="status" aria-live="polite"></div>
@@ -280,6 +280,30 @@ input[type="date"]{color-scheme:dark}
 <div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><div><h2 style="margin:0">Chấm / chỉnh sửa bài</h2><div class="small muted" style="margin-top:5px">Có thể mở lại bài cũ để sửa điểm và nhận xét.</div></div><button class="btn secondary" onclick="closeModal('gradeModal')">Đóng</button></div><div id="gradeInfo" style="margin-top:14px"></div><div class="info-grid"><div class="field"><label>Điểm tổng /100</label><input id="gradeScore" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation /100</label><input id="gradePron" type="number" min="0" max="100"></div><div class="field"><label>Fluency /100</label><input id="gradeFlu" type="number" min="0" max="100"></div></div><div class="field"><label>Nhận xét</label><textarea id="gradeFeedback" rows="5" placeholder="Nhận xét cho học sinh..."></textarea></div><button id="saveGradeBtn" class="btn primary" onclick="saveGrade()">Lưu điểm & nhận xét</button><div id="gradeSaveStatus" class="save-status"></div></div></div>
 <div id="toast" class="toast"></div>
 
+<script>
+(function fastStudentClassInit(){
+  function apply(){
+    const sel=document.getElementById('studentClass');
+    if(!sel) return;
+    try {
+      const raw=localStorage.getItem('ms_classes_v6');
+      const data=raw?JSON.parse(raw):{};
+      const arr=Object.values(data||{}).filter(x=>x && x.id);
+      const items=arr.length?arr:[{id:'demo-class',name:'Lớp mẫu',level:'Thử giao diện'}];
+      sel.innerHTML='<option value="">— Chọn lớp của em —</option>'+items.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''))).map(c=>`<option value="${String(c.id).replace(/"/g,'&quot;')}">${String(c.name||'Lớp').replace(/[&<>]/g,'')}</option>`).join('');
+      sel.disabled=false;
+      sel.dataset.ready='1';
+    } catch(e){
+      sel.innerHTML='<option value="demo-class">Lớp mẫu · Thử giao diện</option>';
+      sel.disabled=false;
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true});
+  else apply();
+  setTimeout(apply,50);
+  setTimeout(apply,500);
+})();
+</script>
 <script>
 (() => {
 'use strict';
@@ -832,7 +856,7 @@ function wire(){
  document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
 }
 function boot(){try{wire();renderWave('wave');renderWave('mockWave');if($('mockBlueprint'))renderMockBlueprint();showAuth();loadLoginClasses()}catch(e){console.error('BOOT',e);showAuth();const sel=$('studentClass');if(sel){sel.innerHTML='<option value="demo-class">Lớp mẫu</option>';sel.disabled=false}setStatus('loginStatus','✅ Màn hình đăng nhập đã sẵn sàng.','ok')}}
-window.addEventListener('load',boot);
+window.addEventListener('load',boot); if(document.readyState==='complete') setTimeout(boot,0); else if(document.readyState!=='loading') setTimeout(boot,0);
 })();
 </script>
 </body>
