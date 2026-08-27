@@ -2,407 +2,280 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MS HÂN CLASS · Speaking Room</title>
 <style>
 :root{
-  --bg:#090b18;--surface:#11152a;--surface2:#171c35;--line:#292f52;
-  --purple:#8b5cf6;--purple2:#a78bfa;--blue:#4f7cff;--cyan:#5ee7ff;
-  --text:#f5f5ff;--muted:#9ca4c2;--good:#5ee1a2;--warn:#ffd166;--bad:#ff718d
+  --bg:#070613;--surface:#111027;--surface2:#171435;--line:#2b2550;--purple:#8b5cf6;--purple2:#b18cff;--purple3:#21184a;
+  --text:#f7f4ff;--muted:#aaa3c5;--good:#5ee1a2;--warn:#ffd166;--bad:#ff718d;--shadow:0 22px 70px rgba(83,48,170,.28)
 }
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:
-radial-gradient(circle at 85% -10%,#402c78 0,transparent 34%),var(--bg);color:var(--text)}
-button,input,textarea,select{font:inherit}button{cursor:pointer}
-.hidden{display:none!important}.app{min-height:100vh}.auth{min-height:100vh;display:grid;place-items:center;padding:24px}
-.authbox{width:min(430px,100%);background:#11152aee;border:1px solid #343b62;border-radius:24px;padding:30px;box-shadow:0 25px 90px #0008}
-.logo{font-weight:800;letter-spacing:.02em}.logo span{color:var(--purple2)}.tag{font-size:12px;color:var(--muted);margin-top:4px}
-.auth h1{font-size:26px;margin:30px 0 8px}.tabs{display:grid;grid-template-columns:1fr 1fr;background:#0b0e1e;padding:4px;border-radius:12px;margin:20px 0}
-.tabs button{border:0;background:transparent;color:var(--muted);padding:10px;border-radius:9px}.tabs button.active{background:#2b2250;color:#fff}
-.field{display:grid;gap:7px;margin:13px 0}.field label{font-size:13px;color:#c3c9df}.field input,.field textarea,.field select{
-width:100%;padding:12px 13px;border-radius:11px;border:1px solid #30375d;background:#0c1021;color:#fff;outline:none}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--purple)}
-.btn{border:0;border-radius:11px;padding:11px 15px;font-weight:650}.primary{background:linear-gradient(135deg,var(--purple),#6f6bff);color:white}.secondary{background:#191f39;color:#e9ebfa;border:1px solid #30385f}.danger{background:#351b2a;color:#ffb4c4;border:1px solid #633148}
-.small{font-size:12px}.muted{color:var(--muted)}.error{color:#ff9ab0;font-size:13px;min-height:20px}
-.shell{display:none;min-height:100vh}.side{position:fixed;inset:0 auto 0 0;width:245px;background:#0c1020e8;border-right:1px solid #242b4b;padding:24px 15px;z-index:10}
-.side .logo{padding:0 10px 20px}.nav{display:grid;gap:5px;margin-top:16px}.nav button{border:0;background:transparent;color:#aeb6d3;text-align:left;padding:12px 13px;border-radius:11px}.nav button:hover,.nav button.active{background:#241c46;color:#fff}
-.usercard{position:absolute;bottom:18px;left:15px;right:15px;padding:12px;border:1px solid #282f51;border-radius:13px;background:#11162b}
-.main{margin-left:245px;padding:25px;max-width:1500px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}
-.page{display:none}.page.active{display:block}.hero{padding:25px;border:1px solid #30375c;border-radius:22px;background:linear-gradient(135deg,#1a1839e8,#10152ae8)}
-.hero h1{font-size:28px;margin:0 0 7px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:15px}.card{background:#12172be8;border:1px solid #272f51;border-radius:16px;padding:18px}.stat .num{font-size:26px;font-weight:750;margin-top:8px}.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.action{text-align:left;background:#151a31;border:1px solid #2b3357;color:#fff;border-radius:14px;padding:17px}.action:hover{border-color:#7657d9;background:#1b1b3b}
-.question{font-size:27px;line-height:1.35;margin:22px 0}.pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:#241b43;color:#cfc3ff;font-size:11px;border:1px solid #3b2c69}
-.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;align-items:center;gap:12px}.wave{height:55px;display:flex;align-items:center;gap:3px;margin:10px 0}.wave i{width:3px;background:linear-gradient(#8b5cf6,#5ee7ff);border-radius:8px;height:var(--h)}
-.mic{width:68px;height:68px;border:0;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#5c6dff);color:#fff;font-size:27px;box-shadow:0 12px 35px #7557dc55}.recording{animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 10px #8b5cf622,0 0 35px #8b5cf688}}
-.range{accent-color:var(--purple)}
-.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:11px 8px;border-bottom:1px solid #272e50;text-align:left}.table th{color:#929bb9;font-weight:600}.badge{padding:5px 8px;border-radius:999px;font-size:11px;background:#202741;color:#bdc6e2}.good{color:var(--good)}.score{font-size:40px;font-weight:800}.bar{height:7px;background:#242b48;border-radius:8px;overflow:hidden;margin-top:7px}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan))}
-.split{display:grid;grid-template-columns:1.2fr .8fr;gap:15px}.list{display:grid;gap:8px}.item{padding:12px;border:1px solid #282f51;border-radius:11px;background:#10152a}.click{cursor:pointer}.empty{padding:30px;text-align:center;color:var(--muted)}
-.modal{position:fixed;inset:0;background:#03040a99;display:none;place-items:center;padding:20px;z-index:30}.modal.show{display:grid}.modalbox{width:min(650px,100%);max-height:90vh;overflow:auto;background:#12172c;border:1px solid #343b62;border-radius:20px;padding:22px}
-.toast{position:fixed;right:22px;bottom:22px;padding:13px 16px;border:1px solid #3c4770;border-radius:12px;background:#171e38;display:none;z-index:50}
-@media(max-width:900px){.side{width:70px}.side .logo,.side .usercard,.nav span{display:none}.main{margin-left:70px}.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.main{padding:15px}.grid,.actions,.split{grid-template-columns:1fr}.top{align-items:flex-start}.question{font-size:23px}}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% -10%,#39206f 0,transparent 30%),radial-gradient(circle at 0% 100%,#171038 0,transparent 28%),var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.auth{min-height:100vh;display:grid;place-items:center;padding:28px;background:radial-gradient(circle at 85% 10%,#3b2377 0,transparent 30%),radial-gradient(circle at 10% 90%,#241549 0,transparent 26%),#070613}
+.authbox{width:min(510px,100%);background:#111027e8;backdrop-filter:blur(10px);border:1px solid #342d5d;border-radius:30px;padding:34px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:grid;place-items:center;color:#fff;font-size:23px;box-shadow:0 12px 28px rgba(139,92,246,.28)}.logo{font-weight:850;letter-spacing:.02em;font-size:18px}.logo span{color:var(--purple)}.tag{font-size:12px;color:var(--muted);margin-top:3px}
+.auth h1{font-size:30px;line-height:1.2;margin:30px 0 7px}.auth-sub{color:var(--muted);line-height:1.7;font-size:14px;margin-bottom:22px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.tabs button{border:1px solid #342d5d;background:linear-gradient(180deg,#17142f,#110f25);color:#c7bfdf;padding:14px 12px;border-radius:15px;font-weight:800;text-align:left;min-height:66px;box-shadow:0 5px 18px rgba(86,63,151,.06)}.tabs button::first-line{font-size:14px}.tabs button.active{background:linear-gradient(135deg,#24174d,#17112e);color:var(--purple);border-color:#6f4bd8;box-shadow:0 8px 22px rgba(118,87,232,.13)}
+.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:13px;font-weight:650;color:#cbc4dd}.field input,.field textarea,.field select{width:100%;padding:13px 14px;border-radius:13px;border:1px solid #332c58;background:#111027;color:var(--text);outline:0;transition:.2s}.field input:focus,.field textarea:focus,.field select:focus{border-color:#a28af0;box-shadow:0 0 0 4px #8b5cf622}
+.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:750;transition:.18s}.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}.primary{background:linear-gradient(135deg,var(--purple),#8d6af6);color:#fff;box-shadow:0 10px 24px #7657e82b}.secondary{background:#111027;color:#554d71;border:1px solid #332c58}.soft{background:#21184a;color:#c0a8ff;border:1px solid #4a3976}.danger{background:#1110270f3;color:#ff9db4;border:1px solid #6a2947}.success{background:#102e24;color:#70e3ae;border:1px solid #275f49}
+.small{font-size:12px}.muted{color:var(--muted)}.note{margin-top:15px;text-align:center;color:#9289ad;font-size:11px;line-height:1.6}.status{min-height:21px;margin-top:10px;font-size:12px;text-align:center}.status.ok{color:var(--good)}.status.bad{color:var(--bad)}.status.warn{color:var(--warn)}.teacher-link{display:block;margin:14px auto 0;border:0;background:none;color:#7761d9;font-size:12px;padding:3px}.teacher-link:hover{text-decoration:underline}
+.shell{display:none;min-height:100vh}.side{position:fixed;inset:0 auto 0 0;width:248px;background:#111027afebf;backdrop-filter:blur(10px);border-right:1px solid #2b2550;padding:24px 15px;z-index:10}.side .brand{padding:0 9px 20px}.nav{display:grid;gap:6px;margin-top:10px}.nav button{border:1px solid transparent;background:transparent;color:#b1a9c9;text-align:left;padding:11px 12px;border-radius:12px}.nav button:hover,.nav button.active{background:#21184a;color:#c7b4ff;border-color:#4a3976}.nav-title{font-size:10px;color:#aaa3bd;letter-spacing:.09em;text-transform:uppercase;padding:10px 12px 4px}.usercard{position:absolute;bottom:16px;left:15px;right:15px;padding:13px;border:1px solid #2d2750;border-radius:14px;background:#111027}.usercard .name{font-size:13px;font-weight:800}.main{margin-left:248px;padding:28px;max-width:1650px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.page{display:none}.page.active{display:block}.hero{padding:28px;border:1px solid #e4dcf6;border-radius:24px;background:linear-gradient(135deg,#14112b 0%,#1c1540 100%);box-shadow:0 14px 40px #6f52c10d}.hero h1{margin:0 0 8px;font-size:30px}.hero-sub{max-width:760px;color:var(--muted);line-height:1.7}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:15px}.card{background:#111027;border:1px solid #2d2750;border-radius:18px;padding:19px;box-shadow:0 8px 30px #6f52c10a}.stat .num{font-size:28px;font-weight:850;margin-top:8px;color:#4f3aa6}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.action{text-align:left;background:#111027;border:1px solid #312a55;color:var(--text);border-radius:16px;padding:17px}.action:hover{border-color:#6c4fd6;box-shadow:0 10px 28px rgba(123,88,225,.18)}.action .icon{font-size:23px;margin-bottom:10px}.split{display:grid;grid-template-columns:1.1fr .9fr;gap:15px}.list{display:grid;gap:10px}.item{padding:13px;border:1px solid #2d2750;border-radius:13px;background:#111027}.between{display:flex;justify-content:space-between;align-items:center;gap:12px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:#24194d;color:#c0a8ff;font-size:11px;border:1px solid #4a3976}.badge{padding:5px 9px;border-radius:999px;font-size:11px;background:#201a38;color:#a9a2bf}.score{font-size:42px;font-weight:900;color:#5b45bd}.bar{height:8px;background:#2a2447;border-radius:999px;overflow:hidden;margin-top:7px}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--purple),#9b7cff)}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:12px 9px;border-bottom:1px solid #292345;text-align:left;vertical-align:top}.table th{color:#aaa2bd;font-weight:700}.empty{padding:32px;text-align:center;color:var(--muted)}.question{font-size:30px;line-height:1.4;margin:18px 0}.wave{height:58px;display:flex;align-items:center;gap:3px;margin:10px 0}.wave i{width:3px;background:linear-gradient(#8a6af4,#bdabff);border-radius:8px;height:var(--h)}.mic{width:74px;height:74px;border:0;border-radius:50%;background:linear-gradient(135deg,var(--purple),#8f72ff);color:#fff;font-size:29px;box-shadow:0 14px 30px #7657e82b}.recording{animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 12px #8b5cf622,0 0 36px #8b5cf655}}.range{accent-color:var(--purple)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}.filterbar{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px}.save-status{min-height:22px;margin-top:10px;font-size:12px}.save-status.ok{color:var(--good)}.save-status.bad{color:var(--bad)}.save-status.warn{color:var(--warn)}.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.student-row{display:grid;grid-template-columns:1.5fr .9fr .9fr auto;gap:10px;align-items:center}
+.notice{padding:12px 14px;border:1px solid #3c3266;border-radius:12px;background:#0e0c1f;color:#b8afcf;font-size:12px;line-height:1.6}.success-card{padding:16px;border:1px solid #285e49;border-radius:14px;background:#10261f}.feedback-box{padding:15px;border:1px solid #e7def7;border-radius:14px;background:#121027;margin-top:14px}.feedback-box h4{margin:0 0 8px}.tag-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(3,2,10,.72);backdrop-filter:blur(3px);display:none;place-items:center;padding:20px;z-index:30}.modal.show{display:grid}.modalbox{width:min(760px,100%);max-height:92vh;overflow:auto;background:#111027;border:1px solid #e5ddf6;border-radius:22px;padding:22px;box-shadow:0 30px 90px #2a175c33}.toast{position:fixed;right:20px;bottom:20px;padding:13px 16px;border:1px solid #3a3264;border-radius:13px;background:#111027;display:none;z-index:50;max-width:420px;box-shadow:0 16px 40px #3a24611f}.toast.ok{border-color:#285e49}.toast.bad{border-color:#6a2947}
+.test-step{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}.step-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#241e3f;color:#a79ebe;font-size:12px;font-weight:800}.step-dot.active{background:#7657e8;color:#fff}.step-dot.done{background:#133c2d;color:#70e3ae}.result-big{font-size:52px;font-weight:900;color:#5b45bd}.rubric{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rubric .item{background:#131027}.mock-card{background:linear-gradient(135deg,#18132f,#251955);border-color:#513c90}
+@media(max-width:1050px){.side{width:75px}.side .brand-text,.side .usercard,.nav span,.nav-title{display:none}.main{margin-left:75px}.grid{grid-template-columns:repeat(2,1fr)}.actions{grid-template-columns:1fr 1fr}.filterbar{grid-template-columns:1fr 1fr}.student-row{grid-template-columns:1fr 1fr auto}.split{grid-template-columns:1fr}}
+@media(max-width:650px){.main{padding:15px}.grid,.actions,.info-grid,.rubric,.filterbar{grid-template-columns:1fr}.student-row{grid-template-columns:1fr}.question{font-size:24px}.top{align-items:flex-start}.authbox{padding:24px;border-radius:23px}}
+
+/* Level & mock-test enhancements */
+.level-toolbar{display:grid;grid-template-columns:1fr 220px;gap:12px;margin:14px 0}
+.level-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+.level-chip{border:1px solid #ddd2fa;background:#0e0c1f;color:#5b45bd;border-radius:12px;padding:10px 12px;text-align:center;font-weight:750;cursor:pointer}
+.level-chip.active{background:#7657e8;color:#fff;border-color:#7657e8}
+.mock-builder{display:grid;grid-template-columns:1fr 1.2fr;gap:16px}
+.mock-preview{background:linear-gradient(145deg,#fbf9ff,#f1ecff);border:1px solid #ddd2fa;border-radius:16px;padding:16px}
+.q-pick{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid #342d5d;border-radius:12px;background:#111027}
+.q-pick input{margin-top:3px}.q-meta{font-size:11px;color:#7d75a2;margin-top:4px}
+.mock-list{display:grid;gap:10px;margin-top:14px}.mock-list .item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+@media(max-width:900px){.mock-builder{grid-template-columns:1fr}.level-grid{grid-template-columns:repeat(2,1fr)}.level-toolbar{grid-template-columns:1fr}}
+
+
+select option{background:#111027;color:#f7f4ff}
+input[type="date"]{color-scheme:dark}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0a0914}
+::-webkit-scrollbar-thumb{background:#33275e;border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:#5a43a0}
 </style>
 </head>
 <body>
 
 <div id="auth" class="auth">
   <div class="authbox">
-    <div class="logo">MS <span>HÂN</span> CLASS</div><div class="tag">Speaking Practice Room</div>
-    <h1 id="authTitle">Đăng nhập</h1>
-    <div class="tabs"><button id="studentTab" class="active" onclick="setAuthRole('student')">👧 Học sinh</button><button id="teacherTab" onclick="setAuthRole('teacher')">👩🏻‍🏫 Giáo viên</button></div>
-
-    <div id="studentLoginFields">
-      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="">Đang tải danh sách lớp...</option></select></div>
+    <div class="brand"><div class="brand-mark">🎤</div><div><div class="logo">MS <span>HÂN</span> CLASS</div><div class="tag">Speaking Practice Room</div></div></div>
+    <h1>Đăng nhập vào Speaking Room ✨</h1>
+    <div class="auth-sub">Chọn đúng khu vực để vào hệ thống. Học sinh dùng lớp + mã; giáo viên dùng mã riêng của cô.</div>
+    <div class="tabs"><button id="studentTab" class="active" type="button" onclick="window.showStudentLoginPanel()">👧 Học sinh<br><span class="small muted">Chọn lớp + mã học sinh</span></button><button id="teacherTab" type="button" onclick="window.showTeacherLoginPanel()">👩🏻‍🏫 Giáo viên<br><span class="small muted">Đăng nhập khu vực quản lý</span></button></div>
+    <div id="studentLoginPanel">
+      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="">Đang tải lớp…</option></select></div>
       <div class="field"><label>🔑 Mã học sinh</label><input id="studentCode" autocomplete="off" placeholder="Ví dụ: K01"></div>
-      <div class="small muted">Chỉ cần chọn lớp và nhập mã cô Hân cấp. Không cần email hay mật khẩu.</div>
+      <button id="loginBtn" class="btn primary" style="width:100%;margin-top:8px">Vào phòng Speaking</button>
+      <div id="authError" class="status" role="status" aria-live="polite"></div>
+      <div id="loginStatus" class="status" role="status" aria-live="polite"></div>
+      <div class="note">Phụ huynh: chọn đúng lớp và nhập mã đăng nhập cô Hân cung cấp cho bé.</div><button type="button" class="teacher-link" id="goTeacherLogin" onclick="window.showTeacherLoginPanel()">👩🏻‍🏫 Đăng nhập giáo viên</button>
     </div>
-
-    <div id="teacherLoginFields" class="hidden">
-      <div class="field"><label>🔐 Mật khẩu giáo viên</label><input id="teacherPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu cô Hân"></div>
-      <div class="small muted">Nhập mật khẩu cô Hân để vào khu vực giáo viên.</div>
+    <div id="teacherLoginPanel" class="hidden">
+      <div class="notice"><b>Khu vực giáo viên</b><br><span class="small muted">Dùng mã giáo viên để quản lý lớp, học sinh, bài giao, chấm điểm và lịch sử.</span></div>
+      <div class="field"><label>Mã giáo viên</label><input id="teacherPassword" type="password" autocomplete="current-password" placeholder="Nhập mã giáo viên"></div>
+      <button id="teacherLoginBtn" class="btn primary" style="width:100%" type="button" onclick="window.teacherLoginNow()">Vào trang giáo viên</button>
+      <div id="teacherError" class="status bad" role="status" aria-live="polite"></div>
+      <div class="note">Khi vào được trang quản lý, cô có thể tạo lớp, thêm học sinh, giao bài và xem lịch sử chấm.</div>
     </div>
-
-    <button class="btn primary" style="width:100%;margin-top:16px" onclick="submitAuth()">Đăng nhập</button>
-    <div id="authError" class="error"></div>
-    <div class="small muted" style="margin-top:10px">Học sinh đăng nhập bằng <b>lớp + mã</b>. Giáo viên đăng nhập bằng <b>mật khẩu</b>.</div>
+    <div id="firebaseMiniStatus" class="small muted" style="margin-top:12px;text-align:center"></div>
   </div>
 </div>
 
 <div id="shell" class="shell">
 <aside class="side">
-  <div class="logo">MS <span>HÂN</span> CLASS<div class="tag">Speaking Room</div></div>
-  <div class="nav" id="navStudent">
-    <button class="active" onclick="page('dashboard',this)">🏠 <span>Dashboard</span></button>
-    <button onclick="page('practice',this)">🎤 <span>Luyện Speaking</span></button>
+  <div class="brand"><div class="brand-mark">🎤</div><div class="brand-text"><div class="logo">MS <span>HÂN</span> CLASS</div><div class="tag">Speaking Room</div></div></div>
+  <div id="navStudent" class="nav">
+    <button class="active" onclick="page('dashboard',this)">🏠 <span>Trang chủ</span></button>
+    <button onclick="page('practice',this)">🎤 <span>Luyện nói</span></button>
+    <button onclick="page('mockTest',this)">🧪 <span>Mock Test</span></button>
     <button onclick="page('assignments',this)">📝 <span>Bài được giao</span></button>
     <button onclick="page('history',this)">🕘 <span>Lịch sử</span></button>
   </div>
-  <div class="nav hidden" id="navTeacher">
+  <div id="navTeacher" class="nav hidden">
+    <div class="nav-title">Quản lý lớp</div>
     <button class="active" onclick="page('tdashboard',this)">🏠 <span>Tổng quan</span></button>
     <button onclick="page('classes',this)">👥 <span>Lớp học</span></button>
+    <button onclick="page('students',this)">🧒 <span>Học sinh</span></button>
     <button onclick="page('questions',this)">📚 <span>Ngân hàng câu hỏi</span></button>
+    <button onclick="page('mockBuilder',this)">🧪 <span>Tạo Mock Test</span></button>
     <button onclick="page('assign',this)">📝 <span>Giao bài</span></button>
-    <button onclick="page('submissions',this)">🎤 <span>Bài học sinh nộp</span></button>
+    <div class="nav-title">Theo dõi</div>
+    <button onclick="page('submissions',this)">🎤 <span>Bài nộp & Chấm</span></button>
+    <button onclick="page('reports',this)">📊 <span>Báo cáo</span></button>
     <button onclick="page('historyTeacher',this)">🕘 <span>Lịch sử</span></button>
   </div>
-  <div class="usercard"><div id="who" style="font-size:13px;font-weight:700">—</div><div id="roleText" class="small muted">—</div><button class="btn secondary" style="width:100%;margin-top:9px" onclick="logout()">Đăng xuất</button></div>
+  <div class="usercard"><div id="who" class="name">—</div><div id="roleText" class="small muted">—</div><button class="btn secondary" style="width:100%;margin-top:9px" onclick="logout()">Đăng xuất</button></div>
 </aside>
-
 <main class="main">
-<div class="top"><div><b id="pageTitle">Dashboard</b><div class="small muted">MS HÂN CLASS · Speaking Practice Room</div></div><div class="pill" id="classPill">● Online</div></div>
+<div class="top"><div><b id="pageTitle">Trang chủ</b><div class="small muted">MS HÂN CLASS · Speaking Practice Room</div></div><div class="pill" id="classPill">● Ready</div></div>
 
 <section id="dashboard" class="page active">
- <div class="hero"><h1>👋 Chào em!</h1><div class="muted">Luyện phản xạ, nói rõ hơn và theo dõi tiến bộ của mình.</div>
-  <div class="actions"><button class="action" onclick="page('practice')"><b>🎯 Luyện ngay</b><div class="small muted">Câu hỏi phản xạ ngẫu nhiên</div></button><button class="action" onclick="page('assignments')"><b>📝 Bài được giao</b><div class="small muted">Xem bài cô Hân giao</div></button></div>
- </div>
- <div class="grid"><div class="card stat"><div class="muted">🔥 Chuỗi luyện</div><div class="num" id="sStreak">0</div></div><div class="card stat"><div class="muted">🎤 Lượt luyện</div><div class="num" id="sPractices">0</div></div><div class="card stat"><div class="muted">⭐ Điểm cao nhất</div><div class="num" id="sBest">—</div></div><div class="card stat"><div class="muted">📤 Đã nộp</div><div class="num" id="sSubs">0</div></div></div>
+  <div class="hero"><div class="pill">🌷 Student Space</div><h1>Xin chào <span id="studentHello">em</span>!</h1><div class="hero-sub">Em có thể luyện nói tự do, làm Mock Test, hoàn thành bài cô giao và xem điểm + nhận xét sau mỗi lần làm.</div><div class="actions"><button class="action" onclick="page('practice')"><div class="icon">🎯</div><b>Luyện nói ngay</b><div class="small muted">Câu hỏi luyện phản xạ</div></button><button class="action" onclick="page('mockTest')"><div class="icon">🧪</div><b>Mock Test</b><div class="small muted">Làm một bài test 5 câu</div></button><button class="action" onclick="page('assignments')"><div class="icon">📝</div><b>Bài cô giao</b><div class="small muted">Xem bài theo lớp</div></button></div></div>
+  <div class="grid"><div class="card stat"><div class="muted">🎤 Lượt luyện</div><div class="num" id="sPractices">0</div></div><div class="card stat"><div class="muted">📤 Đã nộp</div><div class="num" id="sSubs">0</div></div><div class="card stat"><div class="muted">⭐ Điểm cao nhất</div><div class="num" id="sBest">—</div></div><div class="card stat"><div class="muted">💬 Đã nhận xét</div><div class="num" id="sGraded">0</div></div></div>
+  <div class="card" style="margin-top:15px"><div class="between"><div><b>🌟 Gợi ý nhỏ cho em</b><div class="small muted" style="margin-top:5px">Nói thành câu đầy đủ, phát âm rõ và cố gắng giải thích thêm “because / so / but” khi phù hợp.</div></div><span class="pill">Keep speaking!</span></div></div>
 </section>
 
-<section id="practice" class="page">
- <div class="card"><div class="pill">QUESTION <span id="qNo">1</span></div><div class="question" id="question">What do you usually do after school?</div><div class="muted small">Hãy trả lời tự nhiên. Em có thể nghe lại và thử lại trước khi nộp.</div><div class="wave" id="wave"></div>
-  <div class="row" style="margin-top:15px"><button id="mic" class="mic" onclick="toggleRecording()">🎤</button><button class="btn secondary" onclick="playLast()">▶ Nghe lại</button><label class="small muted">Âm lượng <input id="volume" class="range" type="range" min="0" max="1" step=".05" value="1"></label><select id="speed" class="btn secondary"><option value=".75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option></select></div>
-  <div class="row" style="margin-top:17px"><button class="btn secondary" onclick="newQuestion()">🔄 Câu khác</button><button class="btn primary" onclick="submitPractice()">📤 Nộp bài</button></div>
- </div>
-</section>
+<section id="practice" class="page"><div class="card"><div class="pill">QUESTION <span id="qNo">1</span></div><div class="question" id="question">What do you usually do after school?</div><div class="muted small">Bấm micro để ghi âm. Hệ thống sẽ cố gắng nhận diện lời nói nếu trình duyệt hỗ trợ, sau đó tạo điểm + nhận xét tự động.</div><div class="wave" id="wave"></div><div class="row" style="margin-top:15px"><button id="mic" class="mic" onclick="toggleRecording()">🎤</button><button class="btn secondary" onclick="playLast()">▶ Nghe lại</button><label class="small muted">Âm lượng <input id="volume" class="range" type="range" min="0" max="1" step=".05" value="1"></label><select id="speed" class="btn secondary"><option value=".75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option></select></div><div class="row" style="margin-top:17px"><button class="btn secondary" onclick="newQuestion()">🔄 Câu khác</button><button class="btn primary" onclick="submitPractice()">📤 Nộp bài</button></div><div id="recordStatus" class="small muted" style="margin-top:10px"></div><div id="autoFeedback" class="feedback-box hidden"></div></div></section>
 
-<section id="assignments" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">📝 Bài được giao</h2><div class="small muted">Các bài cô Hân giao theo lớp và bài học.</div></div></div><div id="studentAssignments" class="list" style="margin-top:16px"></div></div></section>
-<section id="history" class="page"><div class="card"><h2>Lịch sử luyện tập</h2><div id="studentHistory"></div></div></section>
+<section id="mockTest" class="page"><div class="hero mock-card"><div class="pill">🧪 MOCK TEST</div><h1 style="margin-top:10px">Speaking Mini Test</h1><div class="hero-sub">5 câu hỏi • ghi âm từng câu • hệ thống tính điểm tự động sau khi nộp. Cô Hân có thể xem và chỉnh lại kết quả ở trang quản lý.</div><div class="test-step" id="mockSteps"></div></div><div class="card" style="margin-top:15px"><div class="pill" id="mockQuestionNo">Câu 1 / 5</div><div class="question" id="mockQuestion">Tell me about your family.</div><div class="wave" id="mockWave"></div><div class="row"><button id="mockMic" class="mic" onclick="toggleMockRecording()">🎤</button><button class="btn secondary" onclick="playMockLast()">▶ Nghe lại</button><button class="btn secondary" onclick="skipMockQuestion()">Bỏ qua</button></div><div id="mockStatus" class="small muted" style="margin-top:10px"></div><div class="row" style="margin-top:16px"><button id="mockNextBtn" class="btn primary" onclick="finishMockQuestion()">Lưu câu này</button><button class="btn secondary" onclick="resetMockTest()">Làm lại</button></div><div id="mockTranscript" class="notice" style="margin-top:14px">Chưa có bản ghi.</div></div><div id="mockResult" class="card hidden" style="margin-top:15px"></div></section>
 
-<section id="tdashboard" class="page"><div class="hero"><h1>👩🏻‍🏫 Teacher Dashboard</h1><div class="muted">Quản lý lớp, bài học, bài giao và lịch sử của học sinh.</div></div><div class="grid"><div class="card stat"><div class="muted">👥 Học sinh</div><div class="num" id="tStudents">0</div></div><div class="card stat"><div class="muted">📚 Bài giao</div><div class="num" id="tAssignments">0</div></div><div class="card stat"><div class="muted">📤 Bài nộp</div><div class="num" id="tSubmissions">0</div></div><div class="card stat"><div class="muted">⭐ Điểm TB</div><div class="num" id="tAverage">—</div></div></div></section>
+<section id="assignments" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">📝 Bài cô giao</h2><div class="small muted" style="margin-top:5px">Bài chỉ hiện theo đúng lớp của em.</div></div><button class="btn secondary" onclick="loadStudentAssignments()">↻ Làm mới</button></div><div id="studentAssignments" class="list" style="margin-top:16px"></div></div></section>
+<section id="history" class="page"><div class="card"><h2 style="margin:0">🕘 Lịch sử & nhận xét</h2><div class="small muted" style="margin-top:5px">Mỗi lần làm bài được lưu theo thời gian, bài học và điểm.</div><div id="studentHistory" style="margin-top:14px"></div></div></section>
 
-<section id="classes" class="page"><div class="card"><div class="between"><h2>👥 Lớp học</h2><div class="row"><button class="btn secondary" onclick="openModal('studentModal')">+ Thêm học sinh</button><button class="btn primary" onclick="openModal('classModal')">+ Tạo lớp</button></div></div><div id="classList" class="list" style="margin-top:14px"></div><div class="small muted" style="margin-top:12px">Học sinh đăng nhập bằng <b>lớp + mã</b>. Cô có thể cấp mã đơn giản như K01, K02, A01...</div></div></section>
-
-<section id="questions" class="page"><div class="card"><div class="between"><div><h2>📚 Ngân hàng câu hỏi</h2><div class="small muted">Quản lý câu hỏi theo chủ đề/bài học.</div></div><button class="btn primary" onclick="openModal('questionModal')">+ Thêm câu hỏi</button></div><div id="questionList" class="list" style="margin-top:14px"></div></div></section>
-
-<section id="assign" class="page"><div class="card"><h2>📝 Giao bài</h2><div class="field"><label>Tên bài</label><input id="aTitle" placeholder="Speaking Lesson 01"></div><div class="field"><label>Lớp</label><select id="aClass"></select></div><div class="field"><label>Bài học / Topic</label><input id="aLesson" placeholder="Family / School / Daily routines"></div><div class="field"><label>Chọn câu hỏi</label><div id="aQuestions" class="list"></div></div><button class="btn primary" onclick="createAssignment()">Giao bài cho lớp</button></div></section>
-
-<section id="submissions" class="page"><div class="card"><div class="between"><div><h2>Bài học sinh đã nộp</h2><div class="small muted">Lọc theo lớp, bài học và thời gian.</div></div><button class="btn secondary" onclick="loadTeacherData()">↻ Làm mới</button></div>
- <div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="field"><label>Lớp</label><select id="filterClass" onchange="renderSubmissions()"><option value="">Tất cả</option></select></div><div class="field"><label>Bài học</label><input id="filterLesson" oninput="renderSubmissions()" placeholder="Ví dụ: Unit 1"></div><div class="field"><label>Từ ngày</label><input id="filterDate" type="date" onchange="renderSubmissions()"></div></div>
- <div id="submissionList"></div></div></section>
-
-<section id="historyTeacher" class="page"><div class="card"><h2>🕘 Lịch sử quản lý</h2><div class="small muted">Lưu lại bài giao, bài nộp và điểm/nhận xét theo thời gian.</div><div id="teacherHistory" style="margin-top:14px"></div></div></section>
+<section id="tdashboard" class="page"><div class="hero"><div class="pill">👩🏻‍🏫 Teacher Space</div><h1>Quản lý lớp thật gọn 🌷</h1><div class="hero-sub">Theo dõi lớp, học sinh, bài giao, bài nộp và lịch sử chấm trong cùng một nơi.</div></div><div class="grid"><div class="card stat"><div class="muted">👥 Học sinh</div><div class="num" id="tStudents">0</div></div><div class="card stat"><div class="muted">🏫 Lớp</div><div class="num" id="tClasses">0</div></div><div class="card stat"><div class="muted">📝 Bài giao</div><div class="num" id="tAssignments">0</div></div><div class="card stat"><div class="muted">📤 Bài nộp</div><div class="num" id="tSubmissions">0</div></div></div><div class="actions"><button class="action" onclick="openModal('classModal')"><div class="icon">🏫</div><b>Tạo lớp</b><div class="small muted">Tạo lớp mới cho bé</div></button><button class="action" onclick="openModal('studentModal')"><div class="icon">🧒</div><b>Thêm học sinh</b><div class="small muted">Cấp mã đăng nhập</div></button><button class="action" onclick="page('assign')"><div class="icon">📝</div><b>Giao bài</b><div class="small muted">Giao theo lớp + bài học</div></button><button class="action" onclick="page('mockBuilder')"><div class="icon">🧪</div><b>Tạo Mock Test</b><div class="small muted">Tạo đề theo Movers / Flyers / KET</div></button></div></section>
+<section id="classes" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">🏫 Lớp học</h2><div class="small muted" style="margin-top:5px">Theo dõi lớp và số học sinh.</div></div><button class="btn primary" onclick="openModal('classModal')">+ Tạo lớp</button></div><div id="classList" class="list" style="margin-top:14px"></div></div></section>
+<section id="students" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">🧒 Học sinh</h2><div class="small muted" style="margin-top:5px">Tên + lớp + mã đăng nhập của từng bé.</div></div><button class="btn primary" onclick="openModal('studentModal')">+ Thêm học sinh</button></div><div id="studentList" class="list" style="margin-top:14px"></div></div></section>
+<section id="questions" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">📚 Ngân hàng câu hỏi</h2><div class="small muted" style="margin-top:5px">Mỗi câu hỏi có cấp độ để cô dễ lọc và tái sử dụng.</div></div><button class="btn primary" onclick="openModal('questionModal')">+ Thêm câu hỏi</button></div><div class="level-toolbar"><input id="questionSearch" placeholder="🔎 Tìm câu hỏi / topic…" oninput="renderQuestionList()"><select id="questionLevelFilter" onchange="renderQuestionList()"><option value="">Tất cả cấp độ</option><option>Starters</option><option>Movers</option><option>Flyers</option><option>KET</option><option>General</option></select></div><div id="questionLevelSummary" class="level-grid"></div><div id="questionList" class="list" style="margin-top:14px"></div></div></section>
+<section id="mockBuilder" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">🧪 Tạo Mock Test</h2><div class="small muted" style="margin-top:5px">Tạo đề riêng theo cấp độ như Movers, Flyers và chọn số câu cô muốn.</div></div><span class="pill">Teacher only</span></div><div class="mock-builder" style="margin-top:16px"><div><div class="field"><label>Tên Mock Test</label><input id="mockTitle" placeholder="Flyers Speaking Mock Test 01"></div><div class="field"><label>Cấp độ</label><select id="mockLevel" onchange="renderMockBuilderQuestions()"><option>Starters</option><option>Movers</option><option selected>Flyers</option><option>KET</option></select></div><div class="field"><label>Mô tả</label><textarea id="mockDescription" rows="3" placeholder="Ví dụ: Speaking test theo format Flyers…"></textarea></div><div class="info-grid"><div class="field"><label>Số câu</label><input id="mockCount" type="number" min="1" max="20" value="5"></div><div class="field"><label>Thời lượng (phút)</label><input id="mockDuration" type="number" min="1" max="60" value="10"></div></div><button id="saveMockBtn" class="btn primary" onclick="createMockTest()">Tạo Mock Test</button><div id="mockSaveStatus" class="save-status"></div></div><div><div class="mock-preview"><div class="between"><div><b>Chọn câu hỏi</b><div class="small muted">Chỉ hiện câu hỏi cùng cấp độ.</div></div><span id="mockQuestionCount" class="badge">0 câu</span></div><div id="mockBuilderQuestions" class="list" style="margin-top:12px;max-height:420px;overflow:auto"></div></div></div></div><div style="margin-top:22px"><h3 style="margin:0">Mock Test đã tạo</h3><div id="mockTestList" class="mock-list"></div></div></div></section>
+<section id="assign" class="page"><div class="card"><h2 style="margin:0">📝 Giao bài theo lớp</h2><div class="field"><label>Tên bài</label><input id="aTitle" placeholder="Speaking Lesson 01"></div><div class="field"><label>Lớp</label><select id="aClass"></select></div><div class="field"><label>Bài học / Topic</label><input id="aLesson" placeholder="Family / School / Daily routines"></div><div class="field"><label>Loại bài</label><select id="aType"><option value="practice">Luyện nói</option><option value="mock">Mock Test</option></select></div><div class="field"><label>Chọn câu hỏi</label><div id="aQuestions" class="list"></div></div><button class="btn primary" onclick="createAssignment()">Giao bài cho lớp</button><div id="assignStatus" class="save-status"></div></div></section>
+<section id="submissions" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">🎤 Bài nộp & chấm điểm</h2><div class="small muted" style="margin-top:5px">Lọc theo lớp, bài học, học sinh và thời gian.</div></div><button class="btn secondary" onclick="loadTeacherData()">↻ Làm mới</button></div><div class="filterbar" style="margin-top:14px"><div class="field"><label>Lớp</label><select id="filterClass" onchange="renderSubmissions()"></select></div><div class="field"><label>Bài học / câu hỏi</label><input id="filterLesson" oninput="renderSubmissions()" placeholder="Ví dụ: Family"></div><div class="field"><label>Từ ngày</label><input id="filterDate" type="date" onchange="renderSubmissions()"></div><div class="field"><label>Học sinh</label><select id="filterStudent" onchange="renderSubmissions()"></select></div></div><div id="submissionList"></div></div></section>
+<section id="reports" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">📊 Báo cáo theo lớp & bài học</h2><div class="small muted" style="margin-top:5px">Xem tiến bộ theo thời gian và mở lại bài cũ để chỉnh điểm/nhận xét.</div></div><button class="btn secondary" onclick="renderReports()">↻ Cập nhật</button></div><div class="filterbar" style="margin-top:14px"><div class="field"><label>Lớp</label><select id="reportClass" onchange="renderReports()"></select></div><div class="field"><label>Bài học</label><input id="reportLesson" oninput="renderReports()" placeholder="Ví dụ: Unit 1"></div><div class="field"><label>Từ ngày</label><input id="reportDate" type="date" onchange="renderReports()"></div><div class="field"><label>Đến ngày</label><input id="reportDateTo" type="date" onchange="renderReports()"></div></div><div id="reportSummary" class="grid" style="margin-top:14px"></div><div id="reportList" style="margin-top:15px"></div></div></section>
+<section id="historyTeacher" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">🕘 Lịch sử quản lý</h2><div class="small muted" style="margin-top:5px">Lưu thao tác tạo lớp, thêm học sinh, giao bài, chấm và chỉnh sửa.</div></div><button class="btn secondary" onclick="renderTeacherHistory()">↻ Cập nhật</button></div><div id="teacherHistory" style="margin-top:14px"></div></div></section>
 </main></div>
 
-<div id="classModal" class="modal"><div class="modalbox"><div class="between"><h2>Tạo lớp</h2><button class="btn secondary" onclick="closeModal('classModal')">Đóng</button></div><div class="field"><label>Tên lớp</label><input id="newClassName" placeholder="Flyers A"></div><div class="field"><label>Khối / trình độ</label><input id="newClassLevel" placeholder="Flyers"></div><button class="btn primary" onclick="createClass()">Lưu lớp</button></div></div>
-<div id="studentModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm học sinh</h2><button class="btn secondary" onclick="closeModal('studentModal')">Đóng</button></div><div class="field"><label>Tên học sinh</label><input id="newStudentName" placeholder="Ví dụ: Kevin"></div><div class="field"><label>Lớp</label><select id="studentClassManage"></select></div><div class="field"><label>Mã đăng nhập</label><input id="newStudentCode" placeholder="Ví dụ: K01" autocomplete="off"></div><div class="small muted">Mã chỉ cần đơn giản, ví dụ K01. Học sinh sẽ chọn đúng lớp rồi nhập mã này.</div><button class="btn primary" style="margin-top:12px" onclick="createStudent()">Lưu học sinh</button></div></div>
-<div id="questionModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm câu hỏi</h2><button class="btn secondary" onclick="closeModal('questionModal')">Đóng</button></div><div class="field"><label>Câu hỏi</label><textarea id="newQuestion" rows="3" placeholder="What did you do last weekend?"></textarea></div><div class="field"><label>Topic / bài học</label><input id="newTopic" placeholder="Past activities"></div><button class="btn primary" onclick="createQuestion()">Lưu câu hỏi</button></div></div>
-<div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><h2>Chấm bài</h2><button class="btn secondary" onclick="closeModal('gradeModal')">Đóng</button></div><div id="gradeInfo"></div><div class="field"><label>Điểm tổng /100</label><input id="gradeScore" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation /100</label><input id="gradePron" type="number" min="0" max="100"></div><div class="field"><label>Fluency /100</label><input id="gradeFlu" type="number" min="0" max="100"></div><div class="field"><label>Nhận xét</label><textarea id="gradeFeedback" rows="4" placeholder="Good job! Try to speak louder..."></textarea></div><button class="btn primary" onclick="saveGrade()">Lưu điểm & nhận xét</button></div></div>
+<!-- Modals -->
+<div id="classModal" class="modal"><div class="modalbox"><div class="between"><div><h2 style="margin:0">Tạo lớp</h2><div class="small muted" style="margin-top:5px">Ví dụ: Flyers A · Flyers (A2)</div></div><button class="btn secondary" onclick="closeModal('classModal')">Đóng</button></div><div class="field"><label>Tên lớp</label><input id="newClassName" placeholder="Flyers A"></div><div class="field"><label>Khối / trình độ</label><input id="newClassLevel" placeholder="Flyers (A2)"></div><button id="saveClassBtn" class="btn primary" onclick="createClass()">Lưu lớp</button><div id="classSaveStatus" class="save-status"></div></div></div>
+<div id="studentModal" class="modal"><div class="modalbox"><div class="between"><div><h2 style="margin:0">Thêm học sinh</h2><div class="small muted" style="margin-top:5px">Mã lớp + mã học sinh sẽ dùng để đăng nhập.</div></div><button class="btn secondary" onclick="closeModal('studentModal')">Đóng</button></div><div class="field"><label>Tên học sinh</label><input id="newStudentName" placeholder="Ví dụ: Kevin"></div><div class="field"><label>Lớp</label><select id="studentClassManage"></select></div><div class="field"><label>Mã đăng nhập</label><input id="newStudentCode" placeholder="Ví dụ: K01" autocomplete="off"></div><button id="saveStudentBtn" class="btn primary" onclick="createStudent()">Lưu học sinh</button><div id="studentSaveStatus" class="save-status"></div></div></div>
+<div id="questionModal" class="modal"><div class="modalbox"><div class="between"><div><h2 style="margin:0">Thêm câu hỏi</h2><div class="small muted" style="margin-top:5px">Tạo câu hỏi dùng cho luyện nói hoặc mock test.</div></div><button class="btn secondary" onclick="closeModal('questionModal')">Đóng</button></div><div class="field"><label>Câu hỏi</label><textarea id="newQuestion" rows="3" placeholder="What did you do last weekend?"></textarea></div><div class="field"><label>Topic / bài học</label><input id="newTopic" placeholder="Past activities"></div><div class="field"><label>Cấp độ</label><select id="newQuestionLevel"><option>Starters</option><option>Movers</option><option selected>Flyers</option><option>KET</option><option>General</option></select></div><button id="saveQuestionBtn" class="btn primary" onclick="createQuestion()">Lưu câu hỏi</button><div id="questionSaveStatus" class="save-status"></div></div></div>
+<div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><div><h2 style="margin:0">Chấm / chỉnh sửa bài</h2><div class="small muted" style="margin-top:5px">Có thể mở lại bài cũ để sửa điểm và nhận xét.</div></div><button class="btn secondary" onclick="closeModal('gradeModal')">Đóng</button></div><div id="gradeInfo" style="margin-top:14px"></div><div class="info-grid"><div class="field"><label>Điểm tổng /100</label><input id="gradeScore" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation /100</label><input id="gradePron" type="number" min="0" max="100"></div><div class="field"><label>Fluency /100</label><input id="gradeFlu" type="number" min="0" max="100"></div></div><div class="field"><label>Nhận xét</label><textarea id="gradeFeedback" rows="5" placeholder="Nhận xét cho học sinh..."></textarea></div><button id="saveGradeBtn" class="btn primary" onclick="saveGrade()">Lưu điểm & nhận xét</button><div id="gradeSaveStatus" class="save-status"></div></div></div>
 <div id="toast" class="toast"></div>
 
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInAnonymously,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import {getDatabase,ref,push,set,onValue,get,update} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-import {getStorage,ref as sRef,uploadBytes,getDownloadURL} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+<script>
+(() => {
+'use strict';
 
-const firebaseConfig={
- apiKey:"AIzaSyCA39PyvTlLtiqnPT3lkXUp0PgQ7rZmp74",
- authDomain:"speaking-practice-room.firebaseapp.com",
- projectId:"speaking-practice-room",
- storageBucket:"speaking-practice-room.firebasestorage.app",
- messagingSenderId:"840862279040",
- appId:"1:840862279040:web:01a2d248d755ea8121cd65",
- measurementId:"G-CFQKZS9MRD",
- databaseURL:"https://speaking-practice-room-default-rtdb.firebaseio.com"
-};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),storage=getStorage(app);
-
+const firebaseConfig={apiKey:"AIzaSyCA39PyvTlLtiqnPT3lkXUp0PgQ7rZmp74",authDomain:"speaking-practice-room.firebaseapp.com",databaseURL:"https://speaking-practice-room-default-rtdb.firebaseio.com",projectId:"speaking-practice-room",storageBucket:"speaking-practice-room.firebasestorage.app",messagingSenderId:"840862279040",appId:"1:840862279040:web:01a2d248d755ea8121cd65",measurementId:"G-CFQKZS9MRD"};
+const TEACHER_PASSWORD='hanna126';
 const starterQuestions=[
- ["What do you usually do after school?","Daily routines"],
- ["Tell me about your best friend.","People"],
- ["What did you do last weekend?","Past activities"],
- ["What is your favourite subject at school?","School"],
- ["What are you going to do this Sunday?","Future plans"],
- ["Describe your favourite place.","Places"],
- ["What food do you like? Why?","Food"],
- ["What do you do at the weekend?","Free time"],
- ["What would you like to be in the future?","Future"],
- ["Tell me about your family.","Family"]
+ ['Tell me about your family.','Family'],['What do you usually do after school?','Daily routines'],['Tell me about your best friend.','People'],['What did you do last weekend?','Past activities'],['What is your favourite subject at school?','School'],['What are you going to do this Sunday?','Future plans'],['Describe your favourite place.','Places'],['What food do you like? Why?','Food'],['What do you do at the weekend?','Free time'],['What would you like to be in the future?','Future']
 ];
-let role="student",currentQ=0,lastBlob=null,audioUrl=null,rec=null,user=null,studentProfile=null,allQuestions=[],allClasses=[],allAssignments=[],allSubs=[],allHistory=[],selectedSubmission=null;\nconst TEACHER_PASSWORD="hanna126";\nconst TEACHER_EMAIL="teacher@ms-han-class.com";
-
+const mockQuestions=starterQuestions.slice(0,5).map((x,i)=>({id:'mock-'+i,text:x[0],topic:x[1]}));
 const $=id=>document.getElementById(id);
-function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",2300)}
-function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function today(){return new Date().toISOString().slice(0,10)}
-function page(id,btn){
- document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");
- document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active");
- $("pageTitle").textContent=({dashboard:"Dashboard",practice:"Luyện Speaking",assignments:"Bài được giao",history:"Lịch sử",tdashboard:"Teacher Dashboard",classes:"Lớp học",questions:"Ngân hàng câu hỏi",assign:"Giao bài",submissions:"Bài học sinh nộp",historyTeacher:"Lịch sử quản lý"})[id]||"MS HÂN CLASS";
- if(id==="assignments")loadStudentAssignments(); if(id==="history")loadStudentHistory(); if(["classes","questions","assign","submissions","historyTeacher","tdashboard"].includes(id))loadTeacherData();
-}
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const localKeys={classes:'ms_classes_v6',students:'ms_students_v6',questions:'ms_questions_v6',assignments:'ms_assignments_v6',submissions:'ms_submissions_v6',history:'ms_history_v6',mockTests:'ms_mocktests_v1'};
+let role='student',studentProfile=null,allClasses=[],allStudents=[],allQuestions=[],allAssignments=[],allSubs=[],allHistory=[],allMockTests=[];
+let currentQ=0,lastBlob=null,audioUrl=null,rec=null,selectedSubmission=null,idToken=null;
+let recognition=null,liveTranscript='',mockIndex=0,mockAnswers=[],mockRec=null,mockBlob=null,mockAudioUrl=null;
+
+function toast(text,kind=''){const el=$('toast');el.textContent=text;el.className='toast '+kind;el.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.style.display='none',3300)}
+function setStatus(id,text,kind=''){const el=$(id);if(!el)return;el.textContent=text;el.className=(el.className.split(' ')[0]||'status')+' '+kind}
+function setSaveStatus(id,text,kind=''){const el=$(id);if(!el)return;el.textContent=text;el.className='save-status '+kind}
+function localGet(node){try{return JSON.parse(localStorage.getItem(localKeys[node])||'{}')}catch{return {}}}
+function localSet(node,obj){try{localStorage.setItem(localKeys[node],JSON.stringify(obj));return true}catch{return false}}
+function merge(a,b){return Object.assign({},a||{},b||{})}
+function localValues(node){return Object.values(localGet(node)||{})}
+function now(){return new Date().toISOString()}
+
+async function fetchJson(url,options={},timeoutMs=10000){const c=new AbortController();const t=setTimeout(()=>c.abort(),timeoutMs);try{const r=await fetch(url,{...options,signal:c.signal,headers:{Accept:'application/json',...(options.headers||{})}});const tx=await r.text();let d={};try{d=tx?JSON.parse(tx):{}}catch{d=tx}if(!r.ok)throw new Error(d?.error?.message||d?.error||`HTTP ${r.status}`);return d}finally{clearTimeout(t)}}
+function dbUrl(path,token=''){return `${firebaseConfig.databaseURL}/${path.replace(/^\//,'')}.json${token?`?auth=${encodeURIComponent(token)}`:''}`}
+async function ensureFirebase(){if(idToken)return idToken;try{const s=JSON.parse(sessionStorage.getItem('ms_idtoken')||'null');if(s?.idToken){idToken=s.idToken;return idToken}}catch{}try{const d=await fetchJson(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${encodeURIComponent(firebaseConfig.apiKey)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});idToken=d.idToken;sessionStorage.setItem('ms_idtoken',JSON.stringify({idToken}));$('firebaseMiniStatus').textContent='● Kết nối Firebase sẵn sàng';return idToken}catch(e){$('firebaseMiniStatus').textContent='● Chế độ lưu cục bộ đang sẵn sàng';return null}}
+async function dbRead(path){const token=await ensureFirebase();try{return await fetchJson(dbUrl(path,token||''))}catch(e){if(token)try{return await fetchJson(dbUrl(path,''))}catch{}throw e}}
+async function dbWrite(path,value){const token=await ensureFirebase();try{return await fetchJson(dbUrl(path,token||''),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)})}catch(e){if(token)return await fetchJson(dbUrl(path,''),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)});throw e}}
+async function dbPushKey(path){const token=await ensureFirebase();const d=await fetchJson(dbUrl(path,token||''),{method:'POST',headers:{'Content-Type':'application/json'},body:'null'});return d.name}
+async function getNode(node){let remote={};try{remote=await dbRead(node)||{}}catch{}return merge(remote,localGet(node))}
+async function saveData(node,id,obj){const d=localGet(node);d[id]=obj;localSet(node,d);let firebase=false,error=null;try{await dbWrite(`${node}/${id}`,obj);firebase=true}catch(e){error=e}return {firebase,error}}
+async function saveHistory(type,details){const id='h-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);await saveData('history',id,{id,type,details,at:now()})}
+
+function showAuth(){ $('auth').style.display='grid';$('shell').style.display='none' }
+function showStudent(p){role='student';showApp();$('navStudent').classList.remove('hidden');$('navTeacher').classList.add('hidden');$('who').textContent=p.name;$('roleText').textContent=`Học sinh · ${p.className}`;$('classPill').textContent=`● ${p.className}`;$('studentHello').textContent=p.name;page('dashboard')}
+function showTeacher(){role='teacher';showApp();$('navStudent').classList.add('hidden');$('navTeacher').classList.remove('hidden');$('who').textContent='Cô Hân';$('roleText').textContent='Giáo viên';$('classPill').textContent='● Teacher';page('tdashboard');loadTeacherData()}
+function showApp(){$('auth').style.display='none';$('shell').style.display='block'}
+
+async function loadLoginClasses(){let remote={};try{remote=await dbRead('classes')||{}}catch{}allClasses=Object.values(merge(remote,localGet('classes')));if(!allClasses.length)allClasses=[{id:'demo-class',name:'Lớp mẫu',level:'Thử giao diện'}];allClasses.sort((a,b)=>(a.name||'').localeCompare(b.name||''));$('studentClass').innerHTML='<option value="">— Chọn lớp của em —</option>'+allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.level?' · '+esc(c.level):''}</option>`).join('')}
+async function findStudent(classId,code){const d=await getNode('students');const arr=Object.values(d);let s=arr.find(x=>String(x.classId)===String(classId)&&String(x.code||'').trim().toUpperCase()===code);if(s){const c=allClasses.find(x=>String(x.id)===String(classId));return {...s,id:s.id||s.uid,name:s.name||'Học sinh',code:String(s.code||'').toUpperCase(),className:s.className||c?.name||''}}if(classId==='demo-class'&&code==='K01')return {id:'demo-K01',name:'Học sinh mẫu',code:'K01',classId:'demo-class',className:'Lớp mẫu'};return null}
+async function submitStudentLogin(){const btn=$('loginBtn');btn.disabled=true;btn.textContent='Đang kiểm tra…';$('authError').textContent='';setStatus('loginStatus','Đang kiểm tra lớp và mã…','warn');try{const classId=$('studentClass').value,code=$('studentCode').value.trim().toUpperCase();if(!classId)throw new Error('Em hãy chọn lớp nhé.');if(!code)throw new Error('Em hãy nhập mã học sinh nhé.');await ensureFirebase();const p=await findStudent(classId,code);if(!p)throw new Error('Chưa tìm thấy mã này trong lớp. Cô kiểm tra lại mã nhé.');studentProfile=p;sessionStorage.setItem('ms_student',JSON.stringify(p));sessionStorage.setItem('ms_role','student');setStatus('loginStatus','✅ Đăng nhập thành công. Đang mở phòng…','ok');toast('✅ Đã vào phòng Speaking!','ok');setTimeout(()=>showStudent(p),250)}catch(e){$('authError').textContent=e.message||'Không đăng nhập được.';setStatus('loginStatus','❌ Chưa vào được phòng Speaking.','bad')}finally{btn.disabled=false;btn.textContent='Vào phòng Speaking'}}
+function showStudentLoginPanel(){const st=$('studentTab'),te=$('teacherTab');st.classList.add('active');te.classList.remove('active');$('studentLoginPanel').classList.remove('hidden');$('teacherLoginPanel').classList.add('hidden');$('studentCode').focus()}
+function showTeacherLoginPanel(){const st=$('studentTab'),te=$('teacherTab');te.classList.add('active');st.classList.remove('active');$('teacherLoginPanel').classList.remove('hidden');$('studentLoginPanel').classList.add('hidden');$('teacherError').textContent='';setTimeout(()=>$('teacherPassword').focus(),60)}
+window.showStudentLoginPanel=showStudentLoginPanel;window.showTeacherLoginPanel=showTeacherLoginPanel;
+function submitTeacherLogin(){const btn=$('teacherLoginBtn');btn.disabled=true;btn.textContent='Đang đăng nhập…';$('teacherError').textContent='';try{const entered=String($('teacherPassword').value||'').trim();if(!entered)throw new Error('Cô hãy nhập mã giáo viên nhé.');if(entered!==TEACHER_PASSWORD)throw new Error('Mã giáo viên chưa đúng.');sessionStorage.setItem('ms_role','teacher');sessionStorage.removeItem('ms_student');$('teacherPassword').value='';setStatus('teacherError','✅ Đăng nhập thành công! Đang mở trang quản lý…','ok');toast('✅ Đăng nhập giáo viên thành công!','ok');showTeacher()}catch(e){$('teacherError').textContent='❌ '+(e.message||'Không đăng nhập được.')}finally{btn.disabled=false;btn.textContent='Vào trang giáo viên'}}
+window.teacherLoginNow=submitTeacherLogin
+
+function page(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));const s=$(id);if(s)s.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');const titles={dashboard:'Trang chủ',practice:'Luyện nói',mockTest:'Mock Test',assignments:'Bài được giao',history:'Lịch sử',tdashboard:'Tổng quan giáo viên',classes:'Lớp học',students:'Học sinh',questions:'Ngân hàng câu hỏi',assign:'Giao bài',submissions:'Bài nộp & Chấm',reports:'Báo cáo',mockBuilder:'Tạo Mock Test',historyTeacher:'Lịch sử quản lý'};$('pageTitle').textContent=titles[id]||'MS HÂN CLASS';if(role==='student'){if(id==='practice')loadQuestions();if(id==='mockTest')startMockTest(true);if(id==='assignments')loadStudentAssignments();if(id==='history')loadStudentHistory();if(id==='dashboard'){loadStudentStats();loadStudentAssignments()}}else{if(['classes','students','questions','mockBuilder','assign','submissions','reports','historyTeacher','tdashboard'].includes(id))loadTeacherData()}}
 window.page=page;
-window.setAuthRole=r=>{
-  role=r;
-  $("studentTab").classList.toggle("active",r==="student");
-  $("teacherTab").classList.toggle("active",r==="teacher");
-  $("studentLoginFields").classList.toggle("hidden",r!=="student");
-  $("teacherLoginFields").classList.toggle("hidden",r!=="teacher");
-  $("authTitle").textContent=r==="student"?"Học sinh đăng nhập":"Giáo viên đăng nhập";
-  $("authError").textContent="";
-};
-window.submitAuth=async()=>{
-  $("authError").textContent="";
-  try{
-    if(role==="teacher"){
-      const pw=$("teacherPassword").value;
-      if(pw!==TEACHER_PASSWORD)return $("authError").textContent="Mật khẩu giáo viên chưa đúng.";
-      await ensureTeacherAuth();
-      return;
-    }
+function openModal(id){$(id).classList.add('show');const m={classModal:'classSaveStatus',studentModal:'studentSaveStatus',questionModal:'questionSaveStatus',gradeModal:'gradeSaveStatus'};if(m[id])setSaveStatus(m[id],'')}
+function closeModal(id){$(id).classList.remove('show')}
+window.openModal=openModal;window.closeModal=closeModal;
 
-    const classId=$("studentClass").value;
-    const code=$("studentCode").value.trim().toUpperCase();
-    if(!classId)return $("authError").textContent="Em hãy chọn lớp.";
-    if(!code)return $("authError").textContent="Em hãy nhập mã học sinh.";
+async function loadQuestions(){const d=await getNode('questions');allQuestions=Object.values(d);if(!allQuestions.length)allQuestions=starterQuestions.map((x,i)=>({id:'starter-'+i,text:x[0],topic:x[1],level:i<2?'Starters':i<6?'Movers':'Flyers'}));renderQuestion();renderQuestionList();renderAssignQuestions()}
+function renderWave(target='wave'){const w=$(target);if(!w)return;w.innerHTML='';for(let i=0;i<55;i++){const x=document.createElement('i');x.style.setProperty('--h',(8+Math.random()*44)+'px');w.appendChild(x)}}
+function renderQuestion(){const q=allQuestions[currentQ]||{text:starterQuestions[currentQ%starterQuestions.length][0],topic:starterQuestions[currentQ%starterQuestions.length][1]};$('question').textContent=q.text;$('qNo').textContent=currentQ+1}
+function newQuestion(){const len=allQuestions.length||starterQuestions.length;currentQ=Math.floor(Math.random()*len);renderQuestion();lastBlob=null;audioUrl=null;liveTranscript='';$('recordStatus').textContent=''}
+window.newQuestion=newQuestion;
+function renderQuestionList(){const el=$('questionList');if(!el)return;const term=($('questionSearch')?.value||'').trim().toLowerCase();const level=$('questionLevelFilter')?.value||'';const levels=['Starters','Movers','Flyers','KET','General'];const counts=Object.fromEntries(levels.map(x=>[x,allQuestions.filter(q=>(q.level||inferLevel(q.topic)||'General')===x).length]));if($('questionLevelSummary'))$('questionLevelSummary').innerHTML=levels.map(x=>`<button class="level-chip ${level===x?'active':''}" onclick="setQuestionLevel('${x}')">${x}<div style="font-size:11px;margin-top:3px;opacity:.8">${counts[x]} câu</div></button>`).join('');const rows=allQuestions.filter(q=>{const lv=q.level||inferLevel(q.topic)||'General';return(!level||lv===level)&&(!term||(q.text||'').toLowerCase().includes(term)||(q.topic||'').toLowerCase().includes(term))});el.innerHTML=rows.map(q=>{const lv=q.level||inferLevel(q.topic)||'General';return `<div class="item"><div class="between"><div><b>${esc(q.text)}</b><div class="small muted" style="margin-top:4px">${esc(q.topic||'General')}</div></div><span class="badge">${esc(lv)}</span></div></div>`}).join('')||'<div class="empty">Chưa có câu hỏi phù hợp.</div>'}
+function setQuestionLevel(level){if($('questionLevelFilter'))$('questionLevelFilter').value=level;renderQuestionList()}
+window.setQuestionLevel=setQuestionLevel;
+function inferLevel(topic=''){const t=String(topic).toLowerCase();if(t.includes('flyers'))return 'Flyers';if(t.includes('movers'))return 'Movers';if(t.includes('starters'))return 'Starters';if(t.includes('ket'))return 'KET';return 'General'}
 
-    // Anonymous Auth chỉ tạo phiên Firebase để Database/Storage hoạt động.
-    await ensureAnonymousAuth();
-    const profile=await findStudentByClassAndCode(classId,code);
-    if(!profile)return $("authError").textContent="Không tìm thấy mã này trong lớp. Em kiểm tra lại mã nhé.";
-    studentProfile=profile;
-    role="student";
-    sessionStorage.setItem("studentProfile",JSON.stringify(profile));
-    showStudent(profile);
-  }catch(e){
-    console.error(e);
-    $("authError").textContent=friendlyAuthError(e);
-  }
-};
+function renderAssignQuestions(){if(!$('aQuestions'))return;$('aQuestions').innerHTML=allQuestions.map(q=>`<label class="item" style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" class="qcheck" value="${esc(q.id)}"><span><b>${esc(q.text)}</b><br><span class="small muted">${esc(q.topic||'')}</span></span></label>`).join('')}
 
-async function ensureAnonymousAuth(){
-  if(auth.currentUser)return auth.currentUser;
-  const cred=await signInAnonymously(auth);
-  return cred.user;
-}
+function startRecognition(){liveTranscript='';const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return null;try{const r=new SR();r.lang='en-US';r.interimResults=true;r.continuous=true;r.onresult=e=>{let final='';for(let i=e.resultIndex;i<e.results.length;i++){final+=e.results[i][0].transcript+' '}liveTranscript+=final;r._last=liveTranscript};r.onerror=()=>{};r.start();recognition=r;return r}catch{return null}}
+function stopRecognition(){try{recognition?.stop()}catch{};recognition=null}
+function assessSpeech(text,durationSec){const words=(text||'').trim().split(/\s+/).filter(Boolean);const n=words.length;const fillers=(text||'').toLowerCase().match(/\b(um|uh|like|you know)\b/g)?.length||0;let fluency=Math.max(45,Math.min(98,Math.round(50+n*2.4-durationSec<0?50:50+n*1.8-Math.max(0,fillers*2))));let pronunciation=Math.max(50,Math.min(96,Math.round(62+Math.min(n,25)*1.2-(fillers*1.5))));let content=Math.max(45,Math.min(98,Math.round(48+Math.min(n,35)*1.5)));let score=Math.round(pronunciation*.3+fluency*.35+content*.35);let feedback;if(n<8)feedback='Em đã bắt đầu tốt. Thử nói dài hơn, thêm 1–2 ý và ví dụ để câu trả lời tự nhiên hơn.';else if(score>=85)feedback='Rất tốt! Câu trả lời khá đầy đủ và mạch lạc. Tiếp tục giữ nhịp nói và phát âm rõ nhé.';else if(score>=70)feedback='Khá tốt! Em đã có câu trả lời rõ ràng. Hãy thêm chi tiết và nói liền mạch hơn ở lần sau.';else feedback='Em đã hoàn thành bài. Hãy thử nói thành câu đầy đủ hơn và kéo dài câu trả lời một chút nhé.';return {score,pronunciation,fluency,content,wordCount:n,durationSec,feedback}}
 
-async function ensureTeacherAuth(){
-  let cred;
-  try{
-    cred=await signInWithEmailAndPassword(auth,TEACHER_EMAIL,TEACHER_PASSWORD);
-  }catch(e){
-    if(e.code==="auth/user-not-found" || e.code==="auth/invalid-credential"){
-      try{
-        cred=await createUserWithEmailAndPassword(auth,TEACHER_EMAIL,TEACHER_PASSWORD);
-      }catch(e2){
-        if(e2.code==="auth/email-already-in-use") cred=await signInWithEmailAndPassword(auth,TEACHER_EMAIL,TEACHER_PASSWORD);
-        else throw e2;
-      }
-    }else throw e;
-  }
-  await set(ref(db,"users/"+cred.user.uid),{
-    uid:cred.user.uid,name:"Cô Hân",email:TEACHER_EMAIL,role:"teacher",updatedAt:new Date().toISOString()
-  });
-  role="teacher";
-  showTeacher();
-}
+async function toggleRecording(){if(rec?.state==='recording'){rec.stop();stopRecognition();return}if(!navigator.mediaDevices?.getUserMedia){toast('❌ Trình duyệt chưa hỗ trợ ghi âm.','bad');return}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const chunks=[];const started=Date.now();rec=new MediaRecorder(stream);startRecognition();rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=()=>{const dur=(Date.now()-started)/1000;lastBlob=new Blob(chunks,{type:'audio/webm'});audioUrl=URL.createObjectURL(lastBlob);stream.getTracks().forEach(t=>t.stop());$('mic').classList.remove('recording');$('mic').textContent='🎤';const a=assessSpeech(liveTranscript,dur);$('recordStatus').textContent=`✅ Đã ghi âm · ${Math.round(dur)} giây · ${a.wordCount} từ`;showAutoFeedback(a,false)};rec.start();$('mic').classList.add('recording');$('mic').textContent='⏹️';$('recordStatus').textContent='Đang ghi âm… hãy nói tự nhiên'}catch{toast('❌ Hãy cho phép micro trong trình duyệt.','bad')}}
+function playLast(){if(!audioUrl){toast('Chưa có bản ghi.','bad');return}const a=new Audio(audioUrl);a.volume=+$('volume').value;a.playbackRate=+$('speed').value;a.play()}
+function showAutoFeedback(a,afterSubmit){const el=$('autoFeedback');el.classList.remove('hidden');el.innerHTML=`<div class="between"><h4 style="margin:0">${afterSubmit?'✨ Kết quả tự động':'✨ Nhận xét nhanh'}</h4><span class="score" style="font-size:28px">${a.score}/100</span></div><div class="rubric" style="margin-top:10px"><div class="item"><b>Pronunciation</b><div class="small muted">${a.pronunciation}/100</div></div><div class="item"><b>Fluency</b><div class="small muted">${a.fluency}/100</div></div><div class="item"><b>Độ đầy đủ</b><div class="small muted">${a.content}/100</div></div></div><div style="margin-top:10px;color:#625b77;line-height:1.65">${esc(a.feedback)}</div>${liveTranscript?`<div class="notice" style="margin-top:10px"><b>Bản nhận diện:</b> ${esc(liveTranscript)}</div>`:''}`}
 
-function friendlyAuthError(e){
-  const map={
-    "auth/operation-not-allowed":"Firebase chưa bật phương thức đăng nhập cần thiết.",
-    "auth/too-many-requests":"Có quá nhiều lần thử. Em/cô chờ một chút rồi thử lại.",
-    "auth/network-request-failed":"Không kết nối được Firebase. Kiểm tra Internet.",
-    "auth/invalid-credential":"Thông tin đăng nhập chưa đúng."
-  };
-  return map[e.code]||e.message||"Đăng nhập chưa thành công.";
-}
+async function submitPractice(){if(!lastBlob){toast('❌ Hãy ghi âm câu trả lời trước.','bad');return}const q=allQuestions[currentQ]||{};const a=assessSpeech(liveTranscript,Number($('recordStatus').textContent.match(/(\d+) giây/)?.[1]||0));let id='local-'+Date.now();try{id=await dbPushKey('submissions')}catch{}const obj={id,studentId:studentProfile?.id,studentCode:studentProfile?.code,student:studentProfile?.name,classId:studentProfile?.classId,className:studentProfile?.className,questionId:q.id||'starter',question:q.text||'',topic:q.topic||'Practice',assignmentId:null,assignmentTitle:'Luyện nói tự do',type:'practice',score:a.score,pronunciation:a.pronunciation,fluency:a.fluency,content:a.content,wordCount:a.wordCount,transcript:liveTranscript,feedback:a.feedback,status:'graded',submittedAt:now(),autoGraded:true};const res=await saveData('submissions',id,obj);await saveHistory('submit_practice',{submissionId:id,student:obj.student,question:obj.question,score:a.score,topic:obj.topic});showAutoFeedback(a,true);toast(res.firebase?'✅ Đã nộp và lưu kết quả!':'✅ Đã lưu bài trên thiết bị.','ok');loadStudentStats()}
+window.toggleRecording=toggleRecording;window.playLast=playLast;window.submitPractice=submitPractice;
 
-window.logout=async()=>{
-  sessionStorage.removeItem("studentProfile");
-  studentProfile=null;
-  await signOut(auth);
-  $("studentCode").value="";
-};
+async function loadStudentStats(){const d=await getNode('submissions');const rows=Object.values(d).filter(x=>x.studentId===studentProfile?.id||x.studentCode===studentProfile?.code);const scores=rows.map(x=>Number(x.score)).filter(Number.isFinite);$('sPractices').textContent=rows.length;$('sSubs').textContent=rows.length;$('sBest').textContent=scores.length?Math.max(...scores):'—';$('sGraded').textContent=rows.filter(x=>x.status==='graded'||x.score!=null).length}
+async function loadStudentAssignments(){const d=await getNode('assignments');allAssignments=Object.values(d).filter(a=>a.classId===studentProfile?.classId);$('studentAssignments').innerHTML=allAssignments.length?allAssignments.map(a=>`<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted" style="margin-top:4px">${esc(a.lesson||'')}</div></div><span class="badge">${a.type==='mock'?'Mock Test':'Luyện nói'}</span></div><div class="small muted" style="margin-top:7px">${a.questionIds?.length||0} câu · giao ${(a.createdAt||'').slice(0,10)}</div><button class="btn primary" style="margin-top:10px" onclick="startAssignment('${esc(a.id)}')">Bắt đầu</button></div>`).join(''):'<div class="empty">Chưa có bài được giao cho lớp của em.</div>'}
+function startAssignment(id){const a=allAssignments.find(x=>x.id===id);if(!a)return;saveHistory('start_assignment',{assignmentId:id,student:studentProfile?.name,title:a.title});if(a.type==='mock'){startMockTest(false,a);page('mockTest');return}if(a.questionIds?.length){const idx=allQuestions.findIndex(q=>q.id===a.questionIds[0]);if(idx>=0)currentQ=idx}page('practice');toast('▶ Bắt đầu bài: '+a.title,'ok')}
+window.startAssignment=startAssignment;
+async function loadStudentHistory(){const d=await getNode('submissions');const rows=Object.values(d).filter(x=>x.studentId===studentProfile?.id||x.studentCode===studentProfile?.code).sort((a,b)=>(b.submittedAt||'').localeCompare(a.submittedAt||''));$('studentHistory').innerHTML=rows.length?`<table class="table"><thead><tr><th>Thời gian</th><th>Bài học</th><th>Câu hỏi</th><th>Điểm</th><th>Nhận xét</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc((x.submittedAt||'').replace('T',' ').slice(0,16))}</td><td>${esc(x.topic||x.assignmentTitle||'')}</td><td>${esc(x.question||'')}</td><td><b>${x.score??'—'}</b></td><td>${esc(x.feedback||'Chờ nhận xét')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Chưa có lịch sử.</div>'}
 
-onAuthStateChanged(auth,async u=>{
-  user=u;
-  // Không tự mở app chỉ vì Anonymous Auth; học sinh phải chọn lớp + mã.
-  if(!u){
-    $("auth").style.display="grid";$("shell").style.display="none";return;
-  }
-  const saved=sessionStorage.getItem("studentProfile");
-  if(saved){
-    try{
-      studentProfile=JSON.parse(saved);
-      showStudent(studentProfile);
-      return;
-    }catch(_){}
-  }
-  let snap=await get(ref(db,"users/"+u.uid)),data=snap.val()||{};
-  if(data.role==="teacher") showTeacher();
-  else{
-    $("auth").style.display="grid";$("shell").style.display="none";
-  }
-});
+// Mock Test
+function renderMockSteps(){const el=$('mockSteps');el.innerHTML='';for(let i=0;i<5;i++){const d=document.createElement('div');d.className='step-dot '+(i<mockIndex?'done':i===mockIndex?'active':'');d.textContent=i+1;el.appendChild(d)}}
+function startMockTest(reset=true,assignment=null){if(reset){mockIndex=0;mockAnswers=[]}mockQuestions.forEach((q,i)=>{if(assignment?.questionIds?.[i]){const find=allQuestions.find(x=>x.id===assignment.questionIds[i]);if(find)mockQuestions[i]=find}});renderMockSteps();renderMockQuestion();renderWave('mockWave');$('mockResult').classList.add('hidden')}
+function renderMockQuestion(){const q=mockQuestions[mockIndex]||mockQuestions[0];$('mockQuestionNo').textContent=`Câu ${mockIndex+1} / ${mockQuestions.length}`;$('mockQuestion').textContent=q.text;$('mockStatus').textContent='';$('mockTranscript').textContent='Chưa có bản ghi.';mockBlob=null;mockAudioUrl=null;liveTranscript='';renderMockSteps();$('mockNextBtn').textContent=mockIndex===mockQuestions.length-1?'Hoàn thành Mock Test':'Lưu câu này'}
+async function toggleMockRecording(){if(mockRec?.state==='recording'){mockRec.stop();stopRecognition();return}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const chunks=[];const started=Date.now();mockRec=new MediaRecorder(stream);startRecognition();mockRec.ondataavailable=e=>chunks.push(e.data);mockRec.onstop=()=>{const dur=(Date.now()-started)/1000;mockBlob=new Blob(chunks,{type:'audio/webm'});mockAudioUrl=URL.createObjectURL(mockBlob);stream.getTracks().forEach(t=>t.stop());$('mockMic').classList.remove('recording');$('mockMic').textContent='🎤';const a=assessSpeech(liveTranscript,dur);$('mockTranscript').innerHTML=`<b>Tự động nhận xét:</b> ${esc(a.feedback)}<br><span class="small muted">${a.score}/100 · ${a.wordCount} từ</span>`;$('mockStatus').textContent='✅ Đã ghi âm xong.'};mockRec.start();$('mockMic').classList.add('recording');$('mockMic').textContent='⏹️';$('mockStatus').textContent='Đang ghi âm…'}catch{toast('❌ Hãy cho phép micro trong trình duyệt.','bad')}}
+function playMockLast(){if(!mockAudioUrl){toast('Chưa có bản ghi cho câu này.','bad');return}new Audio(mockAudioUrl).play()}
+function skipMockQuestion(){mockAnswers.push({question:mockQuestions[mockIndex].text,score:45,feedback:'Em chưa làm câu này. Hãy thử trả lời đầy đủ hơn ở lần sau.'});advanceMock()}
+function finishMockQuestion(){if(!mockBlob){toast('❌ Hãy ghi âm câu trả lời trước.','bad');return}const duration=0;const a=assessSpeech(liveTranscript,duration);mockAnswers.push({question:mockQuestions[mockIndex].text,topic:mockQuestions[mockIndex].topic,score:a.score,pronunciation:a.pronunciation,fluency:a.fluency,content:a.content,wordCount:a.wordCount,feedback:a.feedback,transcript:liveTranscript});advanceMock()}
+async function advanceMock(){if(mockIndex<mockQuestions.length-1){mockIndex++;renderMockQuestion();return}const avg=Math.round(mockAnswers.reduce((s,x)=>s+x.score,0)/mockAnswers.length);const fb=avg>=85?'Excellent! Em giữ được phong độ tốt qua cả bài.':avg>=70?'Good job! Hãy tiếp tục mở rộng câu trả lời và giữ nhịp nói đều.':'Em đã hoàn thành Mock Test. Hãy luyện nói dài hơn và rõ hơn ở lần tiếp theo.';let id='mock-'+Date.now();try{id=await dbPushKey('submissions')}catch{}const obj={id,studentId:studentProfile?.id,studentCode:studentProfile?.code,student:studentProfile?.name,classId:studentProfile?.classId,className:studentProfile?.className,questionId:'mock-test',question:'Speaking Mini Test (5 câu)',topic:'Mock Test',assignmentId:null,type:'mock',score:avg,pronunciation:Math.round(mockAnswers.reduce((s,x)=>s+x.pronunciation,0)/mockAnswers.length),fluency:Math.round(mockAnswers.reduce((s,x)=>s+x.fluency,0)/mockAnswers.length),feedback:fb,status:'graded',submittedAt:now(),details:mockAnswers,autoGraded:true};const res=await saveData('submissions',id,obj);await saveHistory('mock_test',{submissionId:id,student:obj.student,score:avg});$('mockResult').classList.remove('hidden');$('mockResult').innerHTML=`<div class="between"><div><div class="pill">🎉 Hoàn thành</div><h2 style="margin:9px 0 4px">Kết quả Mock Test</h2><div class="muted">${esc(fb)}</div></div><div class="result-big">${avg}</div></div><div class="grid" style="margin-top:15px"><div class="card"><div class="muted">Câu hỏi</div><b>${mockAnswers.length}</b></div><div class="card"><div class="muted">Điểm phát âm</div><b>${obj.pronunciation}</b></div><div class="card"><div class="muted">Độ trôi chảy</div><b>${obj.fluency}</b></div><div class="card"><div class="muted">Lưu</div><b>${res.firebase?'Firebase':'Thiết bị'}</b></div></div>`;toast(res.firebase?'✅ Mock Test đã lưu!':'✅ Mock Test đã lưu trên thiết bị!','ok');loadStudentStats();renderMockSteps()}
+function resetMockTest(){startMockTest(true)}
+window.toggleMockRecording=toggleMockRecording;window.playMockLast=playMockLast;window.skipMockQuestion=skipMockQuestion;window.finishMockQuestion=finishMockQuestion;window.resetMockTest=resetMockTest;
 
-async function loadLoginClasses(){
-  try{
-    const s=await get(ref(db,"classes"));
-    const d=s.val()||{};
-    allClasses=Object.values(d);
-    const sel=$("studentClass");
-    sel.innerHTML='<option value="">— Chọn lớp của em —</option>'+
-      allClasses.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.level?" · "+esc(c.level):""}</option>`).join("");
-  }catch(e){
-    $("studentClass").innerHTML='<option value="">Không tải được danh sách lớp</option>';
-  }
-}
+// Teacher data
+async function loadTeacherData(){try{const [c,s,a,q,sub,h,mt]=await Promise.all([getNode('classes'),getNode('students'),getNode('assignments'),getNode('questions'),getNode('submissions'),getNode('history'),getNode('mockTests')]);allClasses=Object.values(c);allStudents=Object.values(s);allAssignments=Object.values(a);allQuestions=Object.values(q);allSubs=Object.values(sub);allHistory=Object.values(h);allMockTests=Object.values(mt);if(!allQuestions.length)allQuestions=starterQuestions.map((x,i)=>({id:'starter-'+i,text:x[0],topic:x[1],level:i<2?'Starters':i<6?'Movers':'Flyers'}));$('tStudents').textContent=allStudents.length;$('tClasses').textContent=allClasses.length;$('tAssignments').textContent=allAssignments.length;$('tSubmissions').textContent=allSubs.length;renderClasses();renderStudentList();renderQuestionList();renderAssignQuestions();renderMockBuilderQuestions();renderMockTestList();renderAssignClass();renderStudentClassManage();renderFilters();renderSubmissions();renderReports();renderTeacherHistory()}catch(e){toast('❌ Không tải được dữ liệu quản lý.','bad')}}
+function renderClasses(){const el=$('classList');if(!el)return;el.innerHTML=allClasses.length?allClasses.map(c=>`<div class="item"><div class="between"><div><b>${esc(c.name)}</b><div class="small muted" style="margin-top:4px">${esc(c.level||'')}</div></div><span class="badge">${allStudents.filter(s=>String(s.classId)===String(c.id)).length} HS</span></div></div>`).join(''):'<div class="empty">Chưa có lớp. Bấm “Tạo lớp”.</div>'}
+function renderStudentList(){const el=$('studentList');if(!el)return;const rows=allStudents.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||''));el.innerHTML=rows.length?rows.map(s=>`<div class="item student-row"><div><b>${esc(s.name||'Học sinh')}</b><div class="small muted">${esc(s.className||'')}</div></div><div><span class="badge">Mã: ${esc(String(s.code||'').toUpperCase())}</span></div><div class="small muted">${esc((s.createdAt||'').slice(0,10))}</div><button class="btn secondary" onclick="copyCode('${esc(s.code||'')}')">📋 Sao chép</button></div>`).join(''):'<div class="empty">Chưa có học sinh.</div>'}
+function renderAssignClass(){if(!$('aClass'))return;$('aClass').innerHTML=allClasses.length?allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join(''):'<option value="">Chưa có lớp</option>'}
+function renderStudentClassManage(){if(!$('studentClassManage'))return;$('studentClassManage').innerHTML=allClasses.length?allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join(''):'<option value="">Chưa có lớp</option>'}
+function renderFilters(){const classOpts=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');$('filterClass').innerHTML='<option value="">Tất cả lớp</option>'+classOpts;$('reportClass').innerHTML='<option value="">Tất cả lớp</option>'+classOpts;$('filterStudent').innerHTML='<option value="">Tất cả học sinh</option>'+allStudents.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')}
+async function copyCode(code){try{await navigator.clipboard?.writeText(code)}catch{}toast('📋 Đã sao chép mã: '+code,'ok')}
+window.copyCode=copyCode;
 
-async function findStudentByClassAndCode(classId,code){
-  // Hỗ trợ cả node "students" mới và "users" cũ để không phải xoá database hiện tại.
-  const [ss,us,cs]=await Promise.all([
-    get(ref(db,"students")),
-    get(ref(db,"users")),
-    get(ref(db,"classes/"+classId+"/students"))
-  ]);
-  const candidates=[];
-  Object.values(ss.val()||{}).forEach(x=>candidates.push(x));
-  Object.values(us.val()||{}).forEach(x=>candidates.push(x));
-  Object.values(cs.val()||{}).forEach(x=>candidates.push({...x,classId:x.classId||classId}));
-  const found=candidates.find(x=>
-    x && (x.role==="student" || !x.role) &&
-    String(x.classId||"")===String(classId) &&
-    String(x.code||x.studentCode||"").trim().toUpperCase()===code
-  );
-  if(!found)return null;
-  const cls=allClasses.find(c=>String(c.id)===String(classId));
-  return {
-    uid:found.uid||found.id||("student_"+classId+"_"+code),
-    id:found.id||found.uid||("student_"+classId+"_"+code),
-    name:found.name||found.displayName||"Học sinh",
-    code,
-    classId,
-    className:found.className||cls?.name||""
-  };
-}
+async function createClass(){const name=$('newClassName').value.trim(),level=$('newClassLevel').value.trim();setSaveStatus('classSaveStatus','⏳ Đang lưu lớp…','warn');$('saveClassBtn').disabled=true;try{if(!name)throw new Error('Bạn chưa nhập tên lớp.');if(allClasses.some(c=>c.name.toLowerCase()===name.toLowerCase()))throw new Error('Tên lớp này đã có rồi.');let id='c-'+Date.now();try{id=await dbPushKey('classes')}catch{}const obj={id,name,level,createdAt:now()};const res=await saveData('classes',id,obj);await saveHistory('create_class',obj);await loadTeacherData();await loadLoginClasses();$('newClassName').value='';$('newClassLevel').value='';setSaveStatus('classSaveStatus',res.firebase?'✅ Lưu lớp thành công vào Firebase.':'✅ Lưu lớp thành công trên thiết bị.','ok');toast(res.firebase?'✅ Lưu lớp thành công!':'✅ Lớp đã được lưu trên thiết bị.','ok');setTimeout(()=>closeModal('classModal'),850)}catch(e){setSaveStatus('classSaveStatus','❌ Chưa lưu được lớp: '+e.message,'bad');toast('❌ '+e.message,'bad')}finally{$('saveClassBtn').disabled=false}}
+window.createClass=createClass;
+async function createStudent(){const name=$('newStudentName').value.trim(),classId=$('studentClassManage').value,code=$('newStudentCode').value.trim().toUpperCase();setSaveStatus('studentSaveStatus','⏳ Đang lưu học sinh…','warn');$('saveStudentBtn').disabled=true;try{if(!name)throw new Error('Bạn chưa nhập tên học sinh.');if(!classId)throw new Error('Bạn chưa chọn lớp.');if(!code)throw new Error('Bạn chưa nhập mã đăng nhập.');const d=await getNode('students');if(Object.values(d).some(s=>String(s.classId)===String(classId)&&String(s.code||'').toUpperCase()===code))throw new Error('Mã này đã tồn tại trong lớp.');const c=allClasses.find(x=>String(x.id)===String(classId));if(!c)throw new Error('Không tìm thấy lớp đã chọn.');let id='s-'+Date.now();try{id=await dbPushKey('students')}catch{}const obj={id,name,code,classId,className:c.name,role:'student',createdAt:now()};const res=await saveData('students',id,obj);await saveHistory('create_student',obj);await loadTeacherData();await loadLoginClasses();$('newStudentName').value='';$('newStudentCode').value='';setSaveStatus('studentSaveStatus',res.firebase?'✅ Lưu học sinh thành công vào Firebase.':'✅ Lưu học sinh thành công trên thiết bị.','ok');toast(res.firebase?'✅ Lưu học sinh thành công!':'✅ Học sinh đã được lưu trên thiết bị.','ok');setTimeout(()=>closeModal('studentModal'),900)}catch(e){setSaveStatus('studentSaveStatus','❌ Chưa lưu được học sinh: '+e.message,'bad');toast('❌ '+e.message,'bad')}finally{$('saveStudentBtn').disabled=false}}
+window.createStudent=createStudent;
+async function createQuestion(){setSaveStatus('questionSaveStatus','⏳ Đang lưu câu hỏi…','warn');$('saveQuestionBtn').disabled=true;try{const text=$('newQuestion').value.trim(),topic=$('newTopic').value.trim()||'General',level=$('newQuestionLevel').value||'General';if(!text)throw new Error('Bạn chưa nhập câu hỏi.');let id='q-'+Date.now();try{id=await dbPushKey('questions')}catch{}const obj={id,text,topic,level,createdAt:now()};const res=await saveData('questions',id,obj);await saveHistory('create_question',obj);await loadTeacherData();$('newQuestion').value='';$('newTopic').value='';$('newQuestionLevel').value='Flyers';setSaveStatus('questionSaveStatus',res.firebase?'✅ Đã lưu câu hỏi vào Firebase.':'✅ Đã lưu câu hỏi trên thiết bị.','ok');toast('✅ Lưu câu hỏi thành công!','ok');setTimeout(()=>closeModal('questionModal'),850)}catch(e){setSaveStatus('questionSaveStatus','❌ Chưa lưu được câu hỏi: '+e.message,'bad');toast('❌ '+e.message,'bad')}finally{$('saveQuestionBtn').disabled=false}}
+window.createQuestion=createQuestion;
+async function createAssignment(){const ids=[...document.querySelectorAll('.qcheck:checked')].map(x=>x.value),cid=$('aClass').value;if(!cid||!ids.length){setStatus('assignStatus','❌ Chọn lớp và ít nhất 1 câu hỏi.','bad');toast('❌ Chưa đủ thông tin để giao bài.','bad');return}try{const c=allClasses.find(x=>String(x.id)===String(cid));let id='a-'+Date.now();try{id=await dbPushKey('assignments')}catch{}const obj={id,title:$('aTitle').value.trim()||'Speaking Assignment',classId:cid,className:c?.name||'',lesson:$('aLesson').value.trim()||'Speaking',type:$('aType').value,questionIds:ids,createdAt:now()};const res=await saveData('assignments',id,obj);await saveHistory('create_assignment',obj);setStatus('assignStatus',res.firebase?'✅ Giao bài thành công và đã lưu Firebase.':'✅ Giao bài thành công trên thiết bị.','ok');toast('✅ Đã giao bài cho lớp!','ok');document.querySelectorAll('.qcheck').forEach(x=>x.checked=false);await loadTeacherData()}catch(e){setStatus('assignStatus','❌ Chưa giao được bài. '+e.message,'bad')}}
+window.createAssignment=createAssignment;
 
-async function showStudent(data){
-  $("auth").style.display="none";$("shell").style.display="block";
-  $("navStudent").classList.remove("hidden");$("navTeacher").classList.add("hidden");
-  $("who").textContent=data.name||"Học sinh";
-  $("roleText").textContent=(data.className?"Học sinh · "+data.className:"Học sinh");
-  $("classPill").textContent="● "+(data.className||"Online");
-  loadStudentStats();loadStudentAssignments();
-}
-
-async function showTeacher(){
-  $("auth").style.display="none";$("shell").style.display="block";
-  $("navStudent").classList.add("hidden");$("navTeacher").classList.remove("hidden");
-  $("who").textContent="Cô Hân";$("roleText").textContent="Giáo viên";
-  $("classPill").textContent="● Teacher";
-  loadTeacherData();
-}
-
-function drawWave(){let w=$("wave");w.innerHTML="";for(let i=0;i<55;i++){let e=document.createElement("i");e.style.setProperty("--h",(8+Math.random()*46)+"px");w.appendChild(e)}}drawWave();
-window.newQuestion=()=>{currentQ=Math.floor(Math.random()*allQuestions.length||starterQuestions.length);renderQuestion()};
-function renderQuestion(){let q=allQuestions[currentQ]||{text:starterQuestions[currentQ%starterQuestions.length][0]};$("question").textContent=q.text;$("qNo").textContent=currentQ+1}
-async function loadQuestions(){let s=await get(ref(db,"questions"));let d=s.val()||{};allQuestions=Object.values(d);if(!allQuestions.length){allQuestions=starterQuestions.map((x,i)=>({id:"starter"+i,text:x[0],topic:x[1]}))}renderQuestion();renderQuestionList();renderAssignQuestions()}
-function renderQuestionList(){if(role!=="teacher")return;$("questionList").innerHTML=allQuestions.map(q=>`<div class="item"><b>${esc(q.text)}</b><div class="small muted">${esc(q.topic||"General")}</div></div>`).join("")||'<div class="empty">Chưa có câu hỏi.</div>'}
-function renderAssignQuestions(){$("aQuestions").innerHTML=allQuestions.map((q,i)=>`<label class="item" style="display:flex;gap:9px"><input type="checkbox" class="qcheck" value="${esc(q.id||"")}"> <span><b>${esc(q.text)}</b><br><span class="small muted">${esc(q.topic||"")}</span></span></label>`).join("")}
-window.toggleRecording=async()=>{
- if(rec?.state==="recording"){rec.stop();return}
- try{let stream=await navigator.mediaDevices.getUserMedia({audio:true});lastBlob=null;let chunks=[];rec=new MediaRecorder(stream);
- rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=()=>{lastBlob=new Blob(chunks,{type:"audio/webm"});audioUrl=URL.createObjectURL(lastBlob);stream.getTracks().forEach(t=>t.stop());$("mic").classList.remove("recording");$("mic").textContent="🎤";toast("Đã ghi âm xong!")};
- rec.start();$("mic").classList.add("recording");$("mic").textContent="⏹️";toast("Đang ghi âm...");
- }catch(e){toast("Hãy cho phép microphone trong trình duyệt.")}
-};
-window.playLast=()=>{if(!audioUrl)return toast("Chưa có bản ghi.");let a=new Audio(audioUrl);a.volume=+$("volume").value;a.playbackRate=+$("speed").value;a.play()};
-window.submitPractice=async()=>{
- if(!lastBlob)return toast("Hãy ghi âm câu trả lời trước.");
- try{
-  const id=push(ref(db,"submissions")).key,studentId=studentProfile?.id||user.uid,path=`recordings/${studentId}/${id}.webm`;await uploadBytes(sRef(storage,path),lastBlob,{contentType:"audio/webm"});let url=await getDownloadURL(sRef(storage,path));
-  await set(ref(db,"submissions/"+id),{id,studentId:studentProfile?.id||user.uid,student:studentProfile?.name||"Học sinh",classId:studentProfile?.classId||"",className:studentProfile?.className||"",assignmentId:null,questionId:allQuestions[currentQ]?.id||"starter"+currentQ,question:$("question").textContent,topic:allQuestions[currentQ]?.topic||"Practice",score:null,pronunciation:null,fluency:null,feedback:"Chờ cô Hân chấm.",audioUrl:url,status:"submitted",submittedAt:new Date().toISOString()});
-  toast("Đã nộp bài và lưu vào hệ thống!");loadStudentStats();
- }catch(e){toast("Không thể lưu. Kiểm tra Firebase Database/Storage Rules.")}
-};
-async function loadStudentStats(){let s=await get(ref(db,"submissions"));let rows=Object.values(s.val()||{}).filter(x=>x.studentId===(studentProfile?.id||user.uid));let scores=rows.map(x=>+x.score).filter(Number.isFinite);$("sPractices").textContent=rows.length;$("sSubs").textContent=rows.length;$("sBest").textContent=scores.length?Math.max(...scores):"—";let dates=[...new Set(rows.map(x=>(x.submittedAt||"").slice(0,10)))];$("sStreak").textContent=dates.length}
-async function loadStudentAssignments(){let s=await get(ref(db,"assignments"));let d=s.val()||{};allAssignments=Object.values(d).filter(a=>!studentProfile?.classId||a.classId===studentProfile.classId);$("studentAssignments").innerHTML=allAssignments.length?allAssignments.map(a=>`<div class="item"><div class="between"><b>${esc(a.title)}</b><span class="badge">${esc(a.className||"Class")}</span></div><div class="small muted">${esc(a.lesson||"")} · ${a.questionIds?.length||0} câu · ${esc((a.createdAt||"").slice(0,10))}</div><button class="btn primary" style="margin-top:9px" onclick="startAssignment('${esc(a.id)}')">Bắt đầu</button></div>`).join(""):'<div class="empty">Chưa có bài được giao.</div>'}
-window.startAssignment=async id=>{let a=allAssignments.find(x=>x.id===id);if(a&&a.questionIds?.length){let qid=a.questionIds[0],idx=allQuestions.findIndex(q=>q.id===qid);if(idx>=0)currentQ=idx}page("practice");toast("Bắt đầu bài: "+(a?.title||"Assignment"))};
-async function loadStudentHistory(){let s=await get(ref(db,"submissions"));let rows=Object.values(s.val()||{}).filter(x=>x.studentId===(studentProfile?.id||user.uid)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));$("studentHistory").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Bài</th><th>Điểm</th><th>Nhận xét</th></tr>${rows.map(x=>`<tr><td>${esc((x.submittedAt||"").replace("T"," ").slice(0,16))}</td><td>${esc(x.question)}</td><td><b>${x.score??"Chờ chấm"}</b></td><td>${esc(x.feedback||"—")}</td></tr>`).join("")}</table>`:'<div class="empty">Chưa có lịch sử.</div>'}
-
-async function loadTeacherData(){
- let [u,a,s,q,c,h]=await Promise.all([get(ref(db,"users")),get(ref(db,"assignments")),get(ref(db,"submissions")),get(ref(db,"questions")),get(ref(db,"classes")),get(ref(db,"activityHistory"))]);
- let ud=u.val()||{},ad=a.val()||{},sd=s.val()||{},qd=q.val()||{},cd=c.val()||{},hd=h.val()||{};
- allAssignments=Object.values(ad);allSubs=Object.values(sd);allQuestions=Object.values(qd);allClasses=Object.values(cd);allHistory=Object.values(hd);
- let students=Object.values(ud).filter(x=>x.role==="student"),scores=allSubs.map(x=>+x.score).filter(Number.isFinite);
- $("tStudents").textContent=students.length;$("tAssignments").textContent=allAssignments.length;$("tSubmissions").textContent=allSubs.length;$("tAverage").textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):"—";
- renderClasses();renderStudentClassManage();renderQuestionList();renderAssignQuestions();renderAssignClass();renderFilters();renderSubmissions();renderTeacherHistory();await loadQuestions();
-}
-function renderClasses(){$("classList").innerHTML=allClasses.length?allClasses.map(c=>`<div class="item"><div class="between"><b>${esc(c.name)}</b><span class="badge">${esc(c.level||"")}</span></div><div class="small muted">${esc(c.createdAt||"").slice(0,10)}</div></div>`).join(""):'<div class="empty">Chưa có lớp. Tạo lớp đầu tiên.</div>'}
-function renderAssignClass(){$("aClass").innerHTML=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}
-function renderFilters(){let opts=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");$("filterClass").innerHTML='<option value="">Tất cả</option>'+opts}
-window.createClass=async()=>{let name=$("newClassName").value.trim();if(!name)return toast("Nhập tên lớp.");let id=push(ref(db,"classes")).key;await set(ref(db,"classes/"+id),{id,name,level:$("newClassLevel").value.trim(),teacherId:user.uid,createdAt:new Date().toISOString()});await logActivity("create_class",{classId:id,name});closeModal("classModal");loadTeacherData();toast("Đã tạo lớp.")};
-window.createStudent=async()=>{
-  const name=$("newStudentName").value.trim(),classId=$("studentClassManage").value,code=$("newStudentCode").value.trim().toUpperCase();
-  if(!name)return toast("Nhập tên học sinh.");
-  if(!classId)return toast("Chọn lớp.");
-  if(!code)return toast("Nhập mã đăng nhập.");
-  const snap=await get(ref(db,"students"));
-  const existing=Object.values(snap.val()||{}).find(x=>String(x.classId)===String(classId)&&String(x.code||"").toUpperCase()===code);
-  if(existing)return toast("Mã này đã có trong lớp.");
-  const c=allClasses.find(x=>x.id===classId),id=push(ref(db,"students")).key;
-  const obj={id,name,code,classId,className:c?.name||"",role:"student",createdAt:new Date().toISOString(),createdBy:user.uid};
-  await set(ref(db,"students/"+id),obj);
-  await logActivity("create_student",obj);
-  closeModal("studentModal");
-  $("newStudentName").value="";$("newStudentCode").value="";
-  loadTeacherData();loadLoginClasses();toast("Đã thêm học sinh. Em ấy đăng nhập bằng lớp + mã.");
-};
-
-function renderStudentClassManage(){
-  const el=$("studentClassManage"); if(!el)return;
-  el.innerHTML=allClasses.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
-}
-
-window.createQuestion=async()=>{let text=$("newQuestion").value.trim();if(!text)return toast("Nhập câu hỏi.");let id=push(ref(db,"questions")).key;await set(ref(db,"questions/"+id),{id,text,topic:$("newTopic").value.trim()||"General",createdBy:user.uid,createdAt:new Date().toISOString()});await logActivity("create_question",{questionId:id,text});closeModal("questionModal");loadTeacherData();toast("Đã thêm câu hỏi.")};
-window.createAssignment=async()=>{let ids=[...document.querySelectorAll(".qcheck:checked")].map(x=>x.value),cid=$("aClass").value;if(!cid||!ids.length)return toast("Chọn lớp và ít nhất 1 câu.");let c=allClasses.find(x=>x.id===cid),id=push(ref(db,"assignments")).key,obj={id,title:$("aTitle").value.trim()||"Speaking Assignment",classId:cid,className:c?.name||"",lesson:$("aLesson").value.trim(),questionIds:ids,teacherId:user.uid,createdAt:new Date().toISOString()};await set(ref(db,"assignments/"+id),obj);await logActivity("create_assignment",obj);toast("Đã giao bài.");loadTeacherData()};
-function renderSubmissions(){let cls=$("filterClass").value,lesson=$("filterLesson").value.toLowerCase(),date=$("filterDate").value;let rows=allSubs.filter(x=>(!cls||x.classId===cls||allAssignments.some(a=>a.id===x.assignmentId&&a.classId===cls))&&(!lesson||(x.topic||"").toLowerCase().includes(lesson)||(x.question||"").toLowerCase().includes(lesson))&&(!date||(x.submittedAt||"").slice(0,10)>=date)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));$("submissionList").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Học sinh</th><th>Bài học</th><th>Điểm</th><th></th></tr>${rows.map(x=>`<tr><td>${esc((x.submittedAt||"").replace("T"," ").slice(0,16))}</td><td><b>${esc(x.student)}</b></td><td>${esc(x.topic||"")}</td><td>${x.score??"—"}</td><td><button class="btn secondary" onclick="openGrade('${esc(x.id)}')">Xem / chấm</button></td></tr>`).join("")}</table>`:'<div class="empty">Không có bài phù hợp.</div>'}
-window.openGrade=async id=>{selectedSubmission=allSubs.find(x=>x.id===id);if(!selectedSubmission)return;$("gradeInfo").innerHTML=`<div class="item"><b>${esc(selectedSubmission.student)}</b><div class="small muted">${esc(selectedSubmission.question)}</div>${selectedSubmission.audioUrl?`<audio controls style="width:100%;margin-top:10px" src="${esc(selectedSubmission.audioUrl)}"></audio>`:""}</div>`;$("gradeScore").value=selectedSubmission.score??"";$("gradePron").value=selectedSubmission.pronunciation??"";$("gradeFlu").value=selectedSubmission.fluency??"";$("gradeFeedback").value=selectedSubmission.feedback||"";openModal("gradeModal")};
-window.saveGrade=async()=>{if(!selectedSubmission)return;let patch={score:+$("gradeScore").value,pronunciation:+$("gradePron").value,fluency:+$("gradeFlu").value,feedback:$("gradeFeedback").value.trim(),status:"graded",gradedAt:new Date().toISOString(),gradedBy:user.uid};await update(ref(db,"submissions/"+selectedSubmission.id),patch);await logActivity("grade_submission",{submissionId:selectedSubmission.id,student:selectedSubmission.student,...patch});closeModal("gradeModal");toast("Đã lưu điểm và nhận xét.");loadTeacherData()};
-function renderTeacherHistory(){let rows=allHistory.sort((a,b)=>(b.at||"").localeCompare(a.at||""));$("teacherHistory").innerHTML=rows.length?`<table class="table"><tr><th>Thời gian</th><th>Hoạt động</th><th>Chi tiết</th></tr>${rows.map(x=>`<tr><td>${esc((x.at||"").replace("T"," ").slice(0,16))}</td><td>${esc(x.type)}</td><td class="small">${esc(JSON.stringify(x.details||{}))}</td></tr>`).join("")}</table>`:'<div class="empty">Chưa có lịch sử.</div>'}
-async function logActivity(type,details){let id=push(ref(db,"activityHistory")).key;await set(ref(db,"activityHistory/"+id),{id,type,details,teacherId:user.uid,at:new Date().toISOString()})}
-window.openModal=id=>$(id).classList.add("show");window.closeModal=id=>$(id).classList.remove("show");
+function renderMockBuilderQuestions(){const el=$('mockBuilderQuestions');if(!el)return;const level=$('mockLevel')?.value||'Flyers';const rows=allQuestions.filter(q=>(q.level||inferLevel(q.topic)||'General')===level);el.innerHTML=rows.length?rows.map(q=>`<label class="q-pick"><input type="checkbox" class="mockQCheck" value="${esc(q.id||'')}"><span><b>${esc(q.text)}</b><div class="q-meta">${esc(q.topic||'General')} · ${esc(level)}</div></span></label>`).join(''):'<div class="empty">Chưa có câu hỏi ở cấp độ này. Hãy thêm câu hỏi vào ngân hàng.</div>';if($('mockQuestionCount'))$('mockQuestionCount').textContent=`${rows.length} câu khả dụng`}
+function renderMockTestList(){const el=$('mockTestList');if(!el)return;el.innerHTML=allMockTests.length?allMockTests.slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).map(m=>`<div class="item"><div><div class="between"><div><b>${esc(m.title)}</b><div class="small muted" style="margin-top:4px">${esc(m.level||'')} · ${m.questionIds?.length||0} câu · ${m.duration||10} phút</div></div><span class="badge">${esc(m.status||'published')}</span></div><div class="small muted" style="margin-top:7px">${esc(m.description||'')}</div></div><button class="btn secondary" onclick="assignMockTest('${esc(m.id)}')">Giao bài</button></div>`).join(''):'<div class="empty">Chưa có Mock Test nào. Tạo đề đầu tiên ở trên.</div>'}
+async function createMockTest(){setSaveStatus('mockSaveStatus','⏳ Đang tạo Mock Test…','warn');$('saveMockBtn').disabled=true;try{const title=$('mockTitle').value.trim();const level=$('mockLevel').value;const description=$('mockDescription').value.trim();const count=Math.max(1,Math.min(20,Number($('mockCount').value)||5));const duration=Math.max(1,Math.min(60,Number($('mockDuration').value)||10));const ids=[...document.querySelectorAll('.mockQCheck:checked')].map(x=>x.value);if(!title)throw new Error('Bạn chưa nhập tên Mock Test.');if(!ids.length)throw new Error('Hãy chọn ít nhất 1 câu hỏi.');if(ids.length<count)throw new Error(`Bạn đang chọn ${ids.length} câu, hãy chọn ít nhất ${count} câu hoặc giảm số câu.`);const selected=ids.slice(0,count);let id='mt-'+Date.now();try{id=await dbPushKey('mockTests')}catch{}const obj={id,title,level,description,duration,questionIds:selected,status:'published',createdAt:now()};const res=await saveData('mockTests',id,obj);await saveHistory('create_mock_test',obj);await loadTeacherData();setSaveStatus('mockSaveStatus',res.firebase?'✅ Tạo Mock Test thành công và đã lưu Firebase.':'✅ Tạo Mock Test thành công trên thiết bị.','ok');toast('✅ Đã tạo Mock Test!','ok');$('mockTitle').value='';$('mockDescription').value='';document.querySelectorAll('.mockQCheck').forEach(x=>x.checked=false)}catch(e){setSaveStatus('mockSaveStatus','❌ Chưa tạo được Mock Test: '+e.message,'bad');toast('❌ '+e.message,'bad')}finally{$('saveMockBtn').disabled=false}}
+window.createMockTest=createMockTest;window.renderMockBuilderQuestions=renderMockBuilderQuestions;
+async function assignMockTest(id){const m=allMockTests.find(x=>x.id===id);if(!m)return;page('assign');setTimeout(()=>{if($('aTitle'))$('aTitle').value=m.title;if($('aLesson'))$('aLesson').value=m.level+' · '+(m.description||'Mock Test');if($('aType'))$('aType').value='mock';document.querySelectorAll('.qcheck').forEach(x=>x.checked=m.questionIds.includes(x.value));toast('✅ Đã nạp đề vào form Giao bài. Chọn lớp rồi bấm Giao bài.','ok')},120)}
+window.assignMockTest=assignMockTest;
+function renderSubmissions(){const cls=$('filterClass')?.value||'',term=($('filterLesson')?.value||'').toLowerCase(),date=$('filterDate')?.value||'',student=$('filterStudent')?.value||'';const rows=allSubs.filter(x=>(!cls||String(x.classId)===String(cls))&&(!student||String(x.studentId)===String(student))&&(!term||(x.topic||'').toLowerCase().includes(term)||(x.question||'').toLowerCase().includes(term)||(x.assignmentTitle||'').toLowerCase().includes(term))&&(!date||(x.submittedAt||'').slice(0,10)>=date)).sort((a,b)=>(b.submittedAt||'').localeCompare(a.submittedAt||''));$('submissionList').innerHTML=rows.length?`<table class="table"><thead><tr><th>Thời gian</th><th>Học sinh</th><th>Bài học</th><th>Điểm</th><th></th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc((x.submittedAt||'').replace('T',' ').slice(0,16))}</td><td><b>${esc(x.student||'')}</b><div class="small muted">${esc(x.className||'')}</div></td><td>${esc(x.topic||x.assignmentTitle||'')}<div class="small muted" style="margin-top:4px">${esc(x.question||'')}</div></td><td><b>${x.score??'—'}</b></td><td><button class="btn secondary" onclick="openGrade('${esc(x.id)}')">Xem / chấm</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Không có bài phù hợp với bộ lọc.</div>'}
 window.renderSubmissions=renderSubmissions;
-loadQuestions();
-ensureAnonymousAuth().then(loadLoginClasses).catch(()=>loadLoginClasses());
+function openGrade(id){selectedSubmission=allSubs.find(x=>x.id===id);if(!selectedSubmission)return;$('gradeInfo').innerHTML=`<div class="item"><div class="between"><b>${esc(selectedSubmission.student||'')}</b><span class="badge">${esc(selectedSubmission.className||'')}</span></div><div style="margin-top:8px"><b>${esc(selectedSubmission.question||'')}</b></div><div class="small muted" style="margin-top:6px">${esc(selectedSubmission.topic||selectedSubmission.assignmentTitle||'')} · ${esc((selectedSubmission.submittedAt||'').replace('T',' ').slice(0,16))}</div>${selectedSubmission.transcript?`<div class="notice" style="margin-top:10px"><b>Bản nhận diện:</b> ${esc(selectedSubmission.transcript)}</div>`:''}${selectedSubmission.audioUrl?`<audio controls src="${esc(selectedSubmission.audioUrl)}" style="width:100%;margin-top:10px"></audio>`:''}</div>`;$('gradeScore').value=selectedSubmission.score??'';$('gradePron').value=selectedSubmission.pronunciation??'';$('gradeFlu').value=selectedSubmission.fluency??'';$('gradeFeedback').value=selectedSubmission.feedback||'';openModal('gradeModal')}
+window.openGrade=openGrade;
+async function saveGrade(){if(!selectedSubmission)return;const score=Number($('gradeScore').value),pron=Number($('gradePron').value),flu=Number($('gradeFlu').value);if([score,pron,flu].some(v=>!Number.isFinite(v)||v<0||v>100)){setSaveStatus('gradeSaveStatus','❌ Điểm phải từ 0 đến 100.','bad');return}setSaveStatus('gradeSaveStatus','⏳ Đang lưu điểm và nhận xét…','warn');$('saveGradeBtn').disabled=true;try{const obj={...selectedSubmission,score,pronunciation:pron,fluency:flu,feedback:$('gradeFeedback').value.trim(),status:'graded',gradedAt:now(),lastEditedAt:now()};const res=await saveData('submissions',selectedSubmission.id,obj);await saveHistory('grade_submission',{submissionId:obj.id,student:obj.student,score,pronunciation:pron,fluency:flu,feedback:obj.feedback});setSaveStatus('gradeSaveStatus',res.firebase?'✅ Đã lưu điểm & nhận xét vào Firebase.':'✅ Đã lưu điểm & nhận xét trên thiết bị.','ok');toast('✅ Báo cáo đã được cập nhật!','ok');setTimeout(()=>{closeModal('gradeModal');loadTeacherData()},900)}catch(e){setSaveStatus('gradeSaveStatus','❌ Chưa lưu được điểm: '+e.message,'bad')}finally{$('saveGradeBtn').disabled=false}}
+window.saveGrade=saveGrade;
+function renderReports(){const cls=$('reportClass')?.value||'',term=($('reportLesson')?.value||'').toLowerCase(),from=$('reportDate')?.value||'',to=$('reportDateTo')?.value||'';const rows=allSubs.filter(x=>(!cls||String(x.classId)===String(cls))&&(!term||(x.topic||'').toLowerCase().includes(term)||(x.question||'').toLowerCase().includes(term)||(x.assignmentTitle||'').toLowerCase().includes(term))&&(!from||(x.submittedAt||'').slice(0,10)>=from)&&(!to||(x.submittedAt||'').slice(0,10)<=to));const scored=rows.map(x=>Number(x.score)).filter(Number.isFinite);const avg=scored.length?Math.round(scored.reduce((a,b)=>a+b,0)/scored.length):0;$('reportSummary').innerHTML=`<div class="card stat"><div class="muted">Bài phù hợp</div><div class="num">${rows.length}</div></div><div class="card stat"><div class="muted">Điểm trung bình</div><div class="num">${scored.length?avg:'—'}</div></div><div class="card stat"><div class="muted">Cao nhất</div><div class="num">${scored.length?Math.max(...scored):'—'}</div></div><div class="card stat"><div class="muted">Đã chấm</div><div class="num">${rows.filter(x=>x.score!=null).length}</div></div>`;$('reportList').innerHTML=rows.length?`<table class="table"><thead><tr><th>Ngày</th><th>Học sinh</th><th>Lớp</th><th>Bài học</th><th>Điểm</th><th>Nhận xét</th></tr></thead><tbody>${rows.sort((a,b)=>(b.submittedAt||'').localeCompare(a.submittedAt||'')).map(x=>`<tr><td>${esc((x.submittedAt||'').slice(0,10))}</td><td>${esc(x.student||'')}</td><td>${esc(x.className||'')}</td><td>${esc(x.topic||x.assignmentTitle||'')}</td><td><b>${x.score??'—'}</b></td><td>${esc(x.feedback||'—')} <button class="btn soft" style="margin-left:8px;padding:5px 8px;font-size:11px" onclick="openGrade('${esc(x.id)}')">Sửa</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Chưa có dữ liệu theo bộ lọc.</div>'}
+window.renderReports=renderReports;
+function renderTeacherHistory(){const el=$('teacherHistory');const rows=allHistory.slice().sort((a,b)=>(b.at||'').localeCompare(a.at||''));el.innerHTML=rows.length?`<table class="table"><thead><tr><th>Thời gian</th><th>Hoạt động</th><th>Chi tiết</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc((x.at||'').replace('T',' ').slice(0,16))}</td><td>${esc(x.type||'')}</td><td class="small">${esc(JSON.stringify(x.details||{}))}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Chưa có lịch sử quản lý.</div>'}
+window.renderTeacherHistory=renderTeacherHistory;
+
+function logout(){sessionStorage.removeItem('ms_student');sessionStorage.removeItem('ms_role');sessionStorage.removeItem('ms_idtoken');studentProfile=null;role='student';idToken=null;$('studentCode').value='';$('teacherPassword').value='';showAuth();setStatus('loginStatus','','');$('authError').textContent='';loadLoginClasses();toast('Đã đăng xuất.','ok')}
+window.logout=logout;
+
+function wire(){
+ $('loginBtn').addEventListener('click',submitStudentLogin);$('studentCode').addEventListener('keydown',e=>{if(e.key==='Enter')submitStudentLogin()});$('teacherPassword').addEventListener('keydown',e=>{if(e.key==='Enter')submitTeacherLogin()});
+ document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+}
+async function boot(){wire();renderWave('wave');renderWave('mockWave');await loadLoginClasses();showAuth()}
+window.addEventListener('load',boot);
+})();
 </script>
 </body>
 </html>
