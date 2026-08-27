@@ -132,7 +132,7 @@ input[type="date"]{color-scheme:dark}
     <div class="auth-sub">Chọn đúng khu vực để vào hệ thống. Học sinh dùng lớp + mã; giáo viên dùng mã riêng của cô.</div>
     <div class="tabs"><button id="studentTab" class="active" type="button" onclick="window.showStudentLoginPanel()">👧 Học sinh<br><span class="small muted">Chọn lớp + mã học sinh</span></button><button id="teacherTab" type="button" onclick="window.showTeacherLoginPanel()">👩🏻‍🏫 Giáo viên<br><span class="small muted">Đăng nhập khu vực quản lý</span></button></div>
     <div id="studentLoginPanel">
-      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="demo-class">Lớp mẫu · Thử giao diện</option></select></div>
+      <div class="field"><label>🏫 Chọn lớp</label><select id="studentClass"><option value="demo-class">Lớp mẫu · Thử giao diện</option></select></div><div class="row" style="justify-content:space-between;margin-top:7px"><span id="loginSyncHint" class="small muted">Danh sách lớp được đồng bộ tự động.</span><button type="button" class="soft-link" onclick="loadLoginClasses()">↻ Cập nhật lớp</button></div>
       <div class="field"><label>🔑 Mã học sinh</label><input id="studentCode" autocomplete="off" placeholder="Ví dụ: K01"></div>
       <button id="loginBtn" class="btn primary" style="width:100%;margin-top:8px">Vào phòng Speaking</button>
       <div id="authError" class="status" role="status" aria-live="polite"></div>
@@ -173,7 +173,7 @@ input[type="date"]{color-scheme:dark}
     <button onclick="page('reports',this)">📊 <span>Báo cáo</span></button>
     <button onclick="page('historyTeacher',this)">🕘 <span>Lịch sử</span></button>
   </div>
-  <div class="usercard"><div id="who" class="name">—</div><div id="roleText" class="small muted">—</div><button id="logoutBtn" type="button" class="btn secondary logout-btn" style="width:100%;margin-top:9px">Đăng xuất</button></div>
+  <div class="usercard"><div id="who" class="name">—</div><div id="roleText" class="small muted">—</div><button id="logoutBtn" type="button" class="btn secondary logout-btn" style="width:100%;margin-top:9px" onclick="window.logout()">Đăng xuất</button></div>
 </aside>
 <main class="main">
 <div class="top"><div><b id="pageTitle">Trang chủ</b><div class="small muted">MS HÂN CLASS · Speaking Practice Room</div></div><div class="pill" id="classPill">● Ready</div></div>
@@ -386,7 +386,7 @@ function showTeacher(){role='teacher';showApp();$('navStudent').classList.add('h
 function showApp(){$('auth').style.display='none';$('shell').style.display='block'}
 
 function renderLoginClasses(){const sel=$('studentClass');if(!sel)return;const seen=new Set();const items=[];for(const c of allClasses||[]){const id=String(c.id||'');if(!id||seen.has(id))continue;seen.add(id);items.push(c)}items.sort((a,b)=>(a.name||'').localeCompare(b.name||''));if(!items.length)items.push({id:'demo-class',name:'Lớp mẫu',level:'Thử giao diện'});sel.innerHTML='<option value="">— Chọn lớp của em —</option>'+items.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.level?' · '+esc(c.level):''}</option>`).join('');sel.disabled=false;setStatus('loginStatus','✅ Danh sách lớp đã sẵn sàng.','ok')}
-function loadLoginClasses(){const local=Object.values(localGet('classes')||{});allClasses=local.length?local:[{id:'demo-class',name:'Lớp mẫu',level:'Thử giao diện'}];renderLoginClasses();setStatus('loginStatus','✅ Có thể chọn lớp và nhập mã ngay.','ok');Promise.race([dbRead('classes'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),2500))]).then(remote=>{const merged=merge(remote||{},localGet('classes'));const values=Object.values(merged||{});if(values.length){allClasses=values;renderLoginClasses();setStatus('loginStatus','✅ Danh sách lớp đã đồng bộ từ Firebase.','ok')}}).catch(()=>{setStatus('loginStatus','✅ Có thể đăng nhập với danh sách lớp hiện có.','ok')})}
+function loadLoginClasses(){const local=Object.values(localGet('classes')||{});allClasses=local.length?local:[{id:'demo-class',name:'Lớp mẫu',level:'Thử giao diện'}];renderLoginClasses();setStatus('loginStatus','✅ Danh sách lớp đã sẵn sàng.','ok');const sync=async()=>{try{const remote=await dbRead('classes');const merged=merge(remote||{},localGet('classes'));const values=Object.values(merged||{});if(values.length){allClasses=values;localSet('classes',merged);renderLoginClasses();setStatus('loginStatus','✅ Danh sách lớp đã đồng bộ.','ok')}}catch(e){/* giữ danh sách local */}};setTimeout(sync,80)}
 async function findStudent(classId,code){const d=await getNode('students');const arr=Object.values(d);let s=arr.find(x=>String(x.classId)===String(classId)&&String(x.code||'').trim().toUpperCase()===code);if(s){const c=allClasses.find(x=>String(x.id)===String(classId));return {...s,id:s.id||s.uid,name:s.name||'Học sinh',code:String(s.code||'').toUpperCase(),className:s.className||c?.name||'',classLevel:c?.level||''}}if(classId==='demo-class'&&code==='K01')return {id:'demo-K01',name:'Học sinh mẫu',code:'K01',classId:'demo-class',className:'Lớp mẫu'};return null}
 async function submitStudentLogin(){const btn=$('loginBtn');btn.disabled=true;btn.textContent='Đang kiểm tra…';$('authError').textContent='';setStatus('loginStatus','Đang kiểm tra lớp và mã…','warn');try{const classId=$('studentClass').value,code=$('studentCode').value.trim().toUpperCase();if(!classId)throw new Error('Em hãy chọn lớp nhé.');if(!code)throw new Error('Em hãy nhập mã học sinh nhé.');const p=await findStudent(classId,code);if(!p)throw new Error('Chưa tìm thấy mã này trong lớp. Cô kiểm tra lại mã nhé.');studentProfile={...p,level:inferLevel((p.classLevel||'')+' '+(p.className||''))};sessionStorage.setItem('ms_student',JSON.stringify(p));sessionStorage.setItem('ms_role','student');setStatus('loginStatus','✅ Đăng nhập thành công. Đang mở phòng…','ok');toast('✅ Đã vào phòng Speaking!','ok');setTimeout(()=>showStudent(p),250)}catch(e){$('authError').textContent=e.message||'Không đăng nhập được.';setStatus('loginStatus','❌ Chưa vào được phòng Speaking.','bad')}finally{btn.disabled=false;btn.textContent='Vào phòng Speaking'}}
 function showStudentLoginPanel(){const st=$('studentTab'),te=$('teacherTab');st.classList.add('active');te.classList.remove('active');$('studentLoginPanel').classList.remove('hidden');$('teacherLoginPanel').classList.add('hidden');$('studentCode').focus()}
@@ -845,18 +845,17 @@ function renderTeacherHistory(){const el=$('teacherHistory');const rows=allHisto
 
 window.renderTeacherHistory=renderTeacherHistory;
 
-function logout(){try{if(rec?.state==='recording'){try{rec.stop()}catch{} } if(mockRec?.state==='recording'){try{mockRec.stop()}catch{} } sessionStorage.removeItem('ms_student');sessionStorage.removeItem('ms_role');sessionStorage.removeItem('ms_idtoken');localStorage.removeItem('ms_student');localStorage.removeItem('ms_role');studentProfile=null;role='student';idToken=null;window.location.reload();}catch(e){console.error(e);window.location.href=window.location.href.split('#')[0]+'#logout';window.location.reload();}}
+function logout(){try{if(rec?.state==='recording'){try{rec.stop()}catch{} }if(mockRec?.state==='recording'){try{mockRec.stop()}catch{} }stopRecognition?.();studentProfile=null;role='student';idToken=null;sessionStorage.removeItem('ms_student');sessionStorage.removeItem('ms_role');sessionStorage.removeItem('ms_idtoken');localStorage.removeItem('ms_student');localStorage.removeItem('ms_role');showAuth();showStudentLoginPanel();if($('studentCode'))$('studentCode').value='';if($('teacherPassword'))$('teacherPassword').value='';if($('loginStatus'))setStatus('loginStatus','✅ Đã đăng xuất. Chọn lớp để đăng nhập lại.','ok');toast('✅ Đã đăng xuất.','ok');loadLoginClasses();}catch(e){console.error('LOGOUT',e);window.location.replace(window.location.href.split('#')[0]+'#login');window.location.reload();}}
 window.logout=logout;
 
 function wire(){
- $('loginBtn').addEventListener('click',submitStudentLogin);
- $('studentCode').addEventListener('keydown',e=>{if(e.key==='Enter')submitStudentLogin()});
- $('teacherPassword').addEventListener('keydown',e=>{if(e.key==='Enter')submitTeacherLogin()});
- $('logoutBtn')?.addEventListener('click',logout);
- document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+ $('loginBtn')?.addEventListener('click',submitStudentLogin);
+ $('studentCode')?.addEventListener('keydown',e=>{if(e.key==='Enter')submitStudentLogin()});
+ $('teacherPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')submitTeacherLogin()});
+ document.querySelectorAll('.modal').forEach(m=>{if(!m.dataset.wired){m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')});m.dataset.wired='1'}});
 }
 function boot(){try{wire();renderWave('wave');renderWave('mockWave');if($('mockBlueprint'))renderMockBlueprint();showAuth();loadLoginClasses()}catch(e){console.error('BOOT',e);showAuth();const sel=$('studentClass');if(sel){sel.innerHTML='<option value="demo-class">Lớp mẫu</option>';sel.disabled=false}setStatus('loginStatus','✅ Màn hình đăng nhập đã sẵn sàng.','ok')}}
-window.addEventListener('load',boot); if(document.readyState==='complete') setTimeout(boot,0); else if(document.readyState!=='loading') setTimeout(boot,0);
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',boot,{once:true});}else{boot();}
 })();
 </script>
 </body>
