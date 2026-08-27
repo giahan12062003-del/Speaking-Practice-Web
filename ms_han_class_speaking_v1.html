@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -158,4 +160,7 @@ document.getElementById('assignmentRows').innerHTML=assignments.map((a,i)=>`<tr>
 document.getElementById('studentCount').textContent='—';
 </script>
 </body>
-</html>
+</html>'''
+path=Path("/mnt/data/ms_han_class_speaking_v1.html")
+path.write_text(html,encoding="utf-8")
+print(path)
