@@ -117,7 +117,7 @@ async function saveAssignment(id){const title=$('afTitle').value.trim(),classId=
 async function deleteAssignment(id){if(!confirm('Xóa bài giao?'))return;await db.ref('assignments/'+id).remove();toast('Đã xóa bài giao');refreshTeacher()}
 function renderAssignments(){const arr=Object.entries(state.assignments);$('assignmentsArea').innerHTML=arr.length?'<div class="list">'+arr.map(([id,a])=>`<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="muted">${esc(state.classes[a.classId]?.name||a.classId||'')} · ${(a.questionIds||[]).length} câu · Hạn ${a.dueAt?fmt(a.dueAt):'—'}</div></div><div class="actions"><button class="btn small" onclick="editAssignment('${id}')">Sửa</button><button class="btn danger small" onclick="deleteAssignment('${id}')">Xóa</button></div></div></div>`).join('')+'</div>':'<div class="empty">Chưa có bài giao.</div>'}
 function renderSubmissions(){const fc=$('subClassFilter').value,fa=$('subAssignFilter').value,fs=$('subStatusFilter').value;const arr=Object.entries(state.submissions).filter(([id,s])=>(!fc||s.classId===fc)&&(!fa||s.assignmentId===fa)&&(!fs||s.status===fs)).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));$('submissionsArea').innerHTML=arr.length?'<div class="table-wrap"><table class="table"><thead><tr><th>Học sinh</th><th>Bài</th><th>AI</th><th>Cô</th><th>Thời gian</th><th></th></tr></thead><tbody>'+arr.map(([id,s])=>`<tr><td><b>${esc(s.studentName||s.studentCode)}</b><br><span class="muted">${esc(state.classes[s.classId]?.name||'')}</span></td><td>${esc(s.taskTitle||s.assignmentId)}</td><td>${esc(s.score??'—')}</td><td>${esc(s.teacherScore??'—')}</td><td>${fmt(s.createdAt)}</td><td><div class="actions"><button class="btn small" onclick="reviewSubmission('${id}')">Xem / chấm</button></div></td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Chưa có bài phù hợp.</div>'}
-function reviewSubmission(id){const s=state.submissions[id]||{};$('modalBox').innerHTML=`<div class="modalhead"><h3>🎤 ${esc(s.studentName||'Học sinh')}</h3><button class="close" onclick="closeModal('modal')">×</button></div><div class="item"><b>${esc(s.taskTitle||'Speaking')}</b><p class="muted">${esc(s.question||'')}</p>${s.audioUrl?`<audio controls style="width:100%" src="${esc(s.audioUrl)}"></audio>`:''}<div class="notice" style="margin-top:10px">AI estimate: ${esc(s.score??'—')}/15 · Đúng chủ đề ${esc(s.topic??s.language??'—')}/5 · Độ trôi chảy ${esc(s.fluency??s.interaction??'—')}/5 · Phát âm ${esc(s.pronunciation??'—')}/5</div><p class="muted">${esc(s.aiComment||'')}</p></div><div class="score-grid"><div class="score-box">Overall / 15<input id="gs" class="input" value="${esc(s.teacherScore??s.score??'')}" type="number" step="1" min="0" max="15"></div><div class="score-box">Đúng chủ đề<input id="gl" class="input" value="${esc(s.teacherTopic??s.topic??s.language??'')}" type="number" min="0" max="5"></div><div class="score-box">Pronunciation<input id="gp" class="input" value="${esc(s.teacherPronunciation??s.pronunciation??'')}" type="number" min="0" max="5"></div><div class="score-box">Độ trôi chảy<input id="gi" class="input" value="${esc(s.teacherFluency??s.fluency??s.interaction??'')}" type="number" min="0" max="5"></div></div><div class="field"><label>Nhận xét cô Hân</label><textarea id="gc" class="textarea">${esc(s.teacherComment||s.aiComment||'')}</textarea></div><button class="btn primary" style="width:100%" onclick="saveReview('${id}')">LƯU ĐIỂM & NHẬN XÉT</button>`;openModal('modal')}
+function reviewSubmission(id){const s=state.submissions[id]||{};$('modalBox').innerHTML=`<div class="modalhead"><h3>🎤 ${esc(s.studentName||'Học sinh')}</h3><button class="close" onclick="closeModal('modal')">×</button></div><div class="item"><b>${esc(s.taskTitle||'Speaking')}</b><p class="muted">${esc(s.question||'')}</p>${s.audioUrl?`<audio controls style="width:100%" src="${esc(s.audioUrl)}"></audio>`:''}<div class="notice" style="margin-top:10px">AI estimate: ${esc(s.score??'—')}/15 · Đúng chủ đề ${esc(s.topic??s.language??'—')}/5 · Độ trôi chảy ${esc(s.fluency??s.interaction??'—')}/5 · Phát âm ${esc(s.pronunciation??'—')}/5</div><p class="muted">${esc(s.aiComment||'')}</p></div><div class="score-grid"><div class="score-box">Overall / 15<input id="gs" class="input" value="${esc(s.teacherScore??s.score??'')}" type="number" step="1" min="0" max="15"></div><div class="score-box">Đúng chủ đề<input id="gl" class="input" value="${esc(s.teacherTopic??s.topic??s.language??'')}" type="number" min="0" max="5"></div><div class="score-box">Pronunciation<input id="gp" class="input" value="${esc(s.teacherPronunciation??s.pronunciation??'')}" type="number" min="0" max="5"></div><div class="score-box">Độ trôi chảy<input id="gi" class="input" value="${esc(s.teacherFluency??s.fluency??s.interaction??'')}" type="number" min="0" max="5"></div></div><div class="field"><label>💬 Nhận xét cô Hân dành cho bé</label><textarea id="gc" class="textarea">${esc(s.teacherComment||s.aiComment||'')}</textarea></div><button class="btn primary" style="width:100%" onclick="saveReview('${id}')">LƯU ĐIỂM & NHẬN XÉT</button>`;openModal('modal')}
 async function saveReview(id){
   const topic=Number($('gl').value)||0, fluency=Number($('gi').value)||0, pronunciation=Number($('gp').value)||0;
   const teacherScore=Math.max(0,Math.min(15,topic+fluency+pronunciation));
@@ -299,8 +299,9 @@ async function log(action,detail){try{const t=Date.now();await db.ref('history/'
 
 function calcStreak(studentId){const dates=[...new Set(Object.values(state.submissions||{}).filter(x=>x.studentId===studentId).map(x=>{const d=new Date(x.createdAt||x.time||0);return isNaN(d)?null:d.toISOString().slice(0,10)}).filter(Boolean))].sort().reverse();if(!dates.length)return 0;let streak=0,last=new Date();last.setHours(0,0,0,0);for(const ds of dates){const d=new Date(ds);d.setHours(0,0,0,0);const diff=Math.round((last-d)/86400000);if(diff===0||diff===1){streak++;last=d}else break}return streak}
 function shieldIcon(on){return `<svg viewBox="0 0 32 38" aria-hidden="true"><path d="M16 2 28 6v9c0 8.1-4.9 15-12 20-7.1-5-12-11.9-12-20V6z" fill="${on?'#9b6cff':'#151a36'}" stroke="${on?'#cdbaff':'#6f7798'}" stroke-width="2"/><path d="M16 6 23.5 8.5v6.2c0 5.5-3 10.1-7.5 13.7-4.5-3.6-7.5-8.2-7.5-13.7V8.5z" fill="${on?'#b999ff':'#0e1229'}" opacity="${on?'0.9':'1'}"/></svg>`}
-async function renderStudent(){const s=currentStudent;const [classes,assignments,questions,subs,mocks]=await Promise.all([read('classes'),read('assignments'),read('questions'),read('submissions'),read('mockTests')]);state.classes=classes;state.assignments=assignments;state.questions=questions;state.submissions=subs;state.mockTests=mocks;const tasks=Object.entries(assignments).filter(([id,a])=>a.classId===s.classId&&a.active!==false);const attempts=Object.values(await read('mockAttempts')).filter(x=>x.studentId===s.uid);const best=attempts.length?Math.max(...attempts.map(x=>Number(x.shields)||0)):0;$('studentSub').textContent=(s.name||s.studentName||'Học sinh')+' · '+(classes[s.classId]?.name||'Lớp');$('studentArea').innerHTML=`<div class="student-hero"><div><span class="pill">🏫 ${esc(classes[s.classId]?.name||'')}</span><h2>Xin chào, ${esc(s.name||s.studentName||'em')} 👋</h2><p class="muted">Mỗi ngày một chút · Mỗi lần nói một bước tiến bộ.</p></div><div style="text-align:center"><div class="muted small">Khiên cao nhất</div><div class="shields">${[0,1,2,3,4].map(i=>`<span class="shield ${i<best?'on':''}">${shieldIcon(i<best)}</span>`).join('')}</div></div></div><div class="student-actions"><button type="button" class="student-action" data-student-action="assignments">📝<span class="action-title">Bài được giao</span><span class="action-sub">${tasks.length} bài · Bấm để xem</span></button><button type="button" class="student-action" data-student-action="topics">🎯<span class="action-title">Luyện theo chủ đề</span><span class="action-sub">Chọn topic · Bấm để mở</span></button><button type="button" class="student-action" data-student-action="mock">🏆<span class="action-title">Thi thử</span><span class="action-sub">Phấn đấu 5 khiên · Bấm để làm</span></button></div><div id="studentTasks" class="section"><h2>Bài cô Hân giao</h2><div class="task-list">${tasks.map(([id,a])=>`<div class="task"><span class="pill">${(a.questionIds||[]).length} câu</span><h4>${esc(a.title)}</h4><p>Hạn: ${a.dueAt?fmt(a.dueAt):'Không giới hạn'}</p><button class="btn primary" style="margin-top:12px;width:100%" onclick="startAssignmentPractice('${id}')">BẮT ĐẦU →</button></div>`).join('')||'<div class="empty">Chưa có bài được giao.</div>'}</div></div><div class="section"><h2>🛡️ Thi thử & tiến bộ</h2><div class="panel"><div class="between"><span>Ngôi sao khiên cao nhất</span><b>${best}/5 khiên</b></div><div class="progress" style="margin-top:9px"><span style="width:${best*20}%"></span></div><div class="muted small" style="margin-top:8px">Mỗi lần hoàn thành Mock Test, hệ thống lưu kết quả riêng để em phấn đấu tăng khiên.</div><div class="motivation-card"><div class="motivation"><div>🛡️</div><div class="big">${best}/5</div><div class="muted small">Khiên cao nhất</div></div><div class="motivation"><div>🔥</div><div class="big">${calcStreak(currentStudent.uid)} ngày</div><div class="muted small">Streak luyện</div></div><div class="motivation"><div>🏆</div><div class="big">${attempts.length}</div><div class="muted small">Lần thi thử</div></div></div></div></div>`}
-
+async function renderStudent(){const s=currentStudent;const [classes,assignments,questions,subs,mocks]=await Promise.all([read('classes'),read('assignments'),read('questions'),read('submissions'),read('mockTests')]);state.classes=classes;state.assignments=assignments;state.questions=questions;state.submissions=subs;state.mockTests=mocks;const tasks=Object.entries(assignments).filter(([id,a])=>a.classId===s.classId&&a.active!==false);const attempts=Object.values(await read('mockAttempts')).filter(x=>x.studentId===s.uid);const best=attempts.length?Math.max(...attempts.map(x=>Number(x.shields)||0)):0;$('studentSub').textContent=(s.name||s.studentName||'Học sinh')+' · '+(classes[s.classId]?.name||'Lớp');$('studentArea').innerHTML=`<div class="student-hero"><div><span class="pill">🏫 ${esc(classes[s.classId]?.name||'')}</span><h2>Xin chào, ${esc(s.name||s.studentName||'em')} 👋</h2><p class="muted">Mỗi ngày một chút · Mỗi lần nói một bước tiến bộ.</p></div><div style="text-align:center"><div class="muted small">Khiên cao nhất</div><div class="shields">${[0,1,2,3,4].map(i=>`<span class="shield ${i<best?'on':''}">${shieldIcon(i<best)}</span>`).join('')}</div></div></div><div class="student-actions"><button type="button" class="student-action" data-student-action="assignments">📝<span class="action-title">Bài được giao</span><span class="action-sub">${tasks.length} bài · Bấm để xem</span></button><button type="button" class="student-action" data-student-action="topics">🎯<span class="action-title">Luyện theo chủ đề</span><span class="action-sub">Chọn topic · Bấm để mở</span></button><button type="button" class="student-action" data-student-action="mock">🏆<span class="action-title">Thi thử</span><span class="action-sub">Phấn đấu 5 khiên · Bấm để làm</span></button></div><div id="studentTasks" class="section"><h2>Bài cô Hân giao</h2><div class="task-list">${tasks.map(([id,a])=>`<div class="task"><span class="pill">${(a.questionIds||[]).length} câu</span><h4>${esc(a.title)}</h4><p>Hạn: ${a.dueAt?fmt(a.dueAt):'Không giới hạn'}</p><button class="btn primary" style="margin-top:12px;width:100%" onclick="startAssignmentPractice('${id}')">BẮT ĐẦU →</button></div>`).join('')||'<div class="empty">Chưa có bài được giao.</div>'}</div></div><div class="section"><h2>🛡️ Thi thử & tiến bộ</h2><div class="panel"><div class="between"><span>Ngôi sao khiên cao nhất</span><b>${best}/5 khiên</b></div><div class="progress" style="margin-top:9px"><span style="width:${best*20}%"></span></div><div class="muted small" style="margin-top:8px">Mỗi lần hoàn thành Mock Test, hệ thống lưu kết quả riêng để em phấn đấu tăng khiên.</div><div class="motivation-card"><div class="motivation"><div>🛡️</div><div class="big">${best}/5</div><div class="muted small">Khiên cao nhất</div></div><div class="motivation"><div>🔥</div><div class="big">${calcStreak(currentStudent.uid)} ngày</div><div class="muted small">Streak luyện</div></div><div class="motivation"><div>🏆</div><div class="big">${attempts.length}</div><div class="muted small">Lần thi thử</div></div></div></div></div>
+<div class="section"><h2>💬 Nhận xét của cô Hân</h2><div class="list">
+${Object.values(subs).filter(x=>x.studentId===s.uid&&x.teacherComment).sort((a,b)=>(b.gradedAt||b.createdAt||0)-(a.gradedAt||a.createdAt||0)).slice(0,3).map(x=>`<div class="item"><div class="between"><div><b>${esc(x.taskTitle||x.question||'Bài Speaking')}</b><div class="muted small">${fmt(x.gradedAt||x.createdAt)}</div></div><span class="pill">${esc((x.teacherScore??x.score??'—')+'/15')}</span></div><div style="margin-top:8px;line-height:1.6">${esc(x.teacherComment)}</div></div>`).join('') || '<div class="empty">Cô chưa có nhận xét mới.</div>'}</div></div>`}
 function currentSpokenQuestion(){
   if(!practiceTask) return {};
   if(practiceTask.mockQuestions) return practiceTask.mockQuestions[practiceTask.index]||{};
@@ -554,62 +555,104 @@ function pauseStats(text,duration){
   return {fillers,repeats,pace};
 }
 
+
+function topicKeywords(q){
+  const topic=String(q?.topic||'').toLowerCase();
+  const text=String(q?.text||'').toLowerCase();
+  const map={
+    family:['family','mother','mum','mom','father','dad','brother','sister','parents','grandma','grandfather','home'],
+    'my family':['family','mother','mum','mom','father','dad','brother','sister','parents','grandma','grandfather','home'],
+    school:['school','teacher','class','classroom','subject','lesson','student','friend','homework'],
+    'daily routines':['wake','morning','school','homework','play','eat','dinner','sleep','bed','usually'],
+    people:['boy','girl','man','woman','friend','person','people','family','brother','sister'],
+    'free time':['play','football','game','watch','read','music','weekend','swim','ride','hobby'],
+    'past activities':['yesterday','last','weekend','went','did','played','visited','watched','ate','saw'],
+    future:['future','want','will','going','dream','job','become','would like'],
+    food:['food','eat','like','favourite','favorite','pizza','rice','fruit','drink','meal'],
+    places:['place','park','school','home','shop','beach','city','town','restaurant'],
+    animals:['animal','dog','cat','bird','fish','horse','zoo','pet'],
+    friends:['friend','best friend','play','together','boy','girl'],
+    birthday:['birthday','party','present','cake','candles','age'],
+    holidays:['holiday','vacation','travel','trip','visit','beach','mountain'],
+    hobbies:['hobby','play','read','draw','sing','dance','swim','football','music']
+  };
+  const bag=new Set();
+  Object.keys(map).forEach(k=>{if(topic.includes(k)||text.includes(k))map[k].forEach(x=>bag.add(x))});
+  if(!bag.size){
+    (topic+' '+text).split(/\s+/).map(x=>x.replace(/[^a-z'-]/g,'')).filter(x=>x.length>=4)
+      .filter(x=>!['what','tell','about','your','would','could','please','look','describe','answer'].includes(x))
+      .slice(0,10).forEach(x=>bag.add(x));
+  }
+  return [...bag];
+}
+
+function pauseStats(text,duration){
+  const fillers=(text.match(/\b(um|uh|er|hmm|you know|like)\b/gi)||[]).length;
+  const repeats=(text.match(/\b([A-Za-z']+)(?:\s+\1\b)+/gi)||[]).length;
+  const pace=duration?wordTokens(text).length/(duration/60):0;
+  return {fillers,repeats,pace};
+}
+
 function autoScore(text,duration,analysis,q){
-  const a=analyzeTranscript(text), n=a.count, lower=text.toLowerCase();
+  const a=analyzeTranscript(text), n=a.count, lower=text.toLowerCase().trim();
   const stats=pauseStats(text,duration);
   const keys=topicKeywords(q);
+
+  // Không đủ câu trả lời: không được "ăn điểm" chỉ vì nói được một từ.
+  const genericShort=/^(hello|hi|hey|ok|okay|yes|no|bye|thanks|thank you)$/i.test(lower);
+  const insufficient=n===0 || (n<=2 && genericShort);
+  if(insufficient){
+    return {
+      overall:1, topic:0, fluency:0, pronunciation:1,
+      volume:analysis?.volume||0, pace:Math.round(stats.pace||0),
+      comment:'Bé đã bật micro và nói được một chút, nhưng câu trả lời chưa đủ để đánh giá nội dung của bài. Bé hãy trả lời đúng câu hỏi trước nhé.',
+      words:n,fillers:stats.fillers,repeats:stats.repeats,errors:a.errors,
+      confidence:Math.round((recognitionConfidence.map(x=>Number(x.confidence)||0).filter(Boolean).reduce((s,x)=>s+x,0)/(recognitionConfidence.map(x=>Number(x.confidence)||0).filter(Boolean).length||1))*100),
+      topicComment:'Chưa đủ nội dung để đánh giá đúng chủ đề.',
+      fluencyComment:'Chưa đủ lời nói để đánh giá độ trôi chảy.',
+      pronComment:'Có tín hiệu giọng nói nhưng chưa đủ bằng chứng để đánh giá phát âm chắc chắn.'
+    };
+  }
+
   const hits=keys.filter(k=>lower.includes(k.toLowerCase())).length;
-  const qText=String(q?.text||'').toLowerCase();
+  const topicEvidence=keys.length?hits:0;
 
-  // For young learners, a short but relevant answer is acceptable.
-  // Topic score is intentionally generous unless the answer clearly goes off-topic.
+  // Bé nhỏ có thể trả lời ngắn. Đúng chủ đề thì 4–5 điểm, không cần nói dài.
   let topicScore=5;
-  const topicEvidence = keys.length ? hits : 0;
-  const clearlyOffTopic = n>=3 && keys.length && topicEvidence===0;
-  if(!n) topicScore=0;
-  else if(clearlyOffTopic) topicScore=3;
+  const clearlyOffTopic=keys.length && topicEvidence===0;
+  if(clearlyOffTopic) topicScore=2;
   else if(n<=2) topicScore=4;
-  else if(topicEvidence===0 && /family|school|food|friends|hobbies|holiday|weekend/.test(qText)) topicScore=4;
-  if(/\bwhy\b/.test(qText) && /\bbecause\b/.test(lower)) topicScore=Math.min(5,topicScore+0);
-  topicScore=Math.max(0,Math.min(5,topicScore));
+  if(/\bwhy\b/.test(String(q?.text||'').toLowerCase()) && /\bbecause\b/.test(lower)) topicScore=5;
 
-  // Fluency is gentle: only noticeably repeated / filler-heavy speech is penalized.
+  // Trôi chảy: chỉ trừ khi lặp/ngập ngừng thấy rõ.
   let fluencyScore=5;
-  const roughness = stats.repeats*2 + stats.fillers;
+  const roughness=stats.repeats*2+stats.fillers;
   if(roughness>=6) fluencyScore=3;
   else if(roughness>=3) fluencyScore=4;
-  if(stats.pace>0 && (stats.pace<20 || stats.pace>190)) fluencyScore=Math.max(3,fluencyScore-1);
-  if(n<2 && stats.fillers===0) fluencyScore=Math.max(4,fluencyScore);
+  if(stats.pace>0 && (stats.pace<18 || stats.pace>200)) fluencyScore=Math.max(3,fluencyScore-1);
 
-  // Pronunciation: penalize mainly when recognition confidence is clearly low.
+  // Phát âm: dùng confidence chỉ như tín hiệu hỗ trợ, không lấy âm lượng để suy ra phát âm.
   const confs=recognitionConfidence.map(x=>Number(x.confidence)||0).filter(x=>x>0);
   const confAvg=confs.length?confs.reduce((s,x)=>s+x,0)/confs.length:0.72;
   const lowCount=recognitionConfidence.filter(x=>Number(x.confidence)>0&&Number(x.confidence)<0.45).length;
   let pronunciationScore=5;
   if(confAvg<0.48 || lowCount>=3) pronunciationScore=3;
   else if(confAvg<0.58 || lowCount>=1) pronunciationScore=4;
-  // If audio was extremely quiet, make pronunciation harder rather than claiming bad pronunciation.
-  if(Number(analysis?.volume||60)<38) pronunciationScore=Math.min(pronunciationScore,3);
+  if(Number(analysis?.volume||60)<32) pronunciationScore=Math.min(pronunciationScore,3);
 
   const overall=topicScore+fluencyScore+pronunciationScore;
 
-  const topicComment=topicScore>=5
-    ?'Bé trả lời đúng chủ đề và đã đáp ứng câu hỏi.'
-    :topicScore===4
-    ?'Bé trả lời đúng hướng của chủ đề; như vậy là tốt rồi.'
-    :'Bé đã nói được nhưng cần bám sát câu hỏi hơn một chút.';
+  const topicComment=topicScore>=5?'Bé trả lời đúng chủ đề và đáp ứng câu hỏi.'
+    :topicScore===4?'Bé trả lời đúng chủ đề; câu ngắn như vậy là hoàn toàn ổn.'
+    :'Bé cần tập trung trả lời đúng câu hỏi/chủ đề hơn một chút.';
 
-  const fluencyComment=fluencyScore>=5
-    ?'Bé nói khá tự nhiên và trôi chảy.'
-    :fluencyScore===4
-    ?`Bé nói khá ổn; có khoảng ${stats.repeats||0} chỗ lặp/từ đệm cần giảm nhẹ.`
-    :'Bé còn ngập ngừng/lặp từ khá nhiều, nên nói từng câu ngắn và chậm hơn.';
+  const fluencyComment=fluencyScore>=5?'Bé nói khá tự nhiên và trôi chảy.'
+    :fluencyScore===4?'Bé nói khá ổn; chỉ cần giảm một vài chỗ lặp hoặc ngập ngừng.'
+    :'Bé còn ngập ngừng/lặp từ khá nhiều; mình thử nói từng câu ngắn nhé.';
 
-  const pronComment=pronunciationScore>=5
-    ?'Phát âm nhìn chung rõ và hệ thống nhận diện khá tốt.'
-    :pronunciationScore===4
-    ?'Phát âm khá rõ; có vài từ nên nói chậm và rõ hơn.'
-    :'Một số từ được hệ thống nhận diện chưa rõ; bé nên luyện lại từng từ khó và nói to hơn.';
+  const pronComment=pronunciationScore>=5?'Phát âm nhìn chung rõ và dễ nhận diện.'
+    :pronunciationScore===4?'Phát âm khá rõ; có vài từ nên nói chậm và rõ hơn.'
+    :'Một số từ được hệ thống nhận diện chưa rõ; bé hãy nói chậm và rõ hơn.';
 
   let comment=[topicComment,fluencyComment,pronComment].join(' ');
   if(overall>=14) comment='Xuất sắc! '+comment;
