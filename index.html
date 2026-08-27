@@ -33,6 +33,13 @@
 .custom-builder h4{margin:0 0 6px;font-size:15px}.custom-note{font-size:11px;color:#9da7cb;line-height:1.45}.custom-grid{display:grid;grid-template-columns:140px 1fr;gap:10px}.custom-draft-list{display:grid;gap:8px;margin-top:10px}.custom-draft{padding:10px;border:1px solid #333c68;border-radius:11px;background:#0a1027}.custom-draft img{width:68px;height:48px;object-fit:cover;border-radius:7px;border:1px solid #374373}.custom-actions{display:flex;gap:6px;flex-wrap:wrap}
 @media(max-width:650px){.custom-grid{grid-template-columns:1fr}.custom-draft{padding:9px}}
 </style>
+
+<style id="v10-12-mock-selection">
+.mock-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.mock-select-card{display:block;width:100%;text-align:left;border:1px solid #3d326d;border-radius:16px;background:#0c1230;color:#f5f1ff;padding:16px;cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
+.mock-select-card:hover{transform:translateY(-2px);border-color:#8f63ff;box-shadow:0 10px 30px rgba(93,57,170,.18)}
+.mock-select-card .pill.success{border-color:#2e8b62;color:#69e8ad}
+</style>
 </head>
 <body>
 <div id="toast" class="toast"></div>
@@ -965,36 +972,364 @@ function buildMockQuestionItems(m){
  return parts.flatMap(p=>byPart[p]);
 }
 
-async function startStudentMock(){
- const mocks=Object.entries(state.mockTests).filter(([id,m])=>m.classId===currentStudent.classId&&m.active!==false);
- if(!mocks.length){toast('Chưa có đề thi thử cho lớp này.','info');return}
- const [id,m]=mocks[0];
- const items=buildMockQuestionItems(m);
- if(!items.length){toast('Đề chưa có câu hỏi.','err');return}
- practiceTask={id,title:m.title,questionIds:items.map((q,i)=>q._id||('q-'+i)),mockQuestions:items,classId:m.classId,isMock:true,mockLevel:m.level,index:0,mockScores:[],wordFixes:{}};
- renderMockStudentQuestion(0);
+
+async function startStudentMock(mockId){
+  const mocks=Object.entries(state.mockTests||{})
+    .filter(([id,m])=>m.classId===currentStudent.classId&&m.active!==false)
+    .sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+  if(!mocks.length){toast('Chưa có đề thi thử cho lớp này.','info');return}
+
+  // When a specific mockId is supplied, open that mock directly.
+  if(mockId && state.mockTests[mockId]){
+    openStudentMockById(mockId);
+    return;
+  }
+
+  const attempts=Object.values(await read('mockAttempts'));
+  const attemptsByMock={};
+  attempts.filter(x=>x.studentId===currentStudent.uid).forEach(x=>{
+    attemptsByMock[x.mockId]=x;
+  });
+
+  $('studentArea').innerHTML=`<div class="section">
+    <div class="between" style="align-items:flex-start;gap:15px">
+      <div>
+        <h2 style="margin:0 0 6px">🏆 Thi thử</h2>
+        <p class="muted" style="margin:0">Chọn một ô Mock Test để bắt đầu. Bé có thể quay lại đề đã làm bất cứ lúc nào để xem lại kết quả.</p>
+      </div>
+      <button class="btn secondary" type="button" onclick="renderStudent()">← Trang chính</button>
+    </div>
+
+    <div class="mock-card-grid" style="margin-top:16px">
+      ${mocks.map(([id,m])=>{
+        const at=attemptsByMock[id];
+        const itemCount=buildMockQuestionItems(m).length;
+        const progress=at?`<span class="pill success">✅ Đã hoàn thành · ${esc(String(at.score??'—'))}/15</span>`:`<span class="pill">📝 Chưa làm</span>`;
+        return `<button class="mock-select-card" type="button" onclick="openStudentMockById('${id}')">
+          <div class="between" style="align-items:flex-start;gap:12px">
+            <div style="text-align:left">
+              <span class="pill">🏆 ${esc(m.level||'Speaking')}</span>
+              <h3 style="margin:9px 0 5px">${esc(m.title||'Mock Test')}</h3>
+              <div class="muted small">${esc(m.topic||'Nhiều chủ đề')} · ${itemCount} câu · ${m.minutes||8} phút</div>
+            </div>
+            <span style="font-size:24px">→</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">${progress}
+            ${at?`<span class="pill">🛡️ ${Number(at.shields)||0}/5 khiên</span>`:''}
+          </div>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+async function openStudentMockById(mockId){
+  const m=state.mockTests[mockId];
+  if(!m){toast('Không tìm thấy Mock Test này.','err');return}
+  const items=buildMockQuestionItems(m);
+  if(!items.length){toast('Đề chưa có câu hỏi.','err');return}
+
+  const attempts=Object.values(await read('mockAttempts'));
+  const previous=attempts.filter(x=>x.studentId===currentStudent.uid&&x.mockId===mockId)
+    .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+
+  practiceTask={
+    id:mockId,
+    title:m.title,
+    questionIds:items.map((q,i)=>q._id||('q-'+i)),
+    mockQuestions:items,
+    classId:m.classId,
+    isMock:true,
+    mockLevel:m.level,
+    index:0,
+    mockScores:[],
+    mockSaved:[],
+    wordFixes:{},
+    previousAttempt:previous||null,
+    previousAnswers:previous?.answers||[]
+  };
+
+  renderMockStudentQuestion(0);
 }
 
 function renderMockStudentQuestion(i){
- practiceTask.index=i;practiceTask.wordFixes={};const q=practiceTask.mockQuestions[i]||{};
- $('studentArea').innerHTML=`<button class="back" onclick="renderStudent()">← Thoát thi thử</button><div class="student-card practice"><div class="between"><div><span class="pill">🏆 ${esc(practiceTask.mockLevel)} · Mock Test</span><div class="muted small">${esc(q.part||'')} · ${esc(q.topic||'')}</div></div><span class="pill">Câu ${i+1}/${practiceTask.mockQuestions.length}</span></div><div class="qbox"><div class="qnum">Speaking test</div><div class="qtext">${esc(q.text||'')}</div>${q.images?.length?`<div class="photo-preview" style="margin-top:13px">${q.images.map(src=>`<img class="qimage" src="${src}" alt="Hình thi thử">`).join('')}</div>`:(q.imageData?`<img class="qimage" src="${q.imageData}" alt="Hình thi thử">`:'')}</div><div class="wave">${Array.from({length:35},()=>'<i></i>').join('')}</div><div class="recordbar"><button id="recordBtn" class="record-btn" onclick="toggleStudentRecord()">🎙️</button><button id="stopBtn" class="btn secondary" onclick="stopStudentRecord()" disabled>⏹ Dừng</button><button class="btn secondary" onclick="speakText('${encodeURIComponent(q.text||'')}')">🔊 Nghe đề</button><button id="rerecordBtn" class="btn secondary hidden" onclick="resetStudentRecording()">🔄 Ghi âm lại</button><button class="btn secondary" onclick="toggleSuggestedAnswer()">💡 Gợi ý trả lời</button><span id="recState" class="record-status info">Nhấn micro để trả lời</span></div><audio id="studentAudio" class="audio" controls style="width:100%;display:none"></audio><div id="suggestionPanel" class="suggestion-panel"></div><div id="studentResult" class="feedback hidden"></div><button id="submitSpeaking" type="button" class="btn primary" style="width:100%;margin-top:12px" disabled>LƯU CÂU TRẢ LỜI</button></div>`
- const submit=$("submitSpeaking"); if(submit){ submit.disabled=false; submit.onclick=async()=>{ if(submit.dataset.busy==='1') return; if(!currentRecord||!practiceTask?.lastScore){toast('Hãy ghi âm và chờ hệ thống phân tích trước khi lưu câu này nhé.','info');return;} submit.dataset.busy='1'; submit.disabled=true; const old=submit.textContent; submit.textContent='⏳ Đang lưu...'; try{ await submitMockAnswer(); } catch(e){ toast('Không thể lưu câu trả lời: '+(e?.message||e),'err'); } finally { submit.dataset.busy='0'; if(document.body.contains(submit) && !practiceTask?.isMock===false){ submit.textContent=old; submit.disabled=false; } } }; }
+  practiceTask.index=i;
+  practiceTask.wordFixes={};
+  const q=practiceTask.mockQuestions[i]||{};
+  const saved=practiceTask.mockSaved?.[i] || practiceTask.previousAnswers?.[i] || null;
+  const completed=!!saved;
+
+  $('studentArea').innerHTML=`<button class="back" type="button" onclick="startStudentMock()">← Danh sách đề</button>
+  <div class="student-card practice">
+    <div class="between">
+      <div>
+        <span class="pill">🏆 ${esc(practiceTask.mockLevel)} · ${esc(practiceTask.title||'Mock Test')}</span>
+        <div class="muted small">${esc(q.part||'')} · ${esc(q.topic||'')}</div>
+      </div>
+      <span class="pill">${completed?'✅ Hoàn thành':'Câu'} ${i+1}/${practiceTask.mockQuestions.length}</span>
+    </div>
+
+    <div class="mock-question-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">
+      ${practiceTask.mockQuestions.map((qq,idx)=>{
+        const done=!!(practiceTask.mockSaved?.[idx]||practiceTask.previousAnswers?.[idx]);
+        return `<button class="btn small ${idx===i?'primary':'secondary'}" type="button" onclick="openMockQuestionByIndex(${idx})">${done?'✅':'◯'} Câu ${idx+1}</button>`;
+      }).join('')}
+    </div>
+
+    <div class="qbox">
+      <div class="qnum">Speaking test · ${completed?'Đã hoàn thành — bé có thể xem lại hoặc làm lại':'Đang làm'}</div>
+      <div class="qtext">${esc(q.text||'')}</div>
+      ${q.images?.length?`<div class="photo-preview" style="margin-top:13px">${q.images.map(src=>`<img class="qimage" src="${src}" alt="Hình thi thử">`).join('')}</div>`:(q.imageData?`<img class="qimage" src="${q.imageData}" alt="Hình thi thử">`:'')}
+    </div>
+
+    ${completed?`<div class="notice success" style="margin-top:12px">✅ Bé đã hoàn thành câu này. Bé vẫn có thể nghe lại bản ghi, xem transcript và kết quả. Muốn thử lại thì bấm <b>Ghi âm lại</b>.</div>`:''}
+
+    <div class="wave">${Array.from({length:35},()=>'<i></i>').join('')}</div>
+    <div class="recordbar">
+      <button id="recordBtn" class="record-btn" type="button" onclick="toggleStudentRecord()">🎙️</button>
+      <button id="stopBtn" class="btn secondary" type="button" onclick="stopStudentRecord()" disabled>⏹ Dừng</button>
+      <button class="btn secondary" type="button" onclick="speakText('${encodeURIComponent(q.text||'')}')">🔊 Nghe đề</button>
+      <button id="rerecordBtn" class="btn secondary ${completed?'':'hidden'}" type="button" onclick="resetStudentRecording()">🔄 Ghi âm lại</button>
+      <button class="btn secondary" type="button" onclick="toggleSuggestedAnswer()">💡 Cách trả lời khác</button>
+      <span id="recState" class="record-status info">${completed?'✅ Đã hoàn thành câu này. Có thể xem lại hoặc ghi âm lại.':'Nhấn micro để trả lời'}</span>
+    </div>
+
+    <audio id="studentAudio" class="audio" controls style="width:100%;display:none"></audio>
+    <div id="suggestionPanel" class="suggestion-panel"></div>
+    <div id="studentResult" class="feedback hidden"></div>
+    <button id="submitSpeaking" type="button" class="btn primary" style="width:100%;margin-top:12px" disabled>${completed?'LÀM LẠI / LƯU CÂU':'LƯU CÂU TRẢ LỜI'}</button>
+    <div class="between" style="margin-top:10px;gap:10px">
+      <button class="btn secondary" type="button" onclick="${i>0?`openMockQuestionByIndex(${i-1})`:'startStudentMock()'}">${i>0?'← Câu trước':'← Danh sách đề'}</button>
+      ${completed?`<button class="btn secondary" type="button" onclick="showSavedMockAnswer(${i})">👀 Xem kết quả đã lưu</button>`:''}
+    </div>
+  </div>`;
+
+  // If the question had a previous saved answer, show its stored result and, when possible, its audio.
+  if(completed){
+    const prev=practiceTask.mockSaved?.[i] || practiceTask.previousAnswers?.[i];
+    if(prev){
+      const panel=$('studentResult');
+      panel.classList.remove('hidden');
+      panel.innerHTML=`<h3 style="margin-top:0">✅ Kết quả câu ${i+1}</h3>
+        <div class="score-total">${Number(prev.overall)||0}/15</div>
+        <div class="rubric-grid">
+          <div class="rubric-box"><b>${Number(prev.topic)||0}/5</b><span>🎯 Đúng chủ đề</span></div>
+          <div class="rubric-box"><b>${Number(prev.fluency)||0}/5</b><span>🌿 Độ trôi chảy</span></div>
+          <div class="rubric-box"><b>${Number(prev.pronunciation)||0}/5</b><span>🔊 Phát âm</span></div>
+        </div>
+        <div class="feedback" style="margin-top:10px">${esc(prev.comment||'')}</div>
+        ${prev.audioUrl?`<audio controls style="width:100%;margin-top:10px" src="${esc(prev.audioUrl)}"></audio>`:''}
+        ${prev.transcript?`<div class="script-panel" style="margin-top:10px"><div class="script-title">📝 Bé đã nói</div><div class="script-text">${esc(prev.transcript)}</div></div>`:''}`;
+    }
+  }
+
+  const submit=$('submitSpeaking');
+  if(submit){
+    submit.onclick=async()=>{
+      if(submit.dataset.busy==='1')return;
+      if(!currentRecord||!practiceTask?.lastScore){
+        toast('Hãy ghi âm và chờ hệ thống phân tích trước khi lưu câu này nhé.','info');return;
+      }
+      submit.dataset.busy='1';submit.disabled=true;submit.textContent='⏳ Đang lưu...';
+      try{await submitMockAnswer()}catch(e){toast('Không thể lưu câu trả lời: '+(e?.message||e),'err')}
+      finally{submit.dataset.busy='0';}
+    };
+  }
 }
 
+function openMockQuestionByIndex(i){
+  if(!practiceTask?.mockQuestions?.[i])return;
+  renderMockStudentQuestion(i);
+}
+
+function showSavedMockAnswer(i){
+  const saved=practiceTask?.mockSaved?.[i] || practiceTask?.previousAnswers?.[i];
+  if(!saved)return toast('Chưa có dữ liệu câu này.','info');
+  const p=$('studentResult');
+  if(!p)return;
+  p.classList.remove('hidden');
+  p.innerHTML=`<h3>✅ Câu ${i+1} đã hoàn thành</h3>
+    <div class="score-total">${Number(saved.overall)||0}/15</div>
+    <div class="rubric-grid">
+      <div class="rubric-box"><b>${Number(saved.topic)||0}/5</b><span>🎯 Đúng chủ đề</span></div>
+      <div class="rubric-box"><b>${Number(saved.fluency)||0}/5</b><span>🌿 Độ trôi chảy</span></div>
+      <div class="rubric-box"><b>${Number(saved.pronunciation)||0}/5</b><span>🔊 Phát âm</span></div>
+    </div>
+    <div class="feedback" style="margin-top:10px">${esc(saved.comment||'')}</div>
+    ${saved.audioUrl?`<audio controls style="width:100%;margin-top:10px" src="${esc(saved.audioUrl)}"></audio>`:''}
+    ${saved.transcript?`<div class="script-panel" style="margin-top:10px"><div class="script-title">📝 Bé đã nói</div><div class="script-text">${esc(saved.transcript)}</div></div>`:''}`;
+}
+function mockOverallComment(scores){
+  if(!scores.length) return 'Bé chưa có đủ câu trả lời để nhận xét.';
+  const avg = scores.reduce((s,x)=>s+(Number(x.overall)||0),0)/scores.length;
+  const topic = scores.reduce((s,x)=>s+(Number(x.topic)||0),0)/scores.length;
+  const fluency = scores.reduce((s,x)=>s+(Number(x.fluency)||0),0)/scores.length;
+  const pronunciation = scores.reduce((s,x)=>s+(Number(x.pronunciation)||0),0)/scores.length;
+  const parts=[];
+  if(topic<4) parts.push('cố gắng bám sát yêu cầu của từng Part');
+  if(fluency<4) parts.push('nói đều và giảm lặp/ngập ngừng');
+  if(pronunciation<4) parts.push('nói chậm và rõ hơn ở các từ khó');
+  if(!parts.length) return `Bé hoàn thành Mock Test rất tốt. Điểm mạnh nổi bật là trả lời đúng nhiệm vụ và nói khá tự nhiên.`;
+  return `Bé đã hoàn thành Mock Test. Lần sau mình ${parts.join(', ')} nhé.`;
+}
+
+function showMockFinalResult(scores){
+  const area=$('studentArea');
+  const avg=Math.round(scores.reduce((s,x)=>s+(Number(x.overall)||0),0)/Math.max(1,scores.length));
+  const topic=Math.round(scores.reduce((s,x)=>s+(Number(x.topic)||0),0)/Math.max(1,scores.length));
+  const fluency=Math.round(scores.reduce((s,x)=>s+(Number(x.fluency)||0),0)/Math.max(1,scores.length));
+  const pronunciation=Math.round(scores.reduce((s,x)=>s+(Number(x.pronunciation)||0),0)/Math.max(1,scores.length));
+  const shields=Math.max(1,Math.min(5,Math.round(avg/3)));
+  const comment=mockOverallComment(scores);
+
+  area.innerHTML=`<div class="student-card practice">
+    <div class="student-hero" style="padding:18px">
+      <div><span class="pill">🏆 ${esc(practiceTask.mockLevel)} · Mock Test</span>
+      <h2 style="margin:8px 0 4px">${esc(practiceTask.title)}</h2>
+      <p class="muted" style="margin:0">Bé đã hoàn thành toàn bộ bài thi thử.</p></div>
+      <div style="text-align:center"><div class="muted small">Khiên dự đoán</div>
+      <div class="shields">${[0,1,2,3,4].map(i=>`<span class="shield ${i<shields?'on':''}">${shieldIcon(i<shields)}</span>`).join('')}</div></div>
+    </div>
+
+    <div class="score-total" style="margin-top:18px">${avg}/15</div>
+    <div class="score-note">Điểm trung bình của tất cả câu trong Mock Test</div>
+
+    <div class="rubric-grid">
+      <div class="rubric-box"><b>${topic}/5</b><span>🎯 Đúng chủ đề</span></div>
+      <div class="rubric-box"><b>${fluency}/5</b><span>🌿 Độ trôi chảy</span></div>
+      <div class="rubric-box"><b>${pronunciation}/5</b><span>🔊 Phát âm</span></div>
+    </div>
+
+    <div class="feedback" style="margin-top:12px">
+      <b>💬 Nhận xét tổng hợp:</b><br>${esc(comment)}
+    </div>
+
+    <div class="section">
+      <h3 style="margin-bottom:9px">📋 Kết quả từng câu</h3>
+      <div class="list">${scores.map((x,i)=>`<div class="item">
+        <div class="between">
+          <div><b>Câu ${i+1}</b><div class="muted small">${esc(x.part||'')} · ${esc(x.topic||'')}</div></div>
+          <span class="pill">${Number(x.overall)||0}/15</span>
+        </div>
+        <div class="muted small" style="margin-top:6px">🎯 ${Number(x.topic)||0}/5 · 🌿 ${Number(x.fluency)||0}/5 · 🔊 ${Number(x.pronunciation)||0}/5</div>
+        <div style="margin-top:7px;line-height:1.5">${esc(x.comment||'')}</div>
+      </div>`).join('')}</div>
+    </div>
+
+    <div class="record-actions" style="margin-top:14px">
+      <button class="btn secondary" type="button" onclick="startStudentMock()">← Danh sách Mock Test</button><button class="btn primary" type="button" onclick="renderStudent()">Về trang chính</button>
+    </div>
+  </div>`;
+
+  // Celebration after the detailed result is rendered so the child can see feedback.
+  setTimeout(()=>showCelebrate(avg,shields,'Bé đã hoàn thành Mock Test! Hãy xem từng câu để biết mình làm tốt ở đâu nhé.'),250);
+}
+
+
 async function submitMockAnswer(){
- const r=practiceTask.lastScore;if(!r)return;
- practiceTask.mockScores.push(r);
- if(practiceTask.index<practiceTask.mockQuestions.length-1){renderMockStudentQuestion(practiceTask.index+1);return}
- const avg=Math.round(practiceTask.mockScores.reduce((a,b)=>a+b.overall,0)/practiceTask.mockScores.length);
- const shields=Math.max(1,Math.min(5,Math.round(avg/3)));
- const id=key();
- await db.ref('mockAttempts/'+id).set({id,mockId:practiceTask.id,title:practiceTask.title,level:practiceTask.mockLevel,studentId:currentStudent.uid,studentName:currentStudent.name,classId:currentStudent.classId,score:avg,shields,answers:practiceTask.mockScores,createdAt:Date.now()});
- await log('Hoàn thành Mock Test',practiceTask.title);showCelebrate(avg,shields,'Em đã hoàn thành Mock Test. Hãy cố gắng tăng thêm khiên ở lần sau nhé!')
+  const r=practiceTask.lastScore;
+  if(!r)return;
+  const q=practiceTask.mockQuestions[practiceTask.index]||{};
+  const a=practiceTask;
+  const answerIndex=practiceTask.index;
+  const submissionId=key();
+
+  const base={
+    id:submissionId,
+    studentId:currentStudent.uid,
+    studentCode:currentStudent.studentCode,
+    studentName:currentStudent.name,
+    classId:currentStudent.classId,
+    assignmentId:'',
+    taskTitle:`${a.title} · Câu ${answerIndex+1}`,
+    question:q.text||'',
+    level:q.level||a.mockLevel||'',
+    part:q.part||'',
+    topic:q.topic||'',
+    audioUrl:'',
+    transcript,
+    score:r.overall,
+    topic:r.topic,
+    fluency:r.fluency,
+    pronunciation:r.pronunciation,
+    language:r.topic,
+    interaction:r.fluency,
+    teacherScore:null,
+    aiComment:r.comment,
+    teacherComment:'',
+    transcriptOriginal:transcript,
+    transcriptCorrected:correctedTranscript(),
+    wordFixes:a.wordFixes||{},
+    status:'pending',
+    isMock:true,
+    mockId:a.id,
+    mockTitle:a.title,
+    mockQuestionIndex:answerIndex,
+    createdAt:Date.now()
+  };
+
+  try{
+    await db.ref('submissions/'+submissionId).set(base);
+
+    const histId=key();
+    await db.ref('history/'+histId).set({
+      ...base,
+      action:'Học sinh hoàn thành câu Mock Test',
+      time:Date.now(),
+      timeDate:new Date().toISOString().slice(0,10)
+    });
+
+    const storedAnswer={...r,part:q.part||'',topic:q.topic||'',question:q.text||'',audioUrl:'',submissionId,transcript};
+    practiceTask.mockSaved=practiceTask.mockSaved||[];
+    practiceTask.mockSaved[answerIndex]=storedAnswer;
+
+    if(currentRecord){
+      try{
+        const name=`audio/${currentStudent.uid}/mock/${a.id}/${submissionId}.webm`;
+        const snap=await storage.ref(name).put(currentRecord,{contentType:'audio/webm'});
+        const audioUrl=await snap.ref.getDownloadURL();
+        storedAnswer.audioUrl=audioUrl;
+        await db.ref('submissions/'+submissionId).update({audioUrl});
+      }catch(e){}
+    }
+
+    // If there are unanswered questions, move to the next unanswered one.
+    const nextUnanswered=practiceTask.mockQuestions.findIndex((_,idx)=>!practiceTask.mockSaved?.[idx]);
+    if(nextUnanswered>=0){
+      toast(`✅ Đã hoàn thành câu ${answerIndex+1}.`);
+      renderMockStudentQuestion(nextUnanswered);
+      return;
+    }
+
+    // All questions completed: calculate overall result and save attempt.
+    const scores=practiceTask.mockSaved.filter(Boolean);
+    const avg=Math.round(scores.reduce((s,x)=>s+(Number(x.overall)||0),0)/Math.max(1,scores.length));
+    const avgTopic=Math.round(scores.reduce((s,x)=>s+(Number(x.topic)||0),0)/Math.max(1,scores.length));
+    const avgFluency=Math.round(scores.reduce((s,x)=>s+(Number(x.fluency)||0),0)/Math.max(1,scores.length));
+    const avgPronunciation=Math.round(scores.reduce((s,x)=>s+(Number(x.pronunciation)||0),0)/Math.max(1,scores.length));
+    const shields=Math.max(1,Math.min(5,Math.round(avg/3)));
+    const finalComment=mockOverallComment(scores);
+
+    const mockAttemptId=key();
+    await db.ref('mockAttempts/'+mockAttemptId).set({
+      id:mockAttemptId,
+      mockId:a.id,title:a.title,level:a.mockLevel,
+      studentId:currentStudent.uid,studentName:currentStudent.name,classId:currentStudent.classId,
+      score:avg,topic:avgTopic,fluency:avgFluency,pronunciation:avgPronunciation,
+      shields,comment:finalComment,answers:scores,createdAt:Date.now()
+    });
+    await log('Hoàn thành Mock Test',a.title);
+    toast('🎉 Mock Test đã hoàn thành!');
+    showMockFinalResult(scores);
+  }catch(e){
+    toast('Không thể lưu kết quả Mock Test: '+(e?.message||e),'err');
+    throw e;
+  }
 }
 function showCelebrate(score,shields,text){$('celebrateScore').textContent=String(score)+'/15';$('celebrateShields').innerHTML=[0,1,2,3,4].map(i=>i<shields?'🛡️':'☆').join('');$('celebrateText').textContent=text;$('celebrate').classList.add('show')}
 function closeCelebrate(){$('celebrate').classList.remove('show');if(role!=='teacher')renderStudent()}
 
-Object.assign(window,{showStudentPracticeLibrary,filterStudentTopic,quickPractice,startAssignmentPractice,renderStudent,toggleStudentRecord,stopStudentRecord,submitPracticeRecording,nextPracticeQuestion,startStudentMock,submitMockAnswer,showCelebrate,closeCelebrate,speakText,editTranscriptWord,correctedTranscript,renderStudentResult,resetStudentRecording,toggleSuggestedAnswer});
+Object.assign(window,{showStudentPracticeLibrary,filterStudentTopic,quickPractice,startAssignmentPractice,renderStudent,toggleStudentRecord,stopStudentRecord,submitPracticeRecording,nextPracticeQuestion,startStudentMock,openStudentMockById,openMockQuestionByIndex,showSavedMockAnswer,submitMockAnswer,showCelebrate,closeCelebrate,speakText,editTranscriptWord,correctedTranscript,renderStudentResult,resetStudentRecording,toggleSuggestedAnswer});
 
 (async function boot(){if(sessionStorage.getItem('msTeacher')==='1'){teacher=true;$('loginScreen').style.display='none';$('teacherApp').style.display='block';refreshTeacher()}else{const s=sessionStorage.getItem('msStudent');if(s){try{currentStudent=JSON.parse(s);$('loginScreen').style.display='none';$('studentApp').style.display='block';await renderStudent()}catch{sessionStorage.clear()}}else loadLoginClasses()}})();
 </script>
