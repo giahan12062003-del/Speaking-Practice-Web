@@ -1,511 +1,135 @@
-from pathlib import Path
-import textwrap
-
 html = r'''<!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MS HÂN CLASS — Speaking Practice</title>
-<meta name="theme-color" content="#7c5cff">
+<title>MS Hân Class · Speaking Practice V4</title>
 <style>
-:root{
-  --bg:#080b18;--panel:#10152a;--panel2:#151b34;--line:#252d4d;
-  --text:#f4f5ff;--muted:#9da6c4;--purple:#8b6cff;--purple2:#b48cff;
-  --blue:#4ea1ff;--pink:#ec79c9;--green:#48d597;--red:#ff667d;--yellow:#ffd166;
-  --shadow:0 16px 45px rgba(0,0,0,.28);--radius:18px
-}
-*{box-sizing:border-box}html,body{margin:0;background:radial-gradient(circle at 15% 0%,#1b1740 0,#080b18 36%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}
-.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:13px}.tiny{font-size:11px}
-.container{max-width:1200px;margin:auto;padding:22px}
-.topbar{height:68px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;background:rgba(8,11,24,.86);backdrop-filter:blur(16px);z-index:20}
-.brand{display:flex;align-items:center;gap:11px;font-weight:750;letter-spacing:.2px}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;box-shadow:0 8px 25px #8b6cff33}
-.app{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 68px)}.sidebar{border-right:1px solid rgba(255,255,255,.07);padding:18px 12px;background:#0b0f20}
-.nav{display:flex;flex-direction:column;gap:5px}.nav button{border:0;background:transparent;color:#b9c1dc;text-align:left;padding:11px 12px;border-radius:12px;display:flex;gap:10px;align-items:center;font-weight:560}.nav button:hover,.nav button.active{background:#1a1736;color:white}.nav button.active{box-shadow:inset 3px 0 var(--purple)}
-.main{min-width:0}.page{display:none}.page.active{display:block}
-.hero{padding:28px 0 18px}.hero h1{font-size:32px;line-height:1.1;margin:8px 0}.hero p{color:var(--muted);margin:8px 0}
-.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{background:linear-gradient(180deg,#12182e,#0f1428);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
-.stat .label{color:var(--muted);font-size:13px}.stat .value{font-size:28px;font-weight:750;margin-top:7px}.num{font-size:30px;font-weight:750}.pill{display:inline-flex;align-items:center;gap:6px;background:#1c193c;border:1px solid #3a326c;color:#c9bcff;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:650}
-.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.between{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.btn{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#151b32;color:#f4f5ff;font-weight:650}.btn:hover{filter:brightness(1.12)}.primary{background:linear-gradient(135deg,#795cff,#9d6dff);border-color:#8c71ff}.secondary{background:#141a30}.danger{background:#321526;border-color:#6e2944;color:#ffb5c1}.success{background:#122b27;border-color:#236a56;color:#9af0cf}
-input,select,textarea{width:100%;background:#0b1021;color:#f4f5ff;border:1px solid #293154;border-radius:11px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:#8066ff;box-shadow:0 0 0 3px #8066ff22}
-label{font-size:12px;color:#aab3d0;display:block;margin:0 0 6px}.field{margin-bottom:12px}
-.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 9px;border-bottom:1px solid #232a48;text-align:left;font-size:13px}.table th{color:#9ea8c7;font-weight:600}.list{display:flex;flex-direction:column;gap:9px}.item{background:#0d1327;border:1px solid #232b4b;border-radius:13px;padding:12px}
-.score{font-size:42px;font-weight:800;line-height:1}.score.good{color:var(--green)}.score.mid{color:var(--yellow)}.score.low{color:var(--red)}
-.progress{height:8px;background:#202744;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:99px}
-.auth{min-height:100vh;display:grid;place-items:center;padding:20px}.authbox{width:min(450px,100%);background:#10152aee;border:1px solid #2a3152;border-radius:24px;padding:26px;box-shadow:0 25px 80px #0008}.tabs{display:grid;grid-template-columns:1fr 1fr;background:#0a0f20;padding:4px;border-radius:12px;margin:16px 0}.tabs button{border:0;background:transparent;color:#9da6c4;padding:9px;border-radius:9px}.tabs button.active{background:#27204b;color:#fff}
-.question{font-size:24px;font-weight:680;line-height:1.3;margin:16px 0}.mic{width:74px;height:74px;border-radius:50%;border:0;background:linear-gradient(135deg,#795cff,#a25fff);color:#fff;font-size:29px;box-shadow:0 12px 35px #795cff45}.mic.recording{background:linear-gradient(135deg,#f05578,#a92e67);animation:pulse 1.2s infinite}@keyframes pulse{50%{transform:scale(1.05)}}
-.wave{height:62px;display:flex;align-items:center;justify-content:center;gap:3px;margin:14px 0}.wave i{display:block;width:3px;height:var(--h);background:linear-gradient(var(--purple2),var(--pink));border-radius:9px;opacity:.7}
-.auto-score{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}.mini{background:#0c1224;border:1px solid #252d4d;border-radius:12px;padding:11px}.mini strong{display:block;font-size:20px;margin-top:3px}.ai-note{border-left:3px solid var(--purple);padding:11px 13px;background:#1b1736;border-radius:0 10px 10px 0;margin-top:11px}
-.empty{text-align:center;padding:30px;color:var(--muted)}.toast{position:fixed;right:20px;bottom:20px;background:#171d35;border:1px solid #394266;padding:12px 15px;border-radius:12px;box-shadow:var(--shadow);z-index:50}
-.badge{padding:4px 8px;border-radius:999px;background:#202846;color:#b9c4e5;font-size:11px}.badge.ok{background:#12332c;color:#8fe7c7}.badge.wait{background:#322b18;color:#f1d38a}
-.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;padding:18px;z-index:40}.modal.show{display:grid}.modalbox{width:min(700px,100%);max-height:90vh;overflow:auto;background:#10152a;border:1px solid #2d3557;border-radius:20px;padding:20px}
-footer{color:#707b9f;text-align:center;padding:25px;font-size:12px}
-@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{position:fixed;bottom:0;left:0;right:0;height:65px;padding:7px 8px;z-index:19;border-right:0;border-top:1px solid #232a48}.nav{flex-direction:row;justify-content:space-around}.nav button{font-size:11px;padding:7px;flex-direction:column;gap:2px}.nav button span{display:block}.main{padding-bottom:70px}.g4{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.container{padding:15px}.g2,.g3,.g4{grid-template-columns:1fr}.question{font-size:20px}.auto-score{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 14px}}
+:root{--bg:#080b18;--panel:#10152a;--panel2:#151b34;--line:#283052;--text:#f5f6ff;--muted:#98a3c5;--p:#8b6cff;--p2:#b08cff;--pink:#e878ca;--green:#48d597;--yellow:#ffd166;--red:#ff667d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#24184d 0,#080b18 35%);color:var(--text);font:14px Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}.authbox{width:min(450px,100%);background:#10152af2;border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 25px 80px #0009}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--p),var(--pink));display:grid;place-items:center;font-size:21px}.brand{display:flex;gap:11px;align-items:center;font-weight:800}.tiny{font-size:11px}.muted{color:var(--muted)}.small{font-size:12px}.tabs{display:grid;grid-template-columns:1fr 1fr;background:#0a0f20;padding:4px;border-radius:12px;margin:20px 0}.tabs button{border:0;background:transparent;color:var(--muted);padding:10px;border-radius:9px}.tabs button.active{background:#29204e;color:#fff}.field{margin:12px 0}label{display:block;font-size:12px;color:#aeb7d2;margin-bottom:6px}input,select,textarea{width:100%;padding:11px 12px;background:#0a1021;border:1px solid #2a3457;border-radius:11px;color:#fff;outline:0}input:focus,select:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px #8b6cff22}.btn{border:1px solid var(--line);background:#151b32;color:#fff;padding:10px 14px;border-radius:11px;font-weight:650}.primary{background:linear-gradient(135deg,#765aff,#9b6dff);border-color:#8c71ff}.danger{background:#321526;border-color:#6e2944;color:#ffb5c1}.success{background:#122c27;border-color:#236a56;color:#9af0cf}
+.top{height:68px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:#080b18dd;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff0c}.app{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 68px)}aside{background:#0b0f20;border-right:1px solid #ffffff0b;padding:16px 10px}.nav{display:flex;flex-direction:column;gap:5px}.nav button{border:0;background:transparent;color:#aeb7d2;text-align:left;padding:11px 12px;border-radius:11px}.nav button:hover,.nav button.active{background:#1c1839;color:#fff}.main{min-width:0}.wrap{max-width:1200px;margin:auto;padding:22px}.page{display:none}.page.active{display:block}.hero{padding:10px 0 20px}.hero h1{font-size:31px;margin:8px 0}.hero p{color:var(--muted);margin:0}.pill{display:inline-block;background:#1d1940;border:1px solid #403678;color:#cfc3ff;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:750}.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.card{background:linear-gradient(180deg,#12182e,#0f1428);border:1px solid var(--line);border-radius:18px;padding:18px}.stat .muted{font-size:12px}.stat b{font-size:28px;display:block;margin-top:5px}.between{display:flex;justify-content:space-between;align-items:center;gap:10px}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.list{display:flex;flex-direction:column;gap:9px}.item{background:#0c1224;border:1px solid #252d4c;border-radius:13px;padding:13px}.badge{padding:4px 8px;border-radius:999px;background:#202846;color:#c1c9e3;font-size:11px}.ok{background:#12332c;color:#91e8c8}.wait{background:#332c18;color:#f2d48c}.question{font-size:25px;font-weight:700;line-height:1.35;margin:18px 0}.mic{width:76px;height:76px;border:0;border-radius:50%;background:linear-gradient(135deg,#795cff,#aa63ff);color:#fff;font-size:28px;box-shadow:0 12px 35px #795cff4a}.recording{background:linear-gradient(135deg,#f05279,#a92e67);animation:pulse 1.1s infinite}@keyframes pulse{50%{transform:scale(1.05)}}.wave{height:55px;display:flex;align-items:center;justify-content:center;gap:3px}.wave i{width:3px;height:var(--h);background:linear-gradient(var(--p2),var(--pink));border-radius:9px}.auto{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.mini{background:#0a1021;border:1px solid #252d4d;border-radius:11px;padding:10px}.mini b{display:block;font-size:20px;margin-top:3px}.feedback{border-left:3px solid var(--p);background:#1b1736;padding:11px 13px;border-radius:0 10px 10px 0;margin-top:10px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #252c49;text-align:left;font-size:13px}.table th{color:#9ca6c3}.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;padding:18px;z-index:30}.modal.show{display:grid}.modalbox{width:min(700px,100%);max-height:90vh;overflow:auto;background:#10152a;border:1px solid #30385a;border-radius:20px;padding:20px}.toast{position:fixed;right:20px;bottom:20px;background:#171d35;border:1px solid #3a4568;padding:12px 15px;border-radius:12px;z-index:60}
+@media(max-width:850px){.app{grid-template-columns:1fr}aside{position:fixed;bottom:0;left:0;right:0;height:64px;z-index:15;padding:6px}.nav{flex-direction:row;justify-content:space-around}.nav button{font-size:11px;padding:6px;text-align:center}.main{padding-bottom:65px}.g4{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}.wrap{padding:15px}.question{font-size:20px}.auto{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-
-<div id="authView" class="auth">
-  <div class="authbox">
-    <div class="brand"><div class="logo">🎤</div><div><div>MS HÂN CLASS</div><div class="tiny muted">Speaking Practice Room</div></div></div>
-    <h1 id="authTitle" style="margin:22px 0 4px">Đăng nhập</h1>
-    <div class="muted small">Luyện phản xạ Speaking · Nộp bài · Tự chấm · Theo dõi tiến bộ</div>
-    <div class="tabs">
-      <button id="studentTab" class="active" onclick="setRole('student')">👧 Học sinh</button>
-      <button id="teacherTab" onclick="setRole('teacher')">👩🏻‍🏫 Giáo viên</button>
-    </div>
-    <div id="nameField" class="field hidden"><label>Họ tên</label><input id="name" placeholder="Tên học sinh"></div>
-    <div class="field"><label>Email</label><input id="email" type="email" placeholder="email@example.com"></div>
-    <div class="field"><label>Mật khẩu</label><input id="password" type="password" placeholder="••••••••"></div>
-    <div id="teacherHint" class="item small hidden" style="margin-bottom:12px">🔐 Tài khoản giáo viên mặc định<br><b>Email:</b> teacher@mshanhclass.com<br><b>Password:</b> hanna126</div>
-    <div class="row">
-      <button class="btn primary" style="flex:1" onclick="login()">Đăng nhập</button>
-      <button id="signupBtn" class="btn secondary hidden" onclick="signupStudent()">Tạo tài khoản</button>
-    </div>
-    <div class="small muted" style="margin-top:14px">Nếu là lần đầu dùng tài khoản giáo viên, hãy tạo tài khoản này trong Firebase Authentication trước.</div>
+<div id="auth" class="auth">
+ <div class="authbox">
+  <div class="brand"><div class="logo">🎤</div><div>MS HÂN CLASS<div class="tiny muted">Speaking Practice Room · V4</div></div></div>
+  <h1 style="margin:22px 0 5px">Chào mừng 👋</h1><div class="muted small">Luyện phản xạ · Nộp bài · Thi thử · Theo dõi tiến bộ</div>
+  <div class="tabs"><button id="studentTab" class="active" onclick="chooseRole('student')">👧 Học sinh</button><button id="teacherTab" onclick="chooseRole('teacher')">👩🏻‍🏫 Giáo viên</button></div>
+  <div id="studentLogin">
+   <div class="field"><label>Chọn lớp</label><select id="loginClass"><option value="">Đang tải lớp...</option></select></div>
+   <div class="field"><label>Mã học sinh</label><input id="studentCode" placeholder="Ví dụ: HS001" autocomplete="off"></div>
+   <button class="btn primary" style="width:100%" onclick="studentLogin()">Vào lớp →</button>
   </div>
+  <div id="teacherLogin" class="hidden">
+   <div class="field"><label>Email giáo viên</label><input id="teacherEmail" value="teacher@mshanhclass.com"></div>
+   <div class="field"><label>Mật khẩu</label><input id="teacherPassword" type="password" value="hanna126"></div>
+   <button class="btn primary" style="width:100%" onclick="teacherLogin()">Đăng nhập giáo viên</button>
+   <div class="item small muted" style="margin-top:12px">Tài khoản mặc định: teacher@mshanhclass.com · hanna126</div>
+  </div>
+ </div>
 </div>
 
-<div id="appView" class="hidden">
-<header class="topbar">
-  <div class="brand"><div class="logo">🎤</div><div>MS HÂN CLASS</div></div>
-  <div class="row"><span id="userLabel" class="small muted"></span><button class="btn secondary" onclick="logout()">Đăng xuất</button></div>
-</header>
-<div class="app">
-<aside class="sidebar"><div class="nav" id="nav"></div></aside>
-<main class="main"><div class="container">
+<div id="app" class="hidden">
+<header class="top"><div class="brand"><div class="logo">🎤</div>MS HÂN CLASS</div><div class="row"><span id="who" class="small muted"></span><button class="btn" onclick="logout()">Đăng xuất</button></div></header>
+<div class="app"><aside><div id="nav" class="nav"></div></aside><main class="main"><div class="wrap">
 
-<!-- STUDENT -->
-<section id="sHome" class="page">
-  <div class="hero"><span class="pill">STUDENT ROOM</span><h1>Xin chào, <span id="studentName">bạn</span> 👋</h1><p>Luyện nói mỗi ngày một chút để phản xạ nhanh và tự tin hơn.</p></div>
-  <div class="grid g4">
-    <div class="card stat"><div class="label">Bài đã nộp</div><div class="value" id="stSubmitted">0</div></div>
-    <div class="card stat"><div class="label">Điểm trung bình</div><div class="value" id="stAverage">—</div></div>
-    <div class="card stat"><div class="label">Bài thi thử</div><div class="value" id="stMocks">0</div></div>
-    <div class="card stat"><div class="label">Chuỗi luyện tập</div><div class="value" id="stStreak">0 🔥</div></div>
-  </div>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><div class="between"><div><b>📝 Bài cô Hân giao</b><div class="small muted">Luyện đúng bài đang cần.</div></div><button class="btn primary" onclick="go('sAssignments')">Xem bài →</button></div><div id="studentAssignmentPreview" class="list" style="margin-top:13px"></div></div>
-    <div class="card"><div class="between"><div><b>🏆 Thi thử Speaking</b><div class="small muted">Mô phỏng Part 1–3.</div></div><button class="btn primary" onclick="go('sMock')">Bắt đầu</button></div><div class="item" style="margin-top:13px">🤖 Sau mỗi câu hệ thống phân tích transcript, fluency, response và tạo nhận xét luyện tập.</div></div>
-  </div>
-</section>
+<section id="sHome" class="page"><div class="hero"><span class="pill">STUDENT</span><h1>Xin chào, <span id="sName">bạn</span> 👋</h1><p id="sClass">—</p></div><div class="grid g4"><div class="card stat"><span class="muted">Bài đã nộp</span><b id="sSub">0</b></div><div class="card stat"><span class="muted">Điểm trung bình</span><b id="sAvg">—</b></div><div class="card stat"><span class="muted">Thi thử</span><b id="sMock">0</b></div><div class="card stat"><span class="muted">Luyện gần nhất</span><b id="sLast">—</b></div></div><div class="grid g2" style="margin-top:14px"><div class="card"><div class="between"><b>📝 Bài cô Hân giao</b><button class="btn primary" onclick="go('sAssignments')">Xem →</button></div><div id="sPreview" class="list" style="margin-top:12px"></div></div><div class="card"><div class="between"><b>🏆 Thi thử Speaking</b><button class="btn primary" onclick="go('sMock')">Bắt đầu</button></div><div class="item" style="margin-top:12px">Làm đề Part 1 → Part 2 → Part 3. Kết quả được lưu vào lịch sử.</div></div></div></section>
 
-<section id="sAssignments" class="page">
- <div class="hero"><span class="pill">ASSIGNMENTS</span><h1>Bài tập của em</h1><p>Cô giao bài theo lớp, chủ đề và thời hạn.</p></div>
- <div id="assignmentList" class="list"></div>
-</section>
+<section id="sAssignments" class="page"><div class="hero"><span class="pill">ASSIGNMENTS</span><h1>Bài cô giao</h1><p>Chỉ hiển thị bài dành cho lớp của em.</p></div><div id="sAssignmentsList" class="list"></div></section>
 
-<section id="sPractice" class="page">
- <div class="hero"><span class="pill">PRACTICE</span><h1>Luyện Speaking</h1><p>Nói → dừng → nhận phản hồi tự động.</p></div>
- <div class="card">
-  <div class="between"><div><span id="practiceTopic" class="pill">Practice</span><div id="practiceQuestion" class="question">What do you like doing after school?</div></div><span id="practiceCounter" class="small muted">1/1</span></div>
-  <div class="wave" id="practiceWave"></div>
-  <div class="row">
-    <button id="practiceMic" class="mic" onclick="togglePractice()">🎤</button>
-    <button class="btn secondary" onclick="speakCurrent()">🔊 Nghe câu hỏi</button>
-    <button class="btn secondary" onclick="retryPractice()">↺ Thử lại</button>
-  </div>
-  <div id="practiceTranscript" class="item" style="margin-top:14px"><span class="muted">Transcript sẽ xuất hiện ở đây…</span></div>
-  <div id="practiceFeedback" class="item hidden" style="margin-top:12px"></div>
-  <div class="between" style="margin-top:13px"><span id="practiceHint" class="small muted">Nhấn microphone để bắt đầu.</span><button class="btn primary" id="submitPracticeBtn" onclick="submitPractice()" disabled>Nộp bài</button></div>
- </div>
-</section>
+<section id="sPractice" class="page"><div class="hero"><span class="pill">PRACTICE</span><h1>Luyện Speaking</h1><p>Nhấn 🎤, nói câu trả lời, dừng lại và xem phản hồi.</p></div><div class="card"><div class="between"><div><span id="pTopic" class="pill">Practice</span><div id="pQuestion" class="question">Chọn một bài để bắt đầu.</div></div><span id="pCounter" class="small muted"></span></div><div id="pWave" class="wave"></div><div class="row"><button id="pMic" class="mic" onclick="togglePractice()">🎤</button><button class="btn" onclick="speak($('pQuestion').textContent)">🔊 Nghe câu hỏi</button><button class="btn" onclick="retryPractice()">↺ Thử lại</button></div><div id="pTranscript" class="item" style="margin-top:14px"><span class="muted">Transcript sẽ xuất hiện ở đây…</span></div><div id="pFeedback" class="item hidden" style="margin-top:10px"></div><div class="between" style="margin-top:12px"><span id="pHint" class="small muted">Chọn bài rồi bắt đầu.</span><button id="pSubmit" class="btn primary" disabled onclick="submitPractice()">📤 Nộp bài</button></div></div></section>
 
-<section id="sMock" class="page">
- <div class="hero"><span class="pill">MOCK TEST</span><h1>🏆 Thi thử Speaking</h1><p>Đề mẫu Part 1 → Part 2 → Part 3. Kết quả được lưu vào lịch sử.</p></div>
- <div class="grid g3">
-  <div class="card stat"><div class="label">Part</div><div class="value" id="mockPart">1</div></div>
-  <div class="card stat"><div class="label">Câu</div><div class="value" id="mockIndex">1/8</div></div>
-  <div class="card stat"><div class="label">Thời gian</div><div class="value" id="mockTimer">10:00</div></div>
- </div>
- <div class="card" style="margin-top:14px">
-  <span id="mockTopic" class="pill">Part 1</span><div id="mockQuestion" class="question">What is your name?</div>
-  <div class="wave" id="mockWave"></div>
-  <div class="row"><button id="mockMic" class="mic" onclick="toggleMock()">🎤</button><button class="btn secondary" onclick="speakMock()">🔊 Nghe câu hỏi</button></div>
-  <div id="mockTranscript" class="item" style="margin-top:14px"><span class="muted">Transcript…</span></div>
-  <div id="mockFeedback" class="item hidden" style="margin-top:12px"></div>
-  <div class="between" style="margin-top:13px"><span id="mockHint" class="small muted">Nhấn microphone để trả lời.</span><button id="mockNext" class="btn primary" onclick="nextMock()" disabled>Tiếp theo →</button></div>
- </div>
-</section>
+<section id="sMock" class="page"><div class="hero"><span class="pill">MOCK TEST</span><h1>🏆 Thi thử Speaking</h1><p>8 câu mô phỏng luyện phản xạ. Kết quả lưu riêng.</p></div><div class="grid g3"><div class="card stat"><span class="muted">Part</span><b id="mPart">1</b></div><div class="card stat"><span class="muted">Câu</span><b id="mIndex">1/8</b></div><div class="card stat"><span class="muted">Thời gian</span><b id="mTime">10:00</b></div></div><div class="card" style="margin-top:14px"><span id="mTopic" class="pill">Part 1</span><div id="mQuestion" class="question"></div><div id="mWave" class="wave"></div><div class="row"><button id="mMic" class="mic" onclick="toggleMock()">🎤</button><button class="btn" onclick="speak($('mQuestion').textContent)">🔊 Nghe câu hỏi</button></div><div id="mTranscript" class="item" style="margin-top:14px"><span class="muted">Transcript…</span></div><div id="mFeedback" class="item hidden" style="margin-top:10px"></div><div class="between" style="margin-top:12px"><span id="mHint" class="small muted">Nhấn microphone để trả lời.</span><button id="mNext" class="btn primary" disabled onclick="nextMock()">Tiếp theo →</button></div></div></section>
 
-<section id="sHistory" class="page">
- <div class="hero"><span class="pill">HISTORY</span><h1>🕘 Lịch sử luyện tập</h1><p>Tất cả bài nộp và bài thi thử của em.</p></div>
- <div id="studentHistory" class="list"></div>
-</section>
+<section id="sHistory" class="page"><div class="hero"><span class="pill">HISTORY</span><h1>🕘 Lịch sử</h1><p>Mỗi lần nộp đều được lưu, không ghi đè.</p></div><div id="sHistoryList" class="list"></div></section>
+<section id="sProgress" class="page"><div class="hero"><span class="pill">PROGRESS</span><h1>📈 Tiến bộ</h1><p>Điểm các lần luyện gần nhất.</p></div><div class="card"><div id="chart" style="height:230px;display:flex;align-items:end;gap:7px;border-bottom:1px solid #2b3352;padding:12px 4px"></div></div></section>
 
-<section id="sProgress" class="page">
- <div class="hero"><span class="pill">PROGRESS</span><h1>📈 Tiến bộ của em</h1><p>Theo dõi điểm qua từng lần luyện.</p></div>
- <div class="card"><div id="progressChart" style="height:230px;display:flex;align-items:end;gap:8px;border-bottom:1px solid #2a3150;padding:15px 4px"></div><div class="small muted" style="margin-top:10px">Mỗi cột là một lần nộp bài gần nhất.</div></div>
-</section>
+<section id="tHome" class="page"><div class="hero"><span class="pill">TEACHER</span><h1>Chào cô Hân 👩🏻‍🏫</h1><p>Quản lý lớp, bài học, bài nộp và lịch sử.</p></div><div class="grid g4"><div class="card stat"><span class="muted">Học sinh</span><b id="tStu">0</b></div><div class="card stat"><span class="muted">Lớp</span><b id="tCls">0</b></div><div class="card stat"><span class="muted">Chờ chấm</span><b id="tPend">0</b></div><div class="card stat"><span class="muted">Đã chấm</span><b id="tGrad">0</b></div></div><div class="card" style="margin-top:14px"><b>⚡ Làm nhanh</b><div class="row" style="margin-top:12px"><button class="btn primary" onclick="go('tClasses')">+ Lớp</button><button class="btn primary" onclick="openAssignment()">+ Giao bài</button><button class="btn" onclick="go('tQuestions')">+ Câu hỏi</button><button class="btn" onclick="go('tSubmissions')">Bài nộp</button></div></div></section>
 
-<!-- TEACHER -->
-<section id="tHome" class="page">
- <div class="hero"><span class="pill">TEACHER DASHBOARD</span><h1>Chào cô Hân 👩🏻‍🏫</h1><p>Quản lý lớp, bài học, bài giao và nhận xét trong một nơi.</p></div>
- <div class="grid g4">
-  <div class="card stat"><div class="label">Học sinh</div><div class="value" id="tStudents">0</div></div>
-  <div class="card stat"><div class="label">Lớp</div><div class="value" id="tClasses">0</div></div>
-  <div class="card stat"><div class="label">Bài chờ chấm</div><div class="value" id="tPending">0</div></div>
-  <div class="card stat"><div class="label">Bài đã chấm</div><div class="value" id="tGraded">0</div></div>
- </div>
- <div class="grid g2" style="margin-top:14px">
-  <div class="card"><b>⚡ Làm nhanh</b><div class="row" style="margin-top:13px"><button class="btn primary" onclick="go('tAssignments')">+ Giao bài</button><button class="btn secondary" onclick="go('tQuestions')">+ Thêm câu hỏi</button><button class="btn secondary" onclick="go('tSubmissions')">Xem bài nộp</button></div></div>
-  <div class="card"><b>💡 Gợi ý quản lý</b><div class="small muted" style="margin-top:10px">Dùng tên bài học + deadline để lọc lịch sử dễ hơn. Có thể sửa điểm/nhận xét sau khi hệ thống tự chấm.</div></div>
- </div>
-</section>
+<section id="tClasses" class="page"><div class="hero between"><div><span class="pill">CLASSES</span><h1>👥 Quản lý lớp</h1><p>Tạo lớp và mã học sinh.</p></div><button class="btn primary" onclick="openModal('classModal')">+ Tạo lớp</button></div><div id="classList" class="grid g2"></div></section>
 
-<section id="tClasses" class="page">
- <div class="hero between"><div><span class="pill">CLASSES</span><h1>👥 Quản lý lớp</h1><p>Tạo lớp và mã lớp để học sinh tham gia.</p></div><button class="btn primary" onclick="openClassModal()">+ Tạo lớp</button></div>
- <div id="classList" class="grid g2"></div>
-</section>
+<section id="tStudents" class="page"><div class="hero"><span class="pill">STUDENTS</span><h1>👧 Học sinh</h1><p>Quản lý mã học sinh và lớp.</p></div><div class="card"><div class="grid g3"><div class="field"><label>Tên học sinh</label><input id="newStuName" placeholder="Nguyễn Minh"></div><div class="field"><label>Mã học sinh</label><input id="newStuCode" placeholder="HS001"></div><div class="field"><label>Lớp</label><select id="newStuClass"></select></div></div><button class="btn primary" onclick="createStudent()">+ Thêm học sinh</button></div><div id="studentList" class="list" style="margin-top:14px"></div></section>
 
-<section id="tQuestions" class="page">
- <div class="hero between"><div><span class="pill">QUESTION BANK</span><h1>📚 Ngân hàng câu hỏi</h1><p>Gắn câu hỏi với bài học/chủ đề.</p></div><button class="btn primary" onclick="openQuestionModal()">+ Thêm câu hỏi</button></div>
- <div id="questionList" class="list"></div>
-</section>
+<section id="tQuestions" class="page"><div class="hero between"><div><span class="pill">QUESTION BANK</span><h1>📚 Ngân hàng câu hỏi</h1><p>Gắn câu hỏi với Part và bài học.</p></div><button class="btn primary" onclick="openModal('questionModal')">+ Thêm</button></div><div id="questionList" class="list"></div></section>
 
-<section id="tAssignments" class="page">
- <div class="hero between"><div><span class="pill">ASSIGNMENTS</span><h1>📝 Giao bài</h1><p>Giao theo lớp, chọn bài và deadline.</p></div><button class="btn primary" onclick="openAssignmentModal()">+ Giao bài</button></div>
- <div id="teacherAssignmentList" class="list"></div>
-</section>
+<section id="tAssignments" class="page"><div class="hero between"><div><span class="pill">ASSIGNMENTS</span><h1>📝 Giao bài</h1><p>Giao cho toàn bộ một lớp.</p></div><button class="btn primary" onclick="openAssignment()">+ Giao bài</button></div><div id="assignmentList" class="list"></div></section>
 
-<section id="tSubmissions" class="page">
- <div class="hero"><span class="pill">SUBMISSIONS</span><h1>🎤 Bài học sinh nộp</h1><p>Nghe bài, xem AI feedback và chỉnh điểm/nhận xét.</p></div>
- <div class="grid g3">
-  <div class="field"><label>Lọc lớp</label><select id="filterClass" onchange="renderSubmissions()"><option value="">Tất cả</option></select></div>
-  <div class="field"><label>Lọc bài</label><select id="filterAssignment" onchange="renderSubmissions()"><option value="">Tất cả</option></select></div>
-  <div class="field"><label>Trạng thái</label><select id="filterStatus" onchange="renderSubmissions()"><option value="">Tất cả</option><option value="pending">Chờ chấm</option><option value="graded">Đã chấm</option></select></div>
- </div>
- <div id="submissionList" class="list"></div>
-</section>
+<section id="tSubmissions" class="page"><div class="hero"><span class="pill">SUBMISSIONS</span><h1>🎤 Bài học sinh nộp</h1><p>Nghe audio, xem AI score và sửa điểm/nhận xét.</p></div><div class="grid g3"><div class="field"><label>Lớp</label><select id="fClass" onchange="renderSubmissions()"></select></div><div class="field"><label>Bài</label><select id="fAssign" onchange="renderSubmissions()"></select></div><div class="field"><label>Trạng thái</label><select id="fStatus" onchange="renderSubmissions()"><option value="">Tất cả</option><option value="pending">Chờ chấm</option><option value="graded">Đã chấm</option></select></div></div><div id="submissionList" class="list"></div></section>
 
-<section id="tHistory" class="page">
- <div class="hero"><span class="pill">HISTORY</span><h1>🕘 Lịch sử quản lý</h1><p>Tra cứu theo học sinh, lớp, bài học và thời gian.</p></div>
- <div class="card">
-  <div class="grid g3"><div class="field"><label>Từ khóa</label><input id="historySearch" placeholder="Tên bé / bài học..." oninput="renderTeacherHistory()"></div><div class="field"><label>Từ ngày</label><input id="historyFrom" type="date" onchange="renderTeacherHistory()"></div><div class="field"><label>Đến ngày</label><input id="historyTo" type="date" onchange="renderTeacherHistory()"></div></div>
- </div>
- <div id="teacherHistory" class="list" style="margin-top:14px"></div>
-</section>
-<footer>MS HÂN CLASS · Speaking Practice Room · Firebase</footer>
-</div></main></div>
-</div>
+<section id="tHistory" class="page"><div class="hero"><span class="pill">HISTORY</span><h1>🕘 Lịch sử quản lý</h1><p>Lọc theo học sinh, bài học và thời gian.</p></div><div class="card"><div class="grid g3"><div class="field"><label>Từ khóa</label><input id="hSearch" placeholder="Tên bé / mã / bài..." oninput="renderTeacherHistory()"></div><div class="field"><label>Từ ngày</label><input id="hFrom" type="date" onchange="renderTeacherHistory()"></div><div class="field"><label>Đến ngày</label><input id="hTo" type="date" onchange="renderTeacherHistory()"></div></div></div><div id="teacherHistory" class="list" style="margin-top:14px"></div></section>
 
-<!-- MODALS -->
-<div id="classModal" class="modal"><div class="modalbox"><div class="between"><h2>Tạo lớp</h2><button class="btn secondary" onclick="closeModal('classModal')">✕</button></div><div class="field"><label>Tên lớp</label><input id="className" placeholder="Flyers A"></div><div class="field"><label>Mô tả</label><input id="classDesc" placeholder="Lớp luyện Speaking"></div><button class="btn primary" onclick="createClass()">Lưu lớp</button></div></div>
+</div></main></div></div>
 
-<div id="questionModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm câu hỏi</h2><button class="btn secondary" onclick="closeModal('questionModal')">✕</button></div><div class="grid g2"><div class="field"><label>Part</label><select id="qPart"><option>Part 1</option><option>Part 2</option><option>Part 3</option></select></div><div class="field"><label>Topic / bài học</label><input id="qTopic" placeholder="School life"></div></div><div class="field"><label>Câu hỏi</label><textarea id="qText" rows="3" placeholder="What do you like doing after school?"></textarea></div><button class="btn primary" onclick="createQuestion()">Lưu câu hỏi</button></div></div>
-
-<div id="assignmentModal" class="modal"><div class="modalbox"><div class="between"><h2>Giao bài</h2><button class="btn secondary" onclick="closeModal('assignmentModal')">✕</button></div><div class="grid g2"><div class="field"><label>Lớp</label><select id="aClass"></select></div><div class="field"><label>Câu hỏi</label><select id="aQuestion"></select></div></div><div class="grid g2"><div class="field"><label>Tên bài</label><input id="aTitle" placeholder="Speaking Practice 01"></div><div class="field"><label>Deadline</label><input id="aDeadline" type="date"></div></div><button class="btn primary" onclick="createAssignment()">Giao bài</button></div></div>
-
-<div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><h2>Chấm & nhận xét</h2><button class="btn secondary" onclick="closeModal('gradeModal')">✕</button></div><div id="gradeContent"></div><input type="hidden" id="gradeId"><div class="grid g3"><div class="field"><label>Overall</label><input id="gradeOverall" type="number" min="0" max="100"></div><div class="field"><label>Fluency</label><input id="gradeFluency" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation</label><input id="gradePron" type="number" min="0" max="100"></div></div><div class="field"><label>Nhận xét của cô</label><textarea id="gradeComment" rows="4"></textarea></div><button class="btn primary" onclick="saveGrade()">Lưu kết quả</button></div></div>
-
+<div id="classModal" class="modal"><div class="modalbox"><div class="between"><h2>Tạo lớp</h2><button class="btn" onclick="closeModal('classModal')">✕</button></div><div class="field"><label>Tên lớp</label><input id="className" placeholder="Flyers A"></div><div class="field"><label>Mô tả</label><input id="classDesc" placeholder="Lớp luyện Speaking"></div><button class="btn primary" onclick="createClass()">Lưu</button></div></div>
+<div id="questionModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm câu hỏi</h2><button class="btn" onclick="closeModal('questionModal')">✕</button></div><div class="grid g2"><div class="field"><label>Part</label><select id="qPart"><option>Part 1</option><option>Part 2</option><option>Part 3</option></select></div><div class="field"><label>Bài học / Topic</label><input id="qTopic" placeholder="My School"></div></div><div class="field"><label>Câu hỏi</label><textarea id="qText" rows="3" placeholder="What do you like about your school?"></textarea></div><button class="btn primary" onclick="createQuestion()">Lưu câu hỏi</button></div></div>
+<div id="assignmentModal" class="modal"><div class="modalbox"><div class="between"><h2>Giao bài</h2><button class="btn" onclick="closeModal('assignmentModal')">✕</button></div><div class="grid g2"><div class="field"><label>Lớp</label><select id="aClass"></select></div><div class="field"><label>Câu hỏi</label><select id="aQuestion"></select></div></div><div class="grid g2"><div class="field"><label>Tên bài</label><input id="aTitle" placeholder="Speaking 01"></div><div class="field"><label>Deadline</label><input id="aDeadline" type="date"></div></div><button class="btn primary" onclick="createAssignment()">Giao bài</button></div></div>
+<div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><h2>Chấm & nhận xét</h2><button class="btn" onclick="closeModal('gradeModal')">✕</button></div><div id="gradeInfo"></div><div class="grid g3"><div class="field"><label>Overall</label><input id="gOverall" type="number" min="0" max="100"></div><div class="field"><label>Fluency</label><input id="gFluency" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation</label><input id="gPron" type="number" min="0" max="100"></div></div><div class="field"><label>Nhận xét cô Hân</label><textarea id="gComment" rows="4"></textarea></div><input type="hidden" id="gId"><button class="btn primary" onclick="saveGrade()">Lưu kết quả</button></div></div>
 <div id="toast" class="toast hidden"></div>
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,updateProfile,signOut} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import {getDatabase,ref,set,get,push,onValue,update,remove} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import {getStorage,ref as sRef,uploadBytes,getDownloadURL} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
-
-const firebaseConfig={
- apiKey:"AIzaSyCA39PyvTlLtiqnPT3lkXUp0PgQ7rZmp74",
- authDomain:"speaking-practice-room.firebaseapp.com",
- projectId:"speaking-practice-room",
- storageBucket:"speaking-practice-room.firebasestorage.app",
- messagingSenderId:"840862279040",
- appId:"1:840862279040:web:01a2d248d755ea8121cd65",
- measurementId:"G-CFQKZS9MRD"
-};
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import{getDatabase,ref,set,get,push,onValue,update}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import{getStorage,ref as sRef,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+const firebaseConfig={apiKey:"AIzaSyCA39PyvTlLtiqnPT3lkXUp0PgQ7rZmp74",authDomain:"speaking-practice-room.firebaseapp.com",projectId:"speaking-practice-room",storageBucket:"speaking-practice-room.firebasestorage.app",messagingSenderId:"840862279040",appId:"1:840862279040:web:01a2d248d755ea8121cd65",measurementId:"G-CFQKZS9MRD"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),storage=getStorage(app);
 const TEACHER_EMAIL="teacher@mshanhclass.com",TEACHER_PASSWORD="hanna126";
-let role="student",user=null,profile=null;
-let data={users:{},classes:{},questions:{},assignments:{},submissions:{},mockTests:{},studentActivity:{}};
-let unsub=[];
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const fmt=d=>d?new Date(d).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}):"—";
-const today=()=>new Date().toISOString().slice(0,10);
-function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>$("toast").classList.add("hidden"),2800)}
-window.toast=toast;
-
-window.setRole=r=>{role=r;$("studentTab").classList.toggle("active",r==="student");$("teacherTab").classList.toggle("active",r==="teacher");$("nameField").classList.toggle("hidden",r!=="student");$("signupBtn").classList.toggle("hidden",r!=="student");$("teacherHint").classList.toggle("hidden",r!=="teacher");if(r==="teacher"){$("email").value=TEACHER_EMAIL;$("password").value=TEACHER_PASSWORD}};
-window.login=async()=>{
- try{
-  const email=role==="teacher"?TEACHER_EMAIL:$("email").value.trim(),pw=role==="teacher"?TEACHER_PASSWORD:$("password").value;
-  if(!email||!pw)throw Error("Vui lòng nhập email và mật khẩu.");
-  await signInWithEmailAndPassword(auth,email,pw);
- }catch(e){toast(authError(e))}
-};
-window.signupStudent=async()=>{
- try{
-  const name=$("name").value.trim(),email=$("email").value.trim(),pw=$("password").value;
-  if(!name)throw Error("Vui lòng nhập họ tên.");
-  if(pw.length<6)throw Error("Mật khẩu cần ít nhất 6 ký tự.");
-  const c=await createUserWithEmailAndPassword(auth,email,pw);
-  await updateProfile(c.user,{displayName:name});
-  await set(ref(db,"users/"+c.user.uid),{uid:c.user.uid,name,email,role:"student",createdAt:new Date().toISOString()});
-  toast("Tạo tài khoản thành công!");
- }catch(e){toast(authError(e))}
-};
-function authError(e){return e.code==="auth/invalid-credential"?"Sai email hoặc mật khẩu.":e.code==="auth/email-already-in-use"?"Email đã được dùng.":e.message||"Có lỗi xảy ra."}
-window.logout=()=>signOut(auth);
-onAuthStateChanged(auth,async u=>{
- user=u;
- if(!u){$("authView").classList.remove("hidden");$("appView").classList.add("hidden");return}
- $("authView").classList.add("hidden");$("appView").classList.remove("hidden");
- const snap=await get(ref(db,"users/"+u.uid));profile=snap.exists()?snap.val():{uid:u.uid,name:u.displayName||u.email,email:u.email,role:u.email===TEACHER_EMAIL?"teacher":"student"};
- role=profile.role==="teacher"||u.email===TEACHER_EMAIL?"teacher":"student";
- $("userLabel").textContent=(role==="teacher"?"👩🏻‍🏫 ":"👧 ")+(profile.name||u.displayName||u.email);
- buildNav();startData();go(role==="teacher"?"tHome":"sHome");
-});
-
-function buildNav(){
- const items=role==="teacher"?[
-  ["tHome","🏠","Tổng quan"],["tClasses","👥","Lớp học"],["tQuestions","📚","Ngân hàng đề"],["tAssignments","📝","Giao bài"],["tSubmissions","🎤","Bài đã nộp"],["tHistory","🕘","Lịch sử"]
- ]:[
-  ["sHome","🏠","Trang chủ"],["sAssignments","📝","Bài được giao"],["sPractice","🎤","Luyện Speaking"],["sMock","🏆","Thi thử"],["sHistory","🕘","Lịch sử"],["sProgress","📈","Tiến bộ"]
- ];
- $("nav").innerHTML=items.map(x=>`<button onclick="go('${x[0]}')" id="nav-${x[0]}">${x[1]} <span>${x[2]}</span></button>`).join("");
-}
-window.go=id=>{
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id)?.classList.add("active");
- document.querySelectorAll("#nav button").forEach(b=>b.classList.remove("active"));$("nav-"+id)?.classList.add("active");
- if(id==="sHome")renderStudentHome();if(id==="sAssignments")renderStudentAssignments();if(id==="sHistory")renderStudentHistory();if(id==="sProgress")renderProgress();
- if(id==="tHome")renderTeacherHome();if(id==="tClasses")renderClasses();if(id==="tQuestions")renderQuestions();if(id==="tAssignments")renderTeacherAssignments();if(id==="tSubmissions")renderSubmissions();if(id==="tHistory")renderTeacherHistory();
- if(id==="sPractice")loadPracticeFromAssignments();
- if(id==="sMock")initMock();
-};
-
-function startData(){
- unsub.forEach(x=>x());unsub=[];
- ["users","classes","questions","assignments","submissions","mockTests","studentActivity"].forEach(k=>{
-  unsub.push(onValue(ref(db,k),s=>{data[k]=s.val()||{};refreshCurrent()}));
- });
-}
-function refreshCurrent(){
- const active=document.querySelector(".page.active")?.id;
- if(active==="sHome")renderStudentHome();if(active==="sAssignments")renderStudentAssignments();if(active==="sHistory")renderStudentHistory();if(active==="sProgress")renderProgress();
- if(active==="tHome")renderTeacherHome();if(active==="tClasses")renderClasses();if(active==="tQuestions")renderQuestions();if(active==="tAssignments")renderTeacherAssignments();if(active==="tSubmissions")renderSubmissions();if(active==="tHistory")renderTeacherHistory();
-}
-
-function studentAssignments(){
- return Object.values(data.assignments).filter(a=>a.active!==false&&(a.studentId===user?.uid||a.classId==="all"||data.users[user?.uid]?.classId===a.classId));
-}
-function renderStudentHome(){
- $("studentName").textContent=profile?.name||user?.displayName||"bạn";
- const subs=Object.values(data.submissions).filter(s=>s.studentId===user?.uid),mocks=Object.values(data.mockTests).filter(s=>s.studentId===user?.uid);
- $("stSubmitted").textContent=subs.length;$("stMocks").textContent=mocks.length;
- const graded=subs.filter(s=>s.status==="graded"&&Number.isFinite(+s.overall));$("stAverage").textContent=graded.length?Math.round(graded.reduce((a,b)=>a+(+b.overall),0)/graded.length):"—";
- const days=[...new Set(subs.map(s=>(s.submittedAt||"").slice(0,10)).filter(Boolean))].sort().reverse();let streak=0,cur=new Date();for(const d of days){const x=new Date(d),diff=Math.round((new Date(cur.toDateString())-new Date(x.toDateString()))/86400000);if(diff===streak)streak++;else break}$("stStreak").textContent=streak+" 🔥";
- const as=studentAssignments().slice(0,3);$("studentAssignmentPreview").innerHTML=as.length?as.map(assignmentCard).join(""):`<div class="empty">Chưa có bài được giao.</div>`;
-}
-function assignmentCard(a){
- const q=data.questions[a.questionId]||{};const sub=Object.values(data.submissions).find(s=>s.assignmentId===a.id&&s.studentId===user?.uid);
- return `<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted">${esc(q.part||"Speaking")} · ${esc(q.topic||"")} · Hạn ${esc(a.deadline||"—")}</div></div><span class="badge ${sub?"ok":"wait"}">${sub?`Đã nộp · ${sub.overall??"—"}`:"Chưa nộp"}</span></div>${!sub?`<button class="btn primary" style="margin-top:9px" onclick="startAssignment('${a.id}')">Làm bài →</button>`:""}</div>`;
-}
-window.startAssignment=id=>{window.currentAssignment=data.assignments[id];go("sPractice")};
-function loadPracticeFromAssignments(){
- const a=window.currentAssignment||studentAssignments()[0];if(!a){$("practiceQuestion").textContent="Chưa có bài được giao.";return}
- const q=data.questions[a.questionId]||{q:"Tell me about yourself.",topic:"Practice",part:"Part 1"};
- window.practice={a,q};$("practiceTopic").textContent=(q.part||"Practice")+" · "+(q.topic||"");$("practiceQuestion").textContent=q.q||q.text||"";
- $("practiceCounter").textContent="1/1";retryPractice();
-}
-function drawWave(id){const w=$(id);w.innerHTML="";for(let i=0;i<48;i++){const e=document.createElement("i");e.style.setProperty("--h",(8+Math.random()*45)+"px");w.appendChild(e)}}
-drawWave("practiceWave");
-
+let D={users:{},classes:{},questions:{},assignments:{},submissions:{},mockTests:{}},user=null,profile=null,role="student",practice=null,rec=null,lastBlob=null,practiceText="",mock={i:0,answers:[],rec:null};
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])),fmt=x=>x?new Date(x).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}):"—";
+function toast(x){$("toast").textContent=x;$("toast").classList.remove("hidden");clearTimeout(window.tt);window.tt=setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+window.chooseRole=r=>{role=r;$("studentTab").classList.toggle("active",r==="student");$("teacherTab").classList.toggle("active",r==="teacher");$("studentLogin").classList.toggle("hidden",r!=="student");$("teacherLogin").classList.toggle("hidden",r!=="teacher")};
+window.teacherLogin=async()=>{try{await signInWithEmailAndPassword(auth,$("teacherEmail").value.trim(),$("teacherPassword").value)}catch(e){toast("Sai email hoặc mật khẩu. Hãy tạo tài khoản giáo viên trong Firebase Authentication.")}};
+window.studentLogin=async()=>{const c=$("loginClass").value,code=$("studentCode").value.trim().toUpperCase();if(!c||!code)return toast("Hãy chọn lớp và nhập mã học sinh.");const u=Object.values(D.users).find(x=>x.role==="student"&&String(x.studentCode).toUpperCase()===code&&x.classId===c);if(!u)return toast("Mã học sinh không thuộc lớp đã chọn.");profile=u;user={uid:u.uid};role="student";enterApp()};
+window.logout=()=>{if(role==="teacher")signOut(auth);else{user=null;profile=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");$("studentCode").value=""}};
+function enterApp(){$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("who").textContent=role==="teacher"?"👩🏻‍🏫 Giáo viên":"👧 "+(profile.name||profile.studentCode);buildNav();startListeners();go(role==="teacher"?"tHome":"sHome")}
+function buildNav(){const a=role==="teacher"?[["tHome","🏠 Tổng quan"],["tClasses","👥 Lớp học"],["tStudents","👧 Học sinh"],["tQuestions","📚 Ngân hàng đề"],["tAssignments","📝 Giao bài"],["tSubmissions","🎤 Bài nộp"],["tHistory","🕘 Lịch sử"]]:[["sHome","🏠 Trang chủ"],["sAssignments","📝 Bài được giao"],["sPractice","🎤 Luyện Speaking"],["sMock","🏆 Thi thử"],["sHistory","🕘 Lịch sử"],["sProgress","📈 Tiến bộ"]];$("nav").innerHTML=a.map(x=>`<button id="n-${x[0]}" onclick="go('${x[0]}')">${x[1]}</button>`).join("")}
+window.go=id=>{document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));$("n-"+id)?.classList.add("active");render(id)};
+function startListeners(){["classes","users","questions","assignments","submissions","mockTests"].forEach(k=>onValue(ref(db,k),s=>{D[k]=s.val()||{};loadClassChoices();const id=document.querySelector(".page.active")?.id;render(id)}))}
+function render(id){if(!id)return;if(id==="sHome")studentHome();if(id==="sAssignments")studentAssignments();if(id==="sHistory")studentHistory();if(id==="sProgress")progress();if(id==="sPractice")loadPractice();if(id==="sMock")initMock();if(id==="tHome")teacherHome();if(id==="tClasses")classes();if(id==="tStudents")students();if(id==="tQuestions")questions();if(id==="tAssignments")assignments();if(id==="tSubmissions")renderSubmissions();if(id==="tHistory")renderTeacherHistory()}
+function loadClassChoices(){const opts=Object.values(D.classes).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");if($("loginClass"))$("loginClass").innerHTML=opts||'<option value="">Chưa có lớp</option>';if($("newStuClass"))$("newStuClass").innerHTML=opts;if($("fClass")){const old=$("fClass").value;$("fClass").innerHTML='<option value="">Tất cả</option>'+opts;$("fClass").value=old}if($("aClass"))$("aClass").innerHTML=opts}
+function myAssignments(){return Object.values(D.assignments).filter(a=>a.classId===profile?.classId&&a.active!==false)}
+function studentHome(){const s=Object.values(D.submissions).filter(x=>x.studentId===user?.uid),g=s.filter(x=>x.overall!=null),m=Object.values(D.mockTests).filter(x=>x.studentId===user?.uid);$("sName").textContent=profile?.name||profile?.studentCode;$("sClass").textContent=D.classes[profile?.classId]?.name||"—";$("sSub").textContent=s.length;$("sAvg").textContent=g.length?Math.round(g.reduce((a,b)=>a+(+b.overall),0)/g.length):"—";$("sMock").textContent=m.length;$("sLast").textContent=s.length?fmt(s.sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""))[0].submittedAt):"—";$("sPreview").innerHTML=myAssignments().slice(0,3).map(acard).join("")||'<div class="item muted">Chưa có bài.</div>'}
+function acard(a){const q=D.questions[a.questionId]||{},s=Object.values(D.submissions).find(x=>x.assignmentId===a.id&&x.studentId===user?.uid);return `<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted">${esc(q.part||"")} · ${esc(q.topic||"")} · Hạn ${esc(a.deadline||"—")}</div></div><span class="badge ${s?"ok":"wait"}">${s?"Đã nộp":"Chưa nộp"}</span></div>${!s?`<button class="btn primary" style="margin-top:9px" onclick="startAssignment('${a.id}')">Bắt đầu →</button>`:""}</div>`}
+window.startAssignment=id=>{practice={a:D.assignments[id],q:D.questions[D.assignments[id].questionId]};go("sPractice")};
+function studentAssignments(){$("sAssignmentsList").innerHTML=myAssignments().map(acard).join("")||'<div class="card muted">Chưa có bài được giao.</div>'}
+function loadPractice(){if(!practice){const a=myAssignments()[0];if(a)practice={a,q:D.questions[a.questionId]}}if(!practice){$("pQuestion").textContent="Chưa có bài để luyện.";return}const q=practice.q||{};$("pTopic").textContent=(q.part||"Speaking")+" · "+(q.topic||"");$("pQuestion").textContent=q.q||"";$("pCounter").textContent="1/1";retryPractice()}
+function wave(id){$(id).innerHTML=Array.from({length:45},()=>`<i style="--h:${8+Math.random()*40}px"></i>`).join("")}wave("pWave");
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let media=null,recognition=null,transcript="",startedAt=0,lastBlob=null;
-function beginRecognition(onLive,onFinal){
- if(!SR)return null;const r=new SR();r.lang="en-US";r.continuous=true;r.interimResults=true;let final="";
- r.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)final+=" "+t;else interim+=" "+t}onLive((final+" "+interim).trim());if(final.trim())onFinal(final.trim())};
- r.onerror=e=>{if(e.error!=="no-speech")toast("Speech recognition: "+e.error)};try{r.start()}catch{}
- return r;
-}
-function scoreText(text,seconds,question){
- const words=(text||"").toLowerCase().replace(/[^a-z0-9'\s]/g," ").split(/\s+/).filter(Boolean),n=words.length,unique=new Set(words).size;
- const fillers=(text.match(/\b(um|uh|er|like|you know)\b/gi)||[]).length,pace=seconds?Math.round(n/(seconds/60)):n;
- const qWords=(question||"").toLowerCase().split(/\s+/).filter(x=>x.length>3),hits=qWords.filter(x=>words.includes(x)).length;
- const response=qWords.length?Math.min(100,Math.round(hits/Math.min(qWords.length,5)*100)):70;
- const fluency=Math.max(35,Math.min(100,Math.round(58+Math.min(n,55)*.65-fillers*4+(pace>=45&&pace<=150?9:0))));
- const pronunciation=Math.max(45,Math.min(98,Math.round(65+(unique/Math.max(n,1))*30-fillers*2)));
- const overall=Math.round(fluency*.4+pronunciation*.35+response*.25);
- const comment=overall>=90?"Excellent! Em nói khá tự nhiên, rõ ý và có phản xạ tốt.":overall>=80?"Very good! Em trả lời tốt. Hãy tiếp tục chú ý phát âm rõ và mở rộng ý.":overall>=70?"Good effort! Em đã trả lời được. Cố gắng nói dài hơn và hạn chế ngập ngừng.":"Keep practising! Hãy nói chậm, rõ, đủ câu và thử lại.";
- return {overall,fluency,pronunciation,response,words:n,pace,comment};
-}
-window.togglePractice=async()=>{
- if(media?.state==="recording"){media.stop();return}
- try{
-  const stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];startedAt=Date.now();transcript="";
-  media=new MediaRecorder(stream);media.ondataavailable=e=>chunks.push(e.data);
-  media.onstop=()=>{stream.getTracks().forEach(t=>t.stop());lastBlob=new Blob(chunks,{type:"audio/webm"});finishPractice()};
-  media.start();$("practiceMic").classList.add("recording");$("practiceMic").textContent="⏹️";$("practiceHint").textContent="Đang ghi âm…";recognition=beginRecognition(t=>{$("practiceTranscript").textContent=t;transcript=t},t=>transcript=t);
- }catch(e){toast("Hãy cấp quyền microphone cho website.")}
-};
-function finishPractice(){
- if(recognition)try{recognition.stop()}catch{}
- const sec=Math.max(1,Math.round((Date.now()-startedAt)/1000)),r=scoreText(transcript,sec,window.practice?.q?.q||"");
- $("practiceMic").classList.remove("recording");$("practiceMic").textContent="🎤";$("practiceHint").textContent="Đã phân tích. Em có thể nộp bài hoặc thử lại.";
- $("practiceFeedback").classList.remove("hidden");$("practiceFeedback").innerHTML=feedbackHTML(r)+"<div class='small muted' style='margin-top:8px'>📝 "+esc(transcript||"Chưa nhận diện được transcript.")+"</div><div class='tiny muted' style='margin-top:6px'>* Pronunciation là điểm luyện tập ước lượng từ transcript/tốc độ/phản xạ; chưa phải chấm âm vị chuyên sâu.</div>";
- $("submitPracticeBtn").disabled=!lastBlob;window.practiceResult={...r,duration:sec};
-}
-function feedbackHTML(r){return `<b>🤖 Kết quả tự động</b><div class="auto-score"><div class="mini">Overall<strong>${r.overall}</strong></div><div class="mini">Fluency<strong>${r.fluency}</strong></div><div class="mini">Pronunciation<strong>${r.pronunciation}</strong></div><div class="mini">Response<strong>${r.response}</strong></div></div><div class="ai-note">${esc(r.comment)}</div>`}
-window.retryPractice=()=>{if(media?.state==="recording")return;$("practiceTranscript").innerHTML='<span class="muted">Transcript sẽ xuất hiện ở đây…</span>';$("practiceFeedback").classList.add("hidden");$("submitPracticeBtn").disabled=true;$("practiceHint").textContent="Nhấn microphone để bắt đầu.";drawWave("practiceWave");lastBlob=null};
-window.speakCurrent=()=>speak($("practiceQuestion").textContent);
-function speak(text){if(!speechSynthesis)return toast("Trình duyệt không hỗ trợ đọc câu hỏi.");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=.9;speechSynthesis.speak(u)}
-window.submitPractice=async()=>{
- if(!lastBlob||!window.practice?.a)return;
- try{
-  const path=`submissions/${user.uid}/${Date.now()}.webm`,sr=await uploadBytes(sRef(storage,path),lastBlob),url=await getDownloadURL(sr.ref),r=window.practiceResult,a=window.practice.a,q=window.practice.q;
-  const id=push(ref(db,"submissions")).key;await set(ref(db,"submissions/"+id),{id,assignmentId:a.id,studentId:user.uid,studentName:profile?.name||user.displayName||user.email,audioUrl:url,question:q.q,topic:q.topic||"",part:q.part||"",transcript,overall:r.overall,fluency:r.fluency,pronunciation:r.pronunciation,response:r.response,autoComment:r.comment,status:"pending",submittedAt:new Date().toISOString()});
-  toast("Đã nộp bài cho cô Hân!");window.currentAssignment=null;go("sHistory");
- }catch(e){toast("Không thể nộp bài: "+(e.message||""))}
-};
-
-const mockQs=[
- {part:"Part 1",topic:"Personal information",q:"What is your name?"},
- {part:"Part 1",topic:"Personal information",q:"How old are you?"},
- {part:"Part 1",topic:"School",q:"What is your favourite school subject?"},
- {part:"Part 2",topic:"Topic",q:"Tell me about your favourite hobby."},
- {part:"Part 2",topic:"Topic",q:"Describe your best friend."},
- {part:"Part 3",topic:"Follow-up",q:"Why is learning English important for you?"},
- {part:"Part 3",topic:"Follow-up",q:"What are you going to do next weekend?"},
- {part:"Part 3",topic:"Follow-up",q:"Do you prefer studying alone or with friends? Why?"}
-];
-let mi=0,mockResults=[],mockRec=null,mockStart=0,mockTimer=null;
-function initMock(){mi=0;mockResults=[];clearInterval(mockTimer);mockTimer=setInterval(()=>{const start=window._mockStarted||Date.now();let sec=Math.max(0,600-Math.floor((Date.now()-start)/1000));$("mockTimer").textContent=`${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;if(sec<=0){clearInterval(mockTimer);finishMock()}},500);window._mockStarted=Date.now();renderMock()}
-function renderMock(){const q=mockQs[mi];$("mockPart").textContent=q.part;$("mockIndex").textContent=`${mi+1}/${mockQs.length}`;$("mockTopic").textContent=q.topic;$("mockQuestion").textContent=q.q;$("mockTranscript").innerHTML='<span class="muted">Transcript…</span>';$("mockFeedback").classList.add("hidden");$("mockNext").disabled=true;$("mockHint").textContent="Nhấn microphone để trả lời.";drawWave("mockWave")}
-window.speakMock=()=>speak($("mockQuestion").textContent);
-window.toggleMock=async()=>{
- if(mockRec?.state==="recording"){mockRec.stop();return}
- try{const stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];mockStart=Date.now();let text="";
-  mockRec=new MediaRecorder(stream);mockRec.ondataavailable=e=>chunks.push(e.data);mockRec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const sec=Math.max(1,Math.round((Date.now()-mockStart)/1000)),r=scoreText(text,sec,$("mockQuestion").textContent);mockResults[mi]=r;$("mockFeedback").classList.remove("hidden");$("mockFeedback").innerHTML=feedbackHTML(r);$("mockNext").disabled=false;$("mockHint").textContent="Đã chấm tự động.";mockRec=null};
-  mockRec.start();$("mockMic").classList.add("recording");$("mockMic").textContent="⏹️";
-  mockRec._recognition=beginRecognition(t=>{$("mockTranscript").textContent=t;text=t},t=>text=t);
-  mockRec.addEventListener("stop",()=>{if(mockRec?._recognition)try{mockRec._recognition.stop()}catch{}});
- }catch(e){toast("Hãy cấp quyền microphone.")}
-};
-window.nextMock=async()=>{if(mi<mockQs.length-1){mi++;renderMock()}else finishMock()};
-async function finishMock(){
- clearInterval(mockTimer);const valid=mockResults.filter(Boolean);if(!valid.length)return;
- const score=Math.round(valid.reduce((a,b)=>a+b.overall,0)/valid.length),id=push(ref(db,"mockTests")).key;
- await set(ref(db,"mockTests/"+id),{id,studentId:user.uid,studentName:profile?.name||user.displayName||user.email,score,answers:mockResults,completedAt:new Date().toISOString()});
- toast(`Hoàn thành thi thử · ${score}/100`);go("sHistory");
-};
-
-function renderStudentAssignments(){$("assignmentList").innerHTML=studentAssignments().length?studentAssignments().map(assignmentCard).join(""):`<div class="card empty">Chưa có bài được giao.</div>`}
-function renderStudentHistory(){
- const subs=Object.values(data.submissions).filter(s=>s.studentId===user?.uid).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||"")),mocks=Object.values(data.mockTests).filter(s=>s.studentId===user?.uid).sort((a,b)=>(b.completedAt||"").localeCompare(a.completedAt||""));
- let html=[...subs.map(s=>`<div class="item"><div class="between"><div><b>🎤 ${esc(s.topic||"Speaking")}</b><div class="small muted">${esc(s.part||"")} · ${fmt(s.submittedAt)}</div></div><span class="badge ${s.status==="graded"?"ok":"wait"}">${s.status==="graded"?"Đã chấm":"Chờ cô chấm"}</span></div><div class="row" style="margin-top:9px"><span>Overall <b>${s.overall??"—"}</b></span><span>Fluency <b>${s.fluency??"—"}</b></span><span>Pronunciation <b>${s.pronunciation??"—"}</b></span></div>${s.teacherComment?`<div class="ai-note">💬 ${esc(s.teacherComment)}</div>`:""}</div>`),...mocks.map(s=>`<div class="item"><div class="between"><div><b>🏆 Mock Speaking Test</b><div class="small muted">${fmt(s.completedAt)}</div></div><span class="score" style="font-size:25px">${s.score}/100</span></div></div>`)].join("");
- $("studentHistory").innerHTML=html||`<div class="card empty">Chưa có lịch sử.</div>`;
-}
-function renderProgress(){
- const arr=Object.values(data.submissions).filter(s=>s.studentId===user?.uid&&s.overall!=null).sort((a,b)=>(a.submittedAt||"").localeCompare(b.submittedAt||"")).slice(-10);
- $("progressChart").innerHTML=arr.length?arr.map((s,i)=>`<div title="${s.overall}" style="flex:1;display:flex;flex-direction:column;justify-content:end;align-items:center;height:100%"><span class="tiny muted">${s.overall}</span><div style="width:min(42px,80%);height:${Math.max(8,s.overall*1.7)}px;background:linear-gradient(#8b6cff,#ec79c9);border-radius:8px 8px 0 0"></div><span class="tiny muted" style="margin-top:5px">${i+1}</span></div>`).join(""):`<div class="empty" style="width:100%">Chưa đủ dữ liệu để tạo biểu đồ.</div>`;
-}
-
-function renderTeacherHome(){const students=Object.values(data.users).filter(x=>x.role==="student"),subs=Object.values(data.submissions),graded=subs.filter(x=>x.status==="graded");$("tStudents").textContent=students.length;$("tClasses").textContent=Object.keys(data.classes).length;$("tPending").textContent=subs.filter(x=>x.status!=="graded").length;$("tGraded").textContent=graded.length}
-function renderClasses(){$("classList").innerHTML=Object.values(data.classes).map(c=>{const n=Object.values(data.users).filter(u=>u.classId===c.id&&u.role==="student").length;return `<div class="card"><div class="between"><div><b>${esc(c.name)}</b><div class="small muted">${esc(c.desc||"")}</div></div><span class="pill">${esc(c.code||"")}</span></div><div class="small muted" style="margin-top:13px">${n} học sinh</div></div>`}).join("")||`<div class="card empty">Chưa có lớp.</div>`}
-window.openClassModal=()=>{$("classModal").classList.add("show")};window.openQuestionModal=()=>{$("questionModal").classList.add("show")};
-window.openAssignmentModal=()=>{fillAssignmentOptions();$("assignmentModal").classList.add("show")};window.closeModal=id=>$(id).classList.remove("show");
-window.createClass=async()=>{const id=push(ref(db,"classes")).key,name=$("className").value.trim(),desc=$("classDesc").value.trim();if(!name)return toast("Nhập tên lớp.");const code=(""+Math.random().toString(36).slice(2,7)).toUpperCase();await set(ref(db,"classes/"+id),{id,name,desc,code,createdAt:new Date().toISOString(),teacherId:user.uid});closeModal("classModal");toast("Đã tạo lớp.");$("className").value="";$("classDesc").value=""}
-window.createQuestion=async()=>{const id=push(ref(db,"questions")).key,q={id,part:$("qPart").value,topic:$("qTopic").value.trim(),q:$("qText").value.trim(),createdAt:new Date().toISOString(),teacherId:user.uid};if(!q.q)return toast("Nhập câu hỏi.");await set(ref(db,"questions/"+id),q);closeModal("questionModal");toast("Đã thêm câu hỏi.");$("qText").value=""}
-function fillAssignmentOptions(){$("aClass").innerHTML=Object.values(data.classes).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");$("aQuestion").innerHTML=Object.values(data.questions).map(q=>`<option value="${q.id}">${esc(q.part)} · ${esc(q.topic)} · ${esc(q.q)}</option>`).join("")}
-window.createAssignment=async()=>{const id=push(ref(db,"assignments")).key,a={id,title:$("aTitle").value.trim()||"Speaking Practice",classId:$("aClass").value,questionId:$("aQuestion").value,deadline:$("aDeadline").value,teacherId:user.uid,active:true,createdAt:new Date().toISOString()};if(!a.classId||!a.questionId)return toast("Hãy tạo lớp và câu hỏi trước.");await set(ref(db,"assignments/"+id),a);closeModal("assignmentModal");toast("Đã giao bài.")}
-function renderQuestions(){$("questionList").innerHTML=Object.values(data.questions).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(q=>`<div class="item"><div class="between"><div><span class="pill">${esc(q.part)}</span> <b>${esc(q.topic||"General")}</b><div style="margin-top:7px">${esc(q.q)}</div></div><button class="btn danger" onclick="deleteQuestion('${q.id}')">Xóa</button></div></div>`).join("")||`<div class="card empty">Chưa có câu hỏi.</div>`}
-window.deleteQuestion=async id=>{if(confirm("Xóa câu hỏi này?"))await remove(ref(db,"questions/"+id))}
-function renderTeacherAssignments(){$("teacherAssignmentList").innerHTML=Object.values(data.assignments).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(a=>{const c=data.classes[a.classId]||{},q=data.questions[a.questionId]||{};const count=Object.values(data.submissions).filter(s=>s.assignmentId===a.id).length;return `<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted">${esc(c.name||"")} · ${esc(q.part||"")} · ${esc(q.topic||"")} · Hạn ${esc(a.deadline||"—")}</div></div><span class="badge">${count} bài nộp</span></div></div>`}).join("")||`<div class="card empty">Chưa có bài giao.</div>`}
-function renderSubmissions(){
- const fc=$("filterClass").value,fa=$("filterAssignment").value,fs=$("filterStatus").value;
- $("filterClass").innerHTML='<option value="">Tất cả lớp</option>'+Object.values(data.classes).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");$("filterClass").value=fc;
- $("filterAssignment").innerHTML='<option value="">Tất cả bài</option>'+Object.values(data.assignments).map(a=>`<option value="${a.id}">${esc(a.title)}</option>`).join("");$("filterAssignment").value=fa;
- let arr=Object.values(data.submissions).filter(s=>(!fs||s.status===fs)&&(!fa||s.assignmentId===fa)&&(!fc||data.assignments[s.assignmentId]?.classId===fc)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
- $("submissionList").innerHTML=arr.map(s=>`<div class="item"><div class="between"><div><b>${esc(s.studentName||"Học sinh")}</b><div class="small muted">${esc(s.topic||"Speaking")} · ${fmt(s.submittedAt)}</div></div><span class="badge ${s.status==="graded"?"ok":"wait"}">${s.status==="graded"?"Đã chấm":"Chờ chấm"}</span></div><div class="row" style="margin-top:10px"><span>Overall <b>${s.overall??"—"}</b></span><span>Fluency <b>${s.fluency??"—"}</b></span><span>Pronunciation <b>${s.pronunciation??"—"}</b></span><button class="btn secondary" onclick="listenAudio('${esc(s.audioUrl||"")}')">▶ Nghe bài</button><button class="btn primary" onclick="openGrade('${s.id}')">Chấm / sửa</button></div>${s.transcript?`<div class="small muted" style="margin-top:9px">📝 ${esc(s.transcript)}</div>`:""}</div>`).join("")||`<div class="card empty">Chưa có bài nộp.</div>`;
-}
-window.listenAudio=url=>{if(!url)return toast("Không có file ghi âm.");const a=new Audio(url);a.controls=true;a.volume=.9;const box=document.createElement("div");box.className="toast";box.innerHTML="▶ Đang mở audio";box.appendChild(a);document.body.appendChild(box);a.play();setTimeout(()=>box.remove(),15000)}
-window.openGrade=id=>{const s=data.submissions[id];if(!s)return;$("gradeId").value=id;$("gradeOverall").value=s.overall??"";$("gradeFluency").value=s.fluency??"";$("gradePron").value=s.pronunciation??"";$("gradeComment").value=s.teacherComment||s.autoComment||"";$("gradeContent").innerHTML=`<div class="item"><b>${esc(s.studentName)}</b><div class="small muted">${esc(s.question||"")} · ${fmt(s.submittedAt)}</div><div class="ai-note" style="margin-top:9px">AI feedback: ${esc(s.autoComment||"Chưa có")}</div></div>`;$("gradeModal").classList.add("show")}
-window.saveGrade=async()=>{const id=$("gradeId").value,s=data.submissions[id];if(!s)return;const overall=Math.max(0,Math.min(100,+$("gradeOverall").value||0)),fluency=Math.max(0,Math.min(100,+$("gradeFluency").value||0)),pronunciation=Math.max(0,Math.min(100,+$("gradePron").value||0)),teacherComment=$("gradeComment").value.trim();await update(ref(db,"submissions/"+id),{overall,fluency,pronunciation,teacherComment,status:"graded",gradedAt:new Date().toISOString(),gradedBy:user.uid});closeModal("gradeModal");toast("Đã lưu điểm và nhận xét.")}
-function renderTeacherHistory(){
- const q=($("historySearch").value||"").toLowerCase(),from=$("historyFrom").value,to=$("historyTo").value;
- let arr=Object.values(data.submissions).filter(s=>{const text=((s.studentName||"")+" "+(s.topic||"")+" "+(s.question||"")).toLowerCase(),d=(s.submittedAt||"").slice(0,10);return (!q||text.includes(q))&&(!from||d>=from)&&(!to||d<=to)}).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
- $("teacherHistory").innerHTML=arr.map(s=>`<div class="item"><div class="between"><div><b>${esc(s.studentName)}</b> · ${esc(s.topic||"Speaking")}<div class="small muted">${fmt(s.submittedAt)}</div></div><b>${s.overall??"—"}/100</b></div><div class="small muted" style="margin-top:7px">${esc(s.teacherComment||s.autoComment||"Chưa có nhận xét")}</div></div>`).join("")||`<div class="card empty">Không tìm thấy lịch sử.</div>`;
-}
+function speechRec(live,final){if(!SR)return null;const r=new SR();r.lang="en-US";r.continuous=true;r.interimResults=true;let f="";r.onresult=e=>{let i="";for(let n=e.resultIndex;n<e.results.length;n++){const t=e.results[n][0].transcript;if(e.results[n].isFinal)f+=" "+t;else i+=" "+t}live((f+" "+i).trim());if(f.trim())final(f.trim())};try{r.start()}catch{}return r}
+function score(text,sec,q){const words=(text||"").toLowerCase().replace(/[^a-z0-9'\s]/g," ").split(/\s+/).filter(Boolean),n=words.length,fill=(text.match(/\b(um|uh|er|like|you know)\b/gi)||[]).length,pace=sec?n/(sec/60):n,uniq=new Set(words).size,qw=(q||"").toLowerCase().split(/\s+/).filter(x=>x.length>3),hit=qw.filter(x=>words.includes(x)).length;const response=qw.length?Math.min(100,Math.round(hit/Math.min(qw.length,5)*100)):70,fluency=Math.max(35,Math.min(100,Math.round(60+Math.min(n,55)*.6-fill*4+(pace>=45&&pace<=150?8:0)))),pron=Math.max(45,Math.min(98,Math.round(66+uniq/Math.max(n,1)*30-fill*2))),overall=Math.round(fluency*.4+pron*.35+response*.25);return{overall,fluency,pronunciation:pron,response,comment:overall>=90?"Excellent! Em nói rõ, tự tin và phản xạ tốt.":overall>=80?"Very good! Em trả lời tốt. Hãy mở rộng ý và chú ý phát âm.":overall>=70?"Good effort! Hãy nói dài hơn và hạn chế ngập ngừng.":"Keep practising! Hãy nói chậm, rõ và đủ câu."}}
+function feedback(r){return `<b>🤖 Kết quả tự động</b><div class="auto"><div class="mini">Overall<b>${r.overall}</b></div><div class="mini">Fluency<b>${r.fluency}</b></div><div class="mini">Pronunciation<b>${r.pronunciation}</b></div><div class="mini">Response<b>${r.response}</b></div></div><div class="feedback">${esc(r.comment)}</div>`}
+window.togglePractice=async()=>{if(rec?.state==="recording"){rec.stop();return}try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];practiceText="";const start=Date.now();rec=new MediaRecorder(st);rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=()=>{st.getTracks().forEach(t=>t.stop());lastBlob=new Blob(chunks,{type:"audio/webm"});const r=score(practiceText,(Date.now()-start)/1000,practice.q.q);$("pFeedback").classList.remove("hidden");$("pFeedback").innerHTML=feedback(r)+`<div class="small muted" style="margin-top:8px">📝 ${esc(practiceText||"Không nhận diện được transcript.")}</div><div class="tiny muted">* Điểm phát âm V4 là điểm luyện tập ước lượng từ transcript/tốc độ; chưa phải chấm âm vị chuyên sâu.</div>`;$("pSubmit").disabled=false;window.pr=r;$("pHint").textContent="Đã phân tích. Có thể nộp hoặc thử lại."};rec.start();$("pMic").classList.add("recording");$("pMic").textContent="⏹️";$("pHint").textContent="Đang ghi âm…";const sr=speechRec(t=>{$("pTranscript").textContent=t;practiceText=t},t=>practiceText=t);rec.addEventListener("stop",()=>{try{sr?.stop()}catch{}})}catch(e){toast("Hãy cấp quyền microphone.")}};
+window.retryPractice=()=>{$("pTranscript").innerHTML='<span class="muted">Transcript sẽ xuất hiện ở đây…</span>';$("pFeedback").classList.add("hidden");$("pSubmit").disabled=true;$("pHint").textContent="Nhấn microphone để bắt đầu.";lastBlob=null};
+window.submitPractice=async()=>{if(!lastBlob||!practice)return;try{const path=`audio/${user.uid}/${Date.now()}.webm`,u=await uploadBytes(sRef(storage,path),lastBlob),url=await getDownloadURL(u.ref),r=window.pr,id=push(ref(db,"submissions")).key;await set(ref(db,"submissions/"+id),{id,assignmentId:practice.a.id,studentId:user.uid,studentName:profile.name,studentCode:profile.studentCode,classId:profile.classId,question:practice.q.q,topic:practice.q.topic||"",part:practice.q.part||"",audioUrl:url,transcript:practiceText,overall:r.overall,fluency:r.fluency,pronunciation:r.pronunciation,response:r.response,autoComment:r.comment,status:"pending",submittedAt:new Date().toISOString()});toast("Đã nộp bài cho cô Hân!");practice=null;go("sHistory")}catch(e){toast("Không thể nộp bài: "+e.message)}};
+const mockQs=[["Part 1","Personal information","What is your name?"],["Part 1","Personal information","How old are you?"],["Part 1","School","What is your favourite school subject?"],["Part 2","Topic","Tell me about your favourite hobby."],["Part 2","Topic","Describe your best friend."],["Part 3","Follow-up","Why is learning English important for you?"],["Part 3","Follow-up","What are you going to do next weekend?"],["Part 3","Follow-up","Do you prefer studying alone or with friends? Why?"]];
+let mtimer;
+function initMock(){mock={i:0,answers:[]};clearInterval(mtimer);let end=Date.now()+600000;mtimer=setInterval(()=>{$("mTime").textContent=new Date(Math.max(0,end-Date.now())).toISOString().substr(14,5);if(end<Date.now()){clearInterval(mtimer);finishMock()}},500);renderMock()}
+function renderMock(){const q=mockQs[mock.i];$("mPart").textContent=q[0];$("mIndex").textContent=`${mock.i+1}/8`;$("mTopic").textContent=q[1];$("mQuestion").textContent=q[2];$("mTranscript").innerHTML='<span class="muted">Transcript…</span>';$("mFeedback").classList.add("hidden");$("mNext").disabled=true;$("mHint").textContent="Nhấn microphone để trả lời.";wave("mWave")}
+window.toggleMock=async()=>{if(mock.rec?.state==="recording"){mock.rec.stop();return}try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[],start=Date.now();let text="";mock.rec=new MediaRecorder(st);mock.rec.ondataavailable=e=>chunks.push(e.data);mock.rec.onstop=()=>{st.getTracks().forEach(t=>t.stop());const r=score(text,(Date.now()-start)/1000,$("mQuestion").textContent);mock.answers[mock.i]=r;$("mFeedback").classList.remove("hidden");$("mFeedback").innerHTML=feedback(r);$("mNext").disabled=false;$("mHint").textContent="Đã chấm tự động."};mock.rec.start();$("mMic").classList.add("recording");$("mMic").textContent="⏹️";const sr=speechRec(t=>{$("mTranscript").textContent=t;text=t},t=>text=t);mock.rec.addEventListener("stop",()=>{try{sr?.stop()}catch{}})}catch(e){toast("Hãy cấp quyền microphone.")}};
+window.nextMock=async()=>{if(mock.i<7){mock.i++;renderMock()}else finishMock()};
+async function finishMock(){clearInterval(mtimer);const a=mock.answers.filter(Boolean);if(!a.length)return;const scoreAll=Math.round(a.reduce((x,y)=>x+y.overall,0)/a.length),id=push(ref(db,"mockTests")).key;await set(ref(db,"mockTests/"+id),{id,studentId:user.uid,studentName:profile.name,classId:profile.classId,score:scoreAll,answers:mock.answers,completedAt:new Date().toISOString()});toast(`Hoàn thành thi thử: ${scoreAll}/100`);go("sHistory")}
+function studentHistory(){const a=Object.values(D.submissions).filter(x=>x.studentId===user.uid).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||"")),m=Object.values(D.mockTests).filter(x=>x.studentId===user.uid).sort((a,b)=>(b.completedAt||"").localeCompare(a.completedAt||""));$("sHistoryList").innerHTML=[...a.map(x=>`<div class="item"><div class="between"><div><b>🎤 ${esc(x.topic||"Speaking")}</b><div class="small muted">${fmt(x.submittedAt)} · ${esc(x.part||"")}</div></div><span class="badge ${x.status==="graded"?"ok":"wait"}">${x.status==="graded"?"Đã chấm":"Chờ cô chấm"}</span></div><div class="row" style="margin-top:8px">Overall <b>${x.overall??"—"}</b> · Fluency <b>${x.fluency??"—"}</b> · Pronunciation <b>${x.pronunciation??"—"}</b></div>${x.teacherComment?`<div class="feedback">💬 ${esc(x.teacherComment)}</div>`:""}</div>`),...m.map(x=>`<div class="item"><div class="between"><div><b>🏆 Mock Speaking Test</b><div class="small muted">${fmt(x.completedAt)}</div></div><b>${x.score}/100</b></div></div>`)].join("")||'<div class="card muted">Chưa có lịch sử.</div>'}
+function progress(){const a=Object.values(D.submissions).filter(x=>x.studentId===user.uid&&x.overall!=null).sort((a,b)=>(a.submittedAt||"").localeCompare(b.submittedAt||"")).slice(-10);$("chart").innerHTML=a.length?a.map((x,i)=>`<div style="flex:1;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center"><span class="tiny">${x.overall}</span><div style="width:min(40px,80%);height:${Math.max(8,x.overall*1.7)}px;background:linear-gradient(#8b6cff,#e878ca);border-radius:7px 7px 0 0"></div><span class="tiny muted">${i+1}</span></div>`).join(""):'<div class="muted" style="width:100%;text-align:center">Chưa có dữ liệu.</div>'}
+function teacherHome(){const st=Object.values(D.users).filter(x=>x.role==="student"),s=Object.values(D.submissions);$("tStu").textContent=st.length;$("tCls").textContent=Object.keys(D.classes).length;$("tPend").textContent=s.filter(x=>x.status!=="graded").length;$("tGrad").textContent=s.filter(x=>x.status==="graded").length}
+function classes(){$("classList").innerHTML=Object.values(D.classes).map(c=>`<div class="card"><div class="between"><div><b>${esc(c.name)}</b><div class="small muted">${esc(c.desc||"")}</div></div><span class="pill">${esc(c.code||"")}</span></div><div class="small muted" style="margin-top:10px">${Object.values(D.users).filter(u=>u.role==="student"&&u.classId===c.id).length} học sinh</div></div>`).join("")||'<div class="card muted">Chưa có lớp.</div>'}
+window.createClass=async()=>{const id=push(ref(db,"classes")).key,name=$("className").value.trim();if(!name)return toast("Nhập tên lớp.");await set(ref(db,"classes/"+id),{id,name,desc:$("classDesc").value.trim(),code:Math.random().toString(36).slice(2,7).toUpperCase(),createdAt:new Date().toISOString(),teacherId:auth.currentUser?.uid||"teacher"});closeModal("classModal");toast("Đã tạo lớp.")}
+function students(){$("studentList").innerHTML=Object.values(D.users).filter(x=>x.role==="student").map(x=>`<div class="item"><div class="between"><div><b>${esc(x.name)}</b><div class="small muted">${esc(x.studentCode)} · ${esc(D.classes[x.classId]?.name||"Chưa xếp lớp")}</div></div><span class="badge">${esc(x.email||"Không dùng email")}</span></div></div>`).join("")||'<div class="card muted">Chưa có học sinh.</div>'}
+window.createStudent=async()=>{const name=$("newStuName").value.trim(),code=$("newStuCode").value.trim().toUpperCase(),classId=$("newStuClass").value;if(!name||!code||!classId)return toast("Điền đủ thông tin.");const id=code;await set(ref(db,"users/"+id),{uid:id,name,studentCode:code,classId,role:"student",createdAt:new Date().toISOString()});toast("Đã tạo học sinh "+code);$("newStuName").value="";$("newStuCode").value=""}
+function questions(){$("questionList").innerHTML=Object.values(D.questions).map(q=>`<div class="item"><span class="pill">${esc(q.part)}</span> <b>${esc(q.topic||"")}</b><div style="margin-top:7px">${esc(q.q)}</div></div>`).join("")||'<div class="card muted">Chưa có câu hỏi.</div>'}
+window.createQuestion=async()=>{const q={id:push(ref(db,"questions")).key,part:$("qPart").value,topic:$("qTopic").value.trim(),q:$("qText").value.trim(),createdAt:new Date().toISOString()};if(!q.q)return toast("Nhập câu hỏi.");await set(ref(db,"questions/"+q.id),q);closeModal("questionModal");toast("Đã thêm câu hỏi.")}
+function assignments(){$("assignmentList").innerHTML=Object.values(D.assignments).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(a=>`<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted">${esc(D.classes[a.classId]?.name||"")} · ${esc(D.questions[a.questionId]?.topic||"")} · Hạn ${esc(a.deadline||"—")}</div></div><span class="badge">${Object.values(D.submissions).filter(s=>s.assignmentId===a.id).length} bài</span></div></div>`).join("")||'<div class="card muted">Chưa có bài.</div>'}
+window.openAssignment=()=>{loadClassChoices();$("aQuestion").innerHTML=Object.values(D.questions).map(q=>`<option value="${q.id}">${esc(q.part)} · ${esc(q.topic)} · ${esc(q.q)}</option>`).join("");openModal("assignmentModal")}
+window.createAssignment=async()=>{const a={id:push(ref(db,"assignments")).key,title:$("aTitle").value.trim()||"Speaking Practice",classId:$("aClass").value,questionId:$("aQuestion").value,deadline:$("aDeadline").value,active:true,createdAt:new Date().toISOString()};if(!a.classId||!a.questionId)return toast("Cần có lớp và câu hỏi.");await set(ref(db,"assignments/"+a.id),a);closeModal("assignmentModal");toast("Đã giao bài.")}
+function renderSubmissions(){loadClassChoices();const fc=$("fClass").value,fa=$("fAssign").value,fs=$("fStatus").value;$("fAssign").innerHTML='<option value="">Tất cả</option>'+Object.values(D.assignments).map(a=>`<option value="${a.id}">${esc(a.title)}</option>`).join("");$("fAssign").value=fa;const a=Object.values(D.submissions).filter(s=>(!fc||s.classId===fc)&&(!fa||s.assignmentId===fa)&&(!fs||s.status===fs)).sort((x,y)=>(y.submittedAt||"").localeCompare(x.submittedAt||""));$("submissionList").innerHTML=a.map(s=>`<div class="item"><div class="between"><div><b>${esc(s.studentName)} · ${esc(s.studentCode||"")}</b><div class="small muted">${esc(s.topic)} · ${fmt(s.submittedAt)}</div></div><span class="badge ${s.status==="graded"?"ok":"wait"}">${s.status==="graded"?"Đã chấm":"Chờ chấm"}</span></div><div class="row" style="margin-top:9px"><span>Overall <b>${s.overall??"—"}</b></span><span>Fluency <b>${s.fluency??"—"}</b></span><span>Pronunciation <b>${s.pronunciation??"—"}</b></span><button class="btn" onclick="audio('${esc(s.audioUrl||"")}')">▶ Nghe</button><button class="btn primary" onclick="grade('${s.id}')">Chấm / sửa</button></div><div class="small muted" style="margin-top:8px">${esc(s.transcript||"")}</div></div>`).join("")||'<div class="card muted">Chưa có bài nộp.</div>'}
+window.audio=url=>{if(!url)return toast("Không có audio.");const a=new Audio(url);a.volume=1;a.play();toast("Đang phát audio…")}
+window.grade=id=>{const s=D.submissions[id];$("gId").value=id;$("gOverall").value=s.overall??"";$("gFluency").value=s.fluency??"";$("gPron").value=s.pronunciation??"";$("gComment").value=s.teacherComment||s.autoComment||"";$("gradeInfo").innerHTML=`<div class="item"><b>${esc(s.studentName)}</b><div class="small muted">${esc(s.question)} · ${fmt(s.submittedAt)}</div><div class="feedback">AI: ${esc(s.autoComment||"—")}</div></div>`;openModal("gradeModal")}
+window.saveGrade=async()=>{const id=$("gId").value;await update(ref(db,"submissions/"+id),{overall:+$("gOverall").value||0,fluency:+$("gFluency").value||0,pronunciation:+$("gPron").value||0,teacherComment:$("gComment").value.trim(),status:"graded",gradedAt:new Date().toISOString(),gradedBy:auth.currentUser?.uid||"teacher"});closeModal("gradeModal");toast("Đã lưu điểm và nhận xét.")}
+function renderTeacherHistory(){const q=($("hSearch").value||"").toLowerCase(),f=$("hFrom").value,t=$("hTo").value,a=Object.values(D.submissions).filter(s=>{const txt=((s.studentName||"")+" "+(s.studentCode||"")+" "+(s.topic||"")+" "+(s.question||"")).toLowerCase(),d=(s.submittedAt||"").slice(0,10);return(!q||txt.includes(q))&&(!f||d>=f)&&(!t||d<=t)}).sort((x,y)=>(y.submittedAt||"").localeCompare(x.submittedAt||""));$("teacherHistory").innerHTML=a.map(s=>`<div class="item"><div class="between"><div><b>${esc(s.studentName)} · ${esc(s.studentCode||"")}</b><div class="small muted">${esc(D.classes[s.classId]?.name||"")} · ${esc(s.topic||"")} · ${fmt(s.submittedAt)}</div></div><b>${s.overall??"—"}/100</b></div><div class="small muted" style="margin-top:7px">${esc(s.teacherComment||s.autoComment||"Chưa có nhận xét")}</div></div>`).join("")||'<div class="card muted">Không tìm thấy lịch sử.</div>'}
+window.openModal=id=>$(id).classList.add("show");window.closeModal=id=>$(id).classList.remove("show");
+onAuthStateChanged(auth,async u=>{if(!u)return;if(u.email===TEACHER_EMAIL){user=u;profile={name:"Ms Hân",role:"teacher"};role="teacher";enterApp()}});
+loadClassChoices();
 </script>
-</body>
-</html>'''
-
-readme = r'''# 💜 MS HÂN CLASS — Speaking Practice Room V3
-
-Web luyện Speaking cho học sinh: luyện phản xạ, ghi âm, transcript, feedback tự động, nộp bài, chấm/sửa điểm, giao bài, quản lý lớp và lịch sử.
-
-## 1. Công nghệ
-- HTML/CSS/JavaScript
-- Firebase Authentication
-- Firebase Realtime Database
-- Firebase Storage
-- Web Speech API / Speech Recognition của trình duyệt
-
-## 2. Firebase project
-Project: `speaking-practice-room`
-
-Config đã được chèn trong `index.html`.
-
-## 3. Tài khoản giáo viên
-Tài khoản mặc định trong giao diện:
-- Email: `teacher@mshanhclass.com`
-- Password: `hanna126`
-
-**Quan trọng:** Firebase Authentication vẫn cần có user này. Vào Firebase Console → Authentication → Users → Add user và tạo đúng email/password trên.
-
-Không nên giữ mật khẩu cố định trong mã nguồn nếu website được dùng ở quy mô lớn. Khi đưa vào sử dụng thật, nên đổi sang tài khoản giáo viên riêng và dùng Firebase Security Rules.
-
-## 4. Học sinh
-Học sinh có thể:
-- Đăng ký / đăng nhập
-- Xem bài được giao
-- Ghi âm câu trả lời
-- Nhận transcript
-- Nhận điểm luyện tập tự động
-- Xem feedback tự động
-- Nộp audio
-- Xem lịch sử
-- Làm Mock Speaking Test
-- Xem biểu đồ tiến bộ
-
-## 5. Giáo viên
-Giáo viên có:
-- Dashboard
-- Quản lý lớp
-- Ngân hàng câu hỏi
-- Giao bài theo lớp
-- Theo dõi bài đã nộp
-- Nghe audio
-- Chấm/sửa Overall, Fluency, Pronunciation
-- Viết nhận xét
-- Lịch sử theo từ khóa/ngày
-
-## 6. Tự động chấm
-V3 tạo feedback luyện tập dựa trên:
-- transcript
-- số từ
-- tốc độ nói
-- filler words
-- mức độ khớp với câu hỏi
-
-**Lưu ý:** Pronunciation trong V3 là điểm luyện tập ước lượng, chưa phải AI chấm âm vị chuyên sâu. Nếu muốn chấm từng âm, trọng âm, intonation và lỗi phát âm cụ thể, V4 nên tích hợp speech-scoring API chuyên dụng.
-
-## 7. Thi thử
-Mock Test gồm:
-- Part 1 — Personal information
-- Part 2 — Topic
-- Part 3 — Follow-up
-
-Kết quả tổng được lưu vào `mockTests`.
-
-## 8. Deploy GitHub → Vercel
-Repository tối thiểu:
-```text
-Speaking-Practice-Web/
-├── index.html
-└── README.md
+</body></html>'''
