@@ -93,9 +93,23 @@ input[type="date"]{color-scheme:dark}
 .image-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:14px}.question-image{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid #3a2c70;background:#0b0a17}.image-upload-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.image-upload-box{padding:12px;border:1px dashed #58468f;border-radius:12px;background:#141027}.image-preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}.image-preview-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid #3a2c70}.part-select-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}.part-select-card{padding:14px;border:1px solid #3a2c70;border-radius:14px;background:linear-gradient(145deg,#17102f,#0f1020)}.part-select-card h4{margin:0 0 6px}.part-select-card .q-list{display:grid;gap:8px;max-height:260px;overflow:auto}.part-select-card .q-pick{margin:0}.selection-count{font-size:12px;color:#b7add8;margin-top:6px}@media(max-width:700px){.image-upload-grid,.part-select-grid{grid-template-columns:1fr}}
 .mock-choice-card .play-badge{position:absolute;right:14px;top:14px}.danger-zone{margin-top:12px;padding-top:12px;border-top:1px solid #2a2443}.history-actions{display:flex;gap:7px;flex-wrap:wrap}.empty-pad{padding:28px;text-align:center;color:#9fa6c8}
 @media(max-width:700px){.filter-grid{grid-template-columns:1fr}}
+
+/* Recording UX / diagnostics */
+.recording-status-card{margin-top:14px;padding:13px 15px;border:1px solid #4d3a82;border-radius:14px;background:linear-gradient(145deg,#17102f,#0d1020);display:flex;gap:12px;align-items:flex-start}
+.recording-status-card .status-icon{font-size:24px;line-height:1}
+.recording-status-card .status-title{font-weight:800;color:#f6f0ff}
+.recording-status-card .status-text{margin-top:3px;font-size:13px;color:#bdb0e6;line-height:1.45}
+.recording-status-card.ok{border-color:#2d8f72;background:linear-gradient(145deg,#102a25,#0e1618)}
+.recording-status-card.bad{border-color:#8b3c52;background:linear-gradient(145deg,#2a1420,#14101a)}
+.recording-status-card.warn{border-color:#8d6b31;background:linear-gradient(145deg,#2b2112,#14120d)}
+.mic-preflight{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mic-preflight .btn{min-height:40px}
+.file-protocol-note{margin-top:9px;padding:9px 11px;border-radius:10px;background:#1d1634;border:1px solid #4b397b;color:#d7c9ff;font-size:12px;line-height:1.45}
 </style>
 </head>
 <body>
+<div id="localServerHint" class="small muted" style="display:none;position:fixed;left:18px;bottom:18px;z-index:90;max-width:420px;padding:12px 14px;border:1px solid #4a367b;border-radius:12px;background:#120d24;color:#d8c8ff">🎤 Để ghi âm ổn định trên Chrome, hãy chạy website bằng localhost hoặc HTTPS. <a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia" target="_blank" rel="noopener" style="color:#b99aff">Xem lý do</a></div>
+
 
 
 <div id="celebrateOverlay" class="celebrate-overlay" aria-live="polite" aria-modal="true" role="dialog">
@@ -185,7 +199,13 @@ input[type="date"]{color-scheme:dark}
       <label class="small muted">Âm lượng <input id="volume" class="range" type="range" min="0" max="1" step=".05" value="1"></label>
       <select id="speed" class="btn secondary"><option value=".75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option></select>
     </div>
-    <div id="recordStatus" class="small muted" style="margin-top:10px"></div>
+    <div id="recordStatus" class="small muted" style="margin-top:10px"></div><div id="recordHelp" class="small muted" style="margin-top:6px"></div>
+    <div id="recordingStatusCard" class="recording-status-card warn" aria-live="polite">
+      <div class="status-icon" id="recordingStatusIcon">🎤</div>
+      <div><div class="status-title" id="recordingStatusTitle">Chưa ghi âm</div><div class="status-text" id="recordingStatusText">Bé hãy bấm nút micro. Sau khi ghi xong, phụ huynh sẽ thấy rõ thời lượng và trạng thái bản ghi.</div></div>
+    </div>
+    <div class="mic-preflight"><button id="micTestBtn" class="btn secondary" type="button" onclick="testMicrophone()">🔎 Kiểm tra microphone</button></div>
+
 
     <div id="speechReview" class="speech-review hidden">
       <div class="between review-head"><b>🗣 Bé nói</b><span class="small muted">Bấm vào từ để đánh dấu lỗi</span></div>
@@ -205,7 +225,12 @@ input[type="date"]{color-scheme:dark}
   </div>
 </section>
 
-<section id="mockTest" class="page"><div id="studentMockCatalog" class="card"><div class="between"><div><h2 style="margin:0">🧪 Mock Test</h2><div class="small muted" style="margin-top:5px">Chọn một đề để mở bài làm. Các đề cô giao cho lớp sẽ được ghim ở đây.</div></div><span class="pill" id="studentMockLevelCatalog">—</span></div><div class="filter-grid" style="margin-top:14px"><input id="studentMockSearch" placeholder="🔎 Tìm tên Mock Test…" oninput="renderStudentMockCatalog()"><select id="studentMockLevel" onchange="renderStudentMockCatalog()"><option value="">Tất cả cấp độ</option><option>Starters</option><option>Movers</option><option>Flyers</option><option>KET</option></select></div><div id="studentMockCards" class="mock-card-grid"></div></div><div id="mockRunner" class="hidden"><div class="hero mock-card"><div class="between"><div><div class="pill">🧪 MOCK TEST</div><h1 style="margin-top:10px">Speaking Mock Test</h1><div class="hero-sub" id="mockHeroDesc">Mô phỏng 4 phần Speaking theo cấp độ Cambridge Young Learners.</div></div><span class="pill" id="mockLevelPill">Flyers</span></div><div class="test-step" id="mockSteps"></div></div><div class="card" style="margin-top:15px"><div class="between"><div class="row mock-toolbar"><button class="btn secondary" onclick="backToMockCatalog()">← Danh sách đề</button><button class="btn danger" onclick="exitMockTest()">⏹ Thoát bài làm</button></div><span class="small muted" id="mockAssignmentLabel"></span></div><div class="mock-question-wrap" style="margin-top:14px"><div class="mock-question-main"><div class="row"><span class="pill" id="mockQuestionNo">Câu 1 / 4</span><span class="mock-part-tag" id="mockPartTag">Part 1</span></div><div class="question" id="mockQuestion">Tell me about your family.</div><div id="mockImages"></div></div></div><div class="wave" id="mockWave"></div><div class="row"><button id="mockMic" class="mic" onclick="toggleMockRecording()">🎤</button><button class="btn secondary" onclick="playMockLast()">▶ Nghe lại</button><button class="btn secondary" onclick="skipMockQuestion()">Bỏ qua</button></div><div id="mockStatus" class="small muted" style="margin-top:10px"></div><div class="row" style="margin-top:16px"><button id="mockNextBtn" class="btn primary" onclick="finishMockQuestion()">Lưu câu này</button><button class="btn secondary" onclick="resetMockTest()">Làm lại</button></div><div id="mockTranscript" class="notice" style="margin-top:14px">Chưa có bản ghi.</div></div><div id="mockResult" class="card hidden" style="margin-top:15px"></div></div></section>
+<section id="mockTest" class="page"><div id="studentMockCatalog" class="card"><div class="between"><div><h2 style="margin:0">🧪 Mock Test</h2><div class="small muted" style="margin-top:5px">Chọn một đề để mở bài làm. Các đề cô giao cho lớp sẽ được ghim ở đây.</div></div><span class="pill" id="studentMockLevelCatalog">—</span></div><div class="filter-grid" style="margin-top:14px"><input id="studentMockSearch" placeholder="🔎 Tìm tên Mock Test…" oninput="renderStudentMockCatalog()"><select id="studentMockLevel" onchange="renderStudentMockCatalog()"><option value="">Tất cả cấp độ</option><option>Starters</option><option>Movers</option><option>Flyers</option><option>KET</option></select></div><div id="studentMockCards" class="mock-card-grid"></div></div><div id="mockRunner" class="hidden"><div class="hero mock-card"><div class="between"><div><div class="pill">🧪 MOCK TEST</div><h1 style="margin-top:10px">Speaking Mock Test</h1><div class="hero-sub" id="mockHeroDesc">Mô phỏng 4 phần Speaking theo cấp độ Cambridge Young Learners.</div></div><span class="pill" id="mockLevelPill">Flyers</span></div><div class="test-step" id="mockSteps"></div></div><div class="card" style="margin-top:15px"><div class="between"><div class="row mock-toolbar"><button class="btn secondary" onclick="backToMockCatalog()">← Danh sách đề</button><button class="btn danger" onclick="exitMockTest()">⏹ Thoát bài làm</button></div><span class="small muted" id="mockAssignmentLabel"></span></div><div class="mock-question-wrap" style="margin-top:14px"><div class="mock-question-main"><div class="row"><span class="pill" id="mockQuestionNo">Câu 1 / 4</span><span class="mock-part-tag" id="mockPartTag">Part 1</span></div><div class="question" id="mockQuestion">Tell me about your family.</div><div id="mockImages"></div></div></div><div class="wave" id="mockWave"></div><div class="row"><button id="mockMic" class="mic" onclick="toggleMockRecording()">🎤</button><button class="btn secondary" onclick="playMockLast()">▶ Nghe lại</button><button class="btn secondary" onclick="skipMockQuestion()">Bỏ qua</button></div><div id="mockStatus" class="small muted" style="margin-top:10px"></div>
+<div id="mockRecordingStatusCard" class="recording-status-card warn" aria-live="polite" style="margin-top:12px">
+  <div class="status-icon" id="mockRecordingStatusIcon">🎤</div>
+  <div><div class="status-title" id="mockRecordingStatusTitle">Chưa ghi âm câu này</div><div class="status-text" id="mockRecordingStatusText">Sau khi dừng micro, bé sẽ thấy rõ câu trả lời đã được ghi âm thành công hay chưa.</div></div>
+</div>
+<div class="row" style="margin-top:16px"><button id="mockNextBtn" class="btn primary" onclick="finishMockQuestion()">Lưu câu này</button><button class="btn secondary" onclick="resetMockTest()">Làm lại</button></div><div id="mockTranscript" class="notice" style="margin-top:14px">Chưa có bản ghi.</div></div><div id="mockResult" class="card hidden" style="margin-top:15px"></div></div></section>
 
 <section id="assignments" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">📝 Bài cô giao</h2><div class="small muted" style="margin-top:5px">Mỗi chủ đề / bài là một ô. Bấm vào để xem các bài bên trong.</div></div><button class="btn secondary" onclick="loadStudentAssignments()">↻ Làm mới</button></div><div class="filter-grid" style="margin-top:14px"><input id="studentAssignmentSearch" placeholder="🔎 Tìm theo tên bài, chủ đề…" oninput="renderStudentAssignmentCatalog()"><select id="studentAssignmentType" onchange="renderStudentAssignmentCatalog()"><option value="">Tất cả</option><option value="practice">Luyện nói</option><option value="mock">Mock Test</option></select></div><div id="studentAssignmentCatalog" class="catalog-grid"></div><div id="studentAssignmentDetail" class="catalog-detail hidden-detail"></div></div></section>
 <section id="history" class="page"><div class="card"><div class="between"><div><h2 style="margin:0">🕘 Lịch sử & nhận xét</h2><div class="small muted" style="margin-top:5px">Mỗi lần làm bài được lưu theo thời gian. Bé có thể xóa kết quả của mình và làm lại.</div></div><button class="btn secondary" onclick="loadStudentHistory()">↻ Cập nhật</button></div><div id="studentHistory" style="margin-top:14px"></div></div></section>
@@ -347,6 +372,7 @@ window.teacherLoginNow=submitTeacherLogin
 
 function page(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));const s=$(id);if(s)s.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');const titles={dashboard:'Trang chủ',practice:'Luyện nói',mockTest:'Mock Test',assignments:'Bài được giao',history:'Lịch sử',tdashboard:'Tổng quan giáo viên',classes:'Lớp học',students:'Học sinh',questions:'Ngân hàng câu hỏi',assign:'Giao bài',submissions:'Bài nộp & Chấm',reports:'Báo cáo',mockBuilder:'Tạo Mock Test',historyTeacher:'Lịch sử quản lý'};$('pageTitle').textContent=titles[id]||'MS HÂN CLASS';if(role==='student'){if(id==='practice')loadQuestions();if(id==='mockTest')startMockTest(true);if(id==='assignments')loadStudentAssignments();if(id==='history')loadStudentHistory();if(id==='dashboard'){loadStudentStats();loadStudentAssignments()}}else{if(['classes','students','questions','mockBuilder','assign','submissions','reports','historyTeacher','tdashboard'].includes(id))loadTeacherData()}}
 window.page=page;
+function initRecordingDiagnostics(){const h=$('localServerHint');if(h && (location.protocol==='file:' || !navigator.mediaDevices?.getUserMedia)){h.style.display='block';}if(location.protocol==='file:')updateRecordingStatus('bad','Cần chạy bằng localhost','Chrome thường không cho microphone khi mở file HTML trực tiếp. Hãy dùng CHAY_WEBSITE_LOCALHOST.bat.');}window.addEventListener('load',initRecordingDiagnostics);
 function openModal(id){$(id).classList.add('show');const m={classModal:'classSaveStatus',studentModal:'studentSaveStatus',questionModal:'questionSaveStatus',gradeModal:'gradeSaveStatus'};if(m[id])setSaveStatus(m[id],'');if(id==='questionModal'&&!editingQuestionId){if($('questionModalTitle'))$('questionModalTitle').textContent='Thêm câu hỏi';if($('saveQuestionBtn'))$('saveQuestionBtn').textContent='Lưu câu hỏi';if($('questionImagePreview'))$('questionImagePreview').innerHTML='';if($('newQuestionImages'))$('newQuestionImages').value=''}if(id==='classModal'&&!editingClassId){if($('classModalTitle'))$('classModalTitle').textContent='Tạo lớp';$('newClassName').value='';$('newClassLevel').value='';if($('saveClassBtn'))$('saveClassBtn').textContent='Lưu lớp'}if(id==='studentModal'&&!editingStudentId){if($('studentModalTitle'))$('studentModalTitle').textContent='Thêm học sinh';$('newStudentName').value='';$('newStudentCode').value='';if($('saveStudentBtn'))$('saveStudentBtn').textContent='Lưu học sinh'}}
 function closeModal(id){$(id).classList.remove('show');if(id==='classModal'&&editingClassId){editingClassId=null;if($('classModalTitle'))$('classModalTitle').textContent='Tạo lớp';if($('saveClassBtn'))$('saveClassBtn').textContent='Lưu lớp';$('newClassName').value='';$('newClassLevel').value=''}if(id==='studentModal'&&editingStudentId){editingStudentId=null;if($('studentModalTitle'))$('studentModalTitle').textContent='Thêm học sinh';if($('saveStudentBtn'))$('saveStudentBtn').textContent='Lưu học sinh';$('newStudentName').value='';$('newStudentCode').value=''}if(id==='questionModal'&&editingQuestionId){editingQuestionId=null;if($('questionModalTitle'))$('questionModalTitle').textContent='Thêm câu hỏi';if($('saveQuestionBtn'))$('saveQuestionBtn').textContent='Lưu câu hỏi';if($('questionImagePreview'))$('questionImagePreview').innerHTML='';if($('newQuestionImages'))$('newQuestionImages').value=''}}
 window.openModal=openModal;window.closeModal=closeModal;
@@ -355,7 +381,7 @@ async function loadQuestions(){const d=await getNode('questions');allQuestions=O
 function renderWave(target='wave'){const w=$(target);if(!w)return;w.innerHTML='';for(let i=0;i<55;i++){const x=document.createElement('i');x.style.setProperty('--h',(8+Math.random()*44)+'px');w.appendChild(x)}}
 function renderQuestion(){const q=allQuestions[currentQ]||{text:starterQuestions[currentQ%starterQuestions.length][0],topic:starterQuestions[currentQ%starterQuestions.length][1]};$('question').textContent=q.text;$('qNo').textContent=currentQ+1;$('questionDoneBadge').classList.toggle('hidden',!practiceCompleted.has(currentQ));$('nextQuestionBtn').disabled=!practiceCompleted.has(currentQ);$('autoFeedback').classList.add('hidden');$('speechReview').classList.add('hidden');selectedWordIndex=-1;transcriptErrors={};transcriptCorrections={};renderTranscriptWords();renderPracticeProgress()}
 function newQuestion(){const len=allQuestions.length||starterQuestions.length;currentQ=(currentQ+1)%len;resetPracticeAnswer();renderQuestion()}
-function resetPracticeAnswer(){lastBlob=null;audioUrl=null;liveTranscript='';$('recordStatus').textContent='';$('speechReview').classList.add('hidden');$('autoFeedback').classList.add('hidden');$('mic').textContent='🎤';$('mic').classList.remove('recording')}
+function resetPracticeAnswer(){try{if(rec?.state==='recording')rec.stop()}catch{};stopRecognition();rec=null;lastBlob=null;if(audioUrl)URL.revokeObjectURL(audioUrl);audioUrl=null;liveTranscript='';$('recordStatus').textContent='';setRecordHelp('','info');$('speechReview').classList.add('hidden');$('autoFeedback').classList.add('hidden');$('mic').textContent='🎤';$('mic').classList.remove('recording')}
 function nextPracticeQuestion(){const len=allQuestions.length||starterQuestions.length;if(!practiceCompleted.has(currentQ)){toast('⚠️ Hãy hoàn thành câu này trước.','bad');return}currentQ=(currentQ+1)%len;resetPracticeAnswer();renderQuestion();window.scrollTo({top:0,behavior:'smooth'});toast('➡️ Sang câu tiếp theo','ok')}
 window.newQuestion=newQuestion;
 function renderQuestionList(){const el=$('questionList');if(!el)return;const term=($('questionSearch')?.value||'').trim().toLowerCase();const level=($('questionLevelFilter')?.value||'');const groups={};allQuestions.forEach(q=>{const lv=q.level||inferLevel(q.topic)||'General';if(level&&lv!==level)return;if(term&&!(`${q.text||''} ${q.topic||''}`).toLowerCase().includes(term))return;const topic=q.topic||'General';if(!groups[topic])groups[topic]={level:lv,items:[]};groups[topic].items.push(q)});const levels=['Starters','Movers','Flyers','KET','General'];const counts=Object.fromEntries(levels.map(x=>[x,allQuestions.filter(q=>(q.level||inferLevel(q.topic)||'General')===x).length]));if($('questionLevelSummary'))$('questionLevelSummary').innerHTML=levels.map(x=>`<button class="level-chip ${level===x?'active':''}" onclick="setQuestionLevel('${x}')">${x}<div style="font-size:11px;margin-top:3px;opacity:.8">${counts[x]} câu</div></button>`).join('');const topics=Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0]));el.innerHTML=topics.map(([topic,g],idx)=>`<div class="topic-group" id="topicGroup${idx}"><div class="topic-head" onclick="toggleTopicGroup(${idx})"><div><b>📁 ${esc(topic)}</b><div class="small muted" style="margin-top:4px">${esc(g.level)} · ${g.items.length} câu</div></div><span>▾</span></div><div class="topic-body">${g.items.map(q=>`<div class="mini-row"><div><b>${esc(q.text)}</b><div class="small muted" style="margin-top:4px">${q.speakingPart?`Part ${q.speakingPart} · `:''}${esc(q.level||g.level)}</div></div><div class="manage-actions"><button class="edit-link" onclick="editQuestionById('${esc(q.id)}');event.stopPropagation()">Sửa</button><button class="danger-link" onclick="deleteQuestionById('${esc(q.id)}');event.stopPropagation()">Xóa</button></div></div>`).join('')}</div></div>`).join('')||'<div class="empty">Chưa có câu hỏi phù hợp.</div>'}
@@ -448,7 +474,164 @@ function showAutoFeedback(a,afterSubmit){const el=$('autoFeedback');if(!el)retur
 function renderTranscriptWords(){const box=$('transcriptWords');if(!box)return;box.innerHTML='';const text=(liveTranscript||'').trim();if(!text){box.innerHTML='<span class="small muted">Chưa nhận diện được lời nói. Bé vẫn có thể nghe lại và nộp bản ghi.</span>';return}const words=text.split(/(\s+)/);words.forEach((raw,i)=>{if(/^\s+$/.test(raw))return;const span=document.createElement('button');span.type='button';span.className='word-chip'+(transcriptErrors[i]?' error':'')+(selectedWordIndex===i?' selected':'');span.textContent=transcriptCorrections[i]||raw;span.dataset.idx=i;span.onclick=()=>{selectedWordIndex=i;span.classList.toggle('selected');$('correctionInput').value=transcriptCorrections[i]||'';$('correctionHint').textContent='Đã chọn từ. Bấm lần nữa để bỏ đánh dấu lỗi.';};box.appendChild(span)});}
 function applyWordCorrection(){if(selectedWordIndex<0){$('correctionHint').textContent='Hãy bấm vào một từ trong phần “Bé nói” trước.';return}const input=$('correctionInput').value.trim();if(input)transcriptCorrections[selectedWordIndex]=input;transcriptErrors[selectedWordIndex]=true;renderTranscriptWords();$('correctionInput').value='';$('correctionHint').textContent='✅ Đã đánh dấu và sửa từ này.'}
 
-async function submitPractice(){if(!lastBlob){toast('❌ Hãy ghi âm câu trả lời trước.','bad');return}const q=allQuestions[currentQ]||{};const dur=Number(($('recordStatus').textContent.match(/(\d+) giây/)||[])[1]||0);const a=assessSpeech(liveTranscript,dur,{level:studentProfile?.level||'Flyers',question:q});let id='local-'+Date.now();try{id=await dbPushKey('submissions')}catch{}const clean=(liveTranscript||'').trim();const correctedWords=(clean?clean.split(/(\s+)/).map((w,i)=>transcriptCorrections[i]||w).join(''):clean).replace(/\s+/g,' ').trim();const obj={id,studentId:studentProfile?.id,studentCode:studentProfile?.code,student:studentProfile?.name,classId:studentProfile?.classId,className:studentProfile?.className,questionId:q.id||'starter',question:q.text||'',topic:q.topic||'Practice',assignmentId:null,assignmentTitle:'Luyện nói tự do',type:'practice',score:a.score,pronunciation:a.pronunciation,fluency:a.fluency,content:a.content,languageBand:a.languageBand,pronunciationBand:a.pronunciationBand,interactionBand:a.interactionBand,wordCount:a.wordCount,issues:a.issues||[],transcript:clean,transcriptCorrected:correctedWords,transcriptErrors:Object.keys(transcriptErrors).map(Number),feedback:a.feedback,status:'graded',submittedAt:now(),autoGraded:true};const res=await saveData('submissions',id,obj);await saveHistory('submit_practice',{submissionId:id,student:obj.student,question:obj.question,score:a.score,topic:obj.topic});practiceCompleted.add(currentQ);$('questionDoneBadge').classList.remove('hidden');$('nextQuestionBtn').disabled=false;showAutoFeedback(a,true);toast(res.firebase?'✅ Đã lưu câu này vào Firebase!':'✅ Đã lưu câu này trên thiết bị!','ok');loadStudentStats();renderPracticeProgress()}
+function getAudioMimeType(){
+  const candidates=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+  for(const type of candidates){try{if(window.MediaRecorder?.isTypeSupported?.(type))return type}catch{}}
+  return '';
+}
+function setRecordHelp(msg,kind='info'){
+  const el=$('recordHelp'); if(!el)return;
+  el.textContent=msg||'';
+  el.style.color=kind==='bad'?'#ff9aae':kind==='ok'?'#8af0c5':'#b9acd8';
+}
+function recordingEnvironmentError(e){
+  const name=e?.name||'';
+  if(!window.isSecureContext && location.protocol!=='file:')return 'Trình duyệt đang chặn micro vì trang chưa chạy trên HTTPS hoặc localhost.';
+  if(!navigator.mediaDevices?.getUserMedia)return 'Trình duyệt hiện không cấp quyền truy cập micro cho trang này. Hãy mở bằng localhost/HTTPS và cho phép Microphone.';
+  if(name==='NotAllowedError'||name==='SecurityError')return 'Microphone đang bị từ chối. Hãy bấm biểu tượng khóa cạnh địa chỉ website → Microphone → Allow, rồi tải lại trang.';
+  if(name==='NotFoundError')return 'Không tìm thấy microphone. Kiểm tra micro/headset và quyền Microphone của Chrome.';
+  if(name==='NotReadableError')return 'Microphone đang được ứng dụng khác sử dụng. Hãy đóng Zoom/Teams/Recorder khác rồi thử lại.';
+  return `Không thể mở micro (${name||'unknown error'}).`;
+}
+
+function updateRecordingStatus(kind,title,text,meta=''){
+  const card=$('recordingStatusCard'); if(!card)return;
+  card.className='recording-status-card '+kind;
+  $('recordingStatusIcon').textContent=kind==='ok'?'✅':kind==='bad'?'❌':'🎤';
+  $('recordingStatusTitle').textContent=title;
+  $('recordingStatusText').textContent=meta?`${text} · ${meta}`:text;
+}
+function currentRecordingContext(){return {student:studentProfile?.name||'Học sinh',className:studentProfile?.className||'',at:new Date().toLocaleString('vi-VN')}}
+
+function updateMockRecordingStatus(kind,title,text,meta=''){
+  const card=$('mockRecordingStatusCard'); if(!card)return;
+  card.className='recording-status-card '+kind;
+  $('mockRecordingStatusIcon').textContent=kind==='ok'?'✅':kind==='bad'?'❌':'🎤';
+  $('mockRecordingStatusTitle').textContent=title;
+  $('mockRecordingStatusText').textContent=meta?`${text} · ${meta}`:text;
+}
+
+async function testMicrophone(){
+  const btn=$('micTestBtn');
+  if(btn)btn.disabled=true;
+  try{
+    if(location.protocol==='file:'){
+      updateRecordingStatus('bad','Chưa thể dùng microphone', 'Bạn đang mở file HTML trực tiếp. Chrome thường chặn microphone ở file://. Hãy chạy bằng localhost/HTTPS rồi thử lại.');
+      if($('recordHelp'))$('recordHelp').textContent='💡 Dùng file BAT đi kèm để mở website tại http://localhost:5500.';
+      toast('❌ Cần chạy website bằng localhost hoặc HTTPS.','bad');
+      return;
+    }
+    if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia){
+      updateRecordingStatus('bad','Microphone chưa sẵn sàng','Trang hiện không ở secure context hoặc trình duyệt chưa hỗ trợ truy cập microphone.');
+      return;
+    }
+    updateRecordingStatus('warn','Đang kiểm tra microphone','Hãy bấm Allow/Cho phép nếu Chrome hỏi quyền.');
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const tracks=stream.getTracks();
+    tracks.forEach(t=>t.stop());
+    updateRecordingStatus('ok','Microphone hoạt động tốt','Đã cấp quyền microphone. Bé có thể bắt đầu ghi âm.');
+    if($('recordHelp'))$('recordHelp').textContent='✅ Phụ huynh có thể yên tâm: micro đã được trình duyệt cấp quyền.';
+    toast('✅ Microphone hoạt động tốt!','ok');
+  }catch(e){
+    const msg=recordingEnvironmentError(e);
+    updateRecordingStatus('bad','Không mở được microphone',msg);
+    if($('recordHelp'))$('recordHelp').textContent='Hãy kiểm tra biểu tượng khóa cạnh địa chỉ website → Microphone → Allow.';
+    toast('❌ '+msg,'bad');
+  }finally{if(btn)btn.disabled=false;}
+}
+window.testMicrophone=testMicrophone;
+async function toggleRecording(){
+  if(rec?.state==='recording'){
+    try{rec.stop()}catch{}
+    stopRecognition();
+    return;
+  }
+  lastBlob=null;
+  if(audioUrl)URL.revokeObjectURL(audioUrl);
+  audioUrl=null;
+  liveTranscript='';
+  recognitionParts={};
+  recognitionConfidence=[];
+  if(location.protocol==='file:'){
+    updateRecordingStatus('bad','Không thể ghi âm khi mở file trực tiếp','Chrome chặn microphone trên file://. Hãy chạy website bằng localhost hoặc HTTPS.');
+    if($('recordStatus'))$('recordStatus').textContent='❌ Chưa ghi âm được';
+    if($('recordHelp'))$('recordHelp').textContent='💡 Mở file BAT “CHAY_WEBSITE_LOCALHOST.bat” đi kèm rồi vào http://localhost:5500.';
+    toast('❌ Hãy chạy website bằng localhost hoặc HTTPS.','bad');
+    return;
+  }
+  if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia){
+    updateRecordingStatus('bad','Microphone chưa sẵn sàng','Trang cần chạy trên HTTPS hoặc localhost để sử dụng microphone.');
+    toast('❌ Trình duyệt chưa cho phép microphone.','bad');
+    return;
+  }
+  let stream=null;
+  try{
+    updateRecordingStatus('warn','Đang xin quyền microphone','Hãy bấm Allow/Cho phép nếu Chrome hỏi quyền.');
+    $('recordStatus').textContent='⏳ Đang xin quyền Microphone…';
+    setRecordHelp('Hãy bấm Allow/Cho phép khi Chrome hỏi quyền dùng microphone.','info');
+    stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    const mime=getAudioMimeType();
+    const options=mime?{mimeType:mime,audioBitsPerSecond:64000}:undefined;
+    const chunks=[];
+    const started=Date.now();
+    rec=new MediaRecorder(stream,options);
+    rec.onstart=()=>{
+      $('mic').classList.add('recording');
+      $('mic').textContent='⏹️';
+      $('recordStatus').textContent='🔴 Đang ghi âm… bấm lần nữa để dừng';
+      updateRecordingStatus('warn','Đang ghi âm','Microphone đang hoạt động. Bé hãy nói tự nhiên.',currentRecordingContext().student);
+      setRecordHelp('Micro đang hoạt động. Khi bé dừng, hệ thống sẽ báo rõ “Đã ghi âm thành công”.','ok');
+    };
+    rec.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+    rec.onerror=e=>{
+      const msg=recordingEnvironmentError(e.error||e);
+      updateRecordingStatus('bad','Ghi âm gặp lỗi',msg);
+      $('recordStatus').textContent='❌ Ghi âm gặp lỗi';
+    };
+    rec.onstop=()=>{
+      const dur=(Date.now()-started)/1000;
+      const blob=new Blob(chunks,{type:rec.mimeType||mime||'audio/webm'});
+      stream?.getTracks().forEach(t=>t.stop());
+      $('mic').classList.remove('recording');
+      $('mic').textContent='🎤';
+      if(blob.size===0){
+        lastBlob=null;
+        $('recordStatus').textContent='❌ Bản ghi rỗng.';
+        updateRecordingStatus('bad','Chưa nhận được audio','Chrome không trả về dữ liệu audio. Hãy kiểm tra microphone permission rồi thử lại.');
+        setRecordHelp('Bạn có thể bấm “Kiểm tra microphone” để thử lại.','bad');
+        return;
+      }
+      lastBlob=blob;
+      audioUrl=URL.createObjectURL(blob);
+      const a=assessSpeech(liveTranscript,dur,{level:studentProfile?.level||'Flyers',question:allQuestions[currentQ]||{}});
+      const when=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      $('recordStatus').textContent=`✅ Đã ghi âm · ${Math.round(dur)} giây · ${a.wordCount} từ`;
+      updateRecordingStatus('ok','✅ Ghi âm thành công','Bản ghi đã sẵn sàng để nghe lại, xem transcript và lưu bài.',`${Math.round(dur)} giây · ${when}`);
+      setRecordHelp('Phụ huynh có thể thấy trạng thái “Đã ghi âm thành công” ngay trên màn hình.','ok');
+      renderTranscriptWords();
+      $('speechReview').classList.remove('hidden');
+      showAutoFeedback(a,false);
+    };
+    startRecognition();
+    rec.start(250);
+  }catch(e){
+    if(rec){try{rec.stop()}catch{}}
+    stream?.getTracks().forEach(t=>t.stop());
+    $('mic').classList.remove('recording');
+    $('mic').textContent='🎤';
+    const msg=recordingEnvironmentError(e);
+    $('recordStatus').textContent='❌ Không mở được microphone.';
+    updateRecordingStatus('bad','Không thể bắt đầu ghi âm',msg);
+    setRecordHelp(msg,'bad');
+    toast('❌ '+msg,'bad');
+  }
+}
+window.toggleRecording=toggleRecording;
+window.playLast=()=>{
+  if(!audioUrl){toast('❌ Chưa có bản ghi để nghe lại.','bad');return}
+  const a=new Audio(audioUrl);a.volume=+$('volume').value;a.playbackRate=+$('speed').value;a.play().catch(()=>toast('❌ Không phát được bản ghi.','bad'));
+};
+async function submitPractice(){if(!lastBlob||lastBlob.size===0){toast('❌ Hãy ghi âm câu trả lời trước.','bad');return}const q=allQuestions[currentQ]||{};const dur=Number(($('recordStatus').textContent.match(/(\d+) giây/)||[])[1]||0);const a=assessSpeech(liveTranscript,dur,{level:studentProfile?.level||'Flyers',question:q});let id='local-'+Date.now();try{id=await dbPushKey('submissions')}catch{}const clean=(liveTranscript||'').trim();const correctedWords=(clean?clean.split(/(\s+)/).map((w,i)=>transcriptCorrections[i]||w).join(''):clean).replace(/\s+/g,' ').trim();const obj={id,studentId:studentProfile?.id,studentCode:studentProfile?.code,student:studentProfile?.name,classId:studentProfile?.classId,className:studentProfile?.className,questionId:q.id||'starter',question:q.text||'',topic:q.topic||'Practice',assignmentId:null,assignmentTitle:'Luyện nói tự do',type:'practice',score:a.score,pronunciation:a.pronunciation,fluency:a.fluency,content:a.content,languageBand:a.languageBand,pronunciationBand:a.pronunciationBand,interactionBand:a.interactionBand,wordCount:a.wordCount,issues:a.issues||[],transcript:clean,transcriptCorrected:correctedWords,transcriptErrors:Object.keys(transcriptErrors).map(Number),feedback:a.feedback,status:'graded',submittedAt:now(),autoGraded:true};const res=await saveData('submissions',id,obj);await saveHistory('submit_practice',{submissionId:id,student:obj.student,question:obj.question,score:a.score,topic:obj.topic});practiceCompleted.add(currentQ);$('questionDoneBadge').classList.remove('hidden');$('nextQuestionBtn').disabled=false;showAutoFeedback(a,true);updateRecordingStatus('ok','✅ Bài đã được lưu','Bé có thể sang câu tiếp theo. Phụ huynh có thể xem lại trạng thái bản ghi và kết quả.',res.firebase?'Firebase':'Thiết bị');toast(res.firebase?'✅ Đã lưu câu này vào Firebase!':'✅ Đã lưu câu này trên thiết bị!','ok');loadStudentStats();renderPracticeProgress()}
 async function loadStudentStats(){const d=await getNode('submissions');const rows=Object.values(d).filter(x=>x.studentId===studentProfile?.id||x.studentCode===studentProfile?.code);const scores=rows.map(x=>Number(x.score)).filter(Number.isFinite);$('sPractices').textContent=rows.length;$('sSubs').textContent=rows.length;$('sBest').textContent=scores.length?Math.max(...scores):'—';$('sGraded').textContent=rows.filter(x=>x.status==='graded'||x.score!=null).length}
 async function loadStudentAssignments(){const [ad,md]=await Promise.all([getNode('assignments'),getNode('mockTests')]);allAssignments=Object.values(ad).filter(a=>a.classId===studentProfile?.classId);allMockTests=Object.values(md);renderStudentAssignmentCatalog();renderStudentMockCatalog()}
 function renderStudentAssignmentCatalog(){const el=$('studentAssignmentCatalog');if(!el)return;const term=($('studentAssignmentSearch')?.value||'').toLowerCase();const type=$('studentAssignmentType')?.value||'';const grouped={};allAssignments.forEach(a=>{if(type&&a.type!==type)return;if(term&&!(`${a.title||''} ${a.lesson||''}`).toLowerCase().includes(term))return;const key=a.lesson||a.title||'Bài học';if(!grouped[key])grouped[key]=[];grouped[key].push(a)});const entries=Object.entries(grouped).sort((a,b)=>a[0].localeCompare(b[0]));el.innerHTML=entries.length?entries.map(([topic,items],i)=>{const mocks=items.filter(x=>x.type==='mock').length;return `<div class="catalog-card" onclick="openStudentAssignmentGroup(${i})"><h3>📚 ${esc(topic)}</h3><div class="small muted">${items.length} bài · ${mocks} Mock Test</div><div class="catalog-meta"><span class="badge">${esc(studentProfile?.className||'')}</span><span class="badge">Bấm để mở</span></div></div>`}).join(''):'<div class="empty-pad">Chưa có bài được giao phù hợp.</div>';window.__studentAssignmentGroups=entries}
@@ -492,44 +675,76 @@ function startMockTest(reset=true,assignment=null){if(reset){mockIndex=0;mockAns
   if($('mockLevelPill'))$('mockLevelPill').textContent=mockLevel;if($('mockHeroDesc')){const bp=getBlueprint(mockLevel);$('mockHeroDesc').textContent=`Mô phỏng 4 phần Speaking · CEFR ${bp.cefr} · thời lượng chính thức ${bp.time}. Kết quả bên dưới là điểm luyện tập và dự đoán khiên tham khảo.`}
   renderMockSteps();renderMockQuestion();renderWave('mockWave');$('mockResult').classList.add('hidden')}
 function renderMockQuestion(){const q=mockQuestions[mockIndex]||mockQuestions[0];const part=q.speakingPart||((mockIndex%4)+1);const bp=getBlueprint(mockLevel);const partInfo=bp.parts.find(x=>x.n===Number(part))||bp.parts[0];$('mockQuestionNo').textContent=`Câu ${mockIndex+1} / ${mockQuestions.length}`;$('mockQuestion').textContent=q.text;$('mockImages').innerHTML=renderQuestionImages(q.images);$('mockPartTag').textContent=`Part ${part} · ${partInfo.title}`;$('mockStatus').textContent='';$('mockTranscript').textContent='Chưa có bản ghi.';mockBlob=null;mockAudioUrl=null;liveTranscript='';mockDurationSec=0;renderMockSteps();$('mockNextBtn').textContent=mockIndex===mockQuestions.length-1?'Hoàn thành Mock Test':'Lưu câu này'}
-async function toggleMockRecording(){if(mockRec?.state==='recording'){mockRec.stop();stopRecognition();return}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const chunks=[];const started=Date.now();mockRec=new MediaRecorder(stream);startRecognition();mockRec.ondataavailable=e=>chunks.push(e.data);mockRec.onstop=()=>{mockDurationSec=(Date.now()-started)/1000;mockBlob=new Blob(chunks,{type:'audio/webm'});mockAudioUrl=URL.createObjectURL(mockBlob);stream.getTracks().forEach(t=>t.stop());$('mockMic').classList.remove('recording');$('mockMic').textContent='🎤';const a=assessSpeech(liveTranscript,mockDurationSec,{level:mockLevel,question:mockQuestions[mockIndex]});$('mockTranscript').innerHTML=`<b>Bé nói:</b> ${liveTranscript?esc(liveTranscript):'<span class="muted">Chưa nhận diện được lời nói.</span>'}<div style="margin-top:8px"><span class="pill">Điểm luyện: ${a.score}/100</span> <span class="small muted">${a.wordCount} từ · ${Math.round(mockDurationSec)} giây</span></div><div class="small muted" style="margin-top:7px">${esc(a.feedback)}</div><div class="score-note">Ngôn ngữ ${a.languageBand}/5 · Phát âm ${a.pronunciationBand}/5 · Tương tác ${a.interactionBand}/5</div>`;$('mockStatus').textContent='✅ Đã ghi âm xong · câu này đã sẵn sàng để lưu'};mockRec.start();$('mockMic').classList.add('recording');$('mockMic').textContent='⏹️';$('mockStatus').textContent='Đang ghi âm… hãy nói tự nhiên'}catch{toast('❌ Hãy cho phép micro trong trình duyệt.','bad')}}
-function playMockLast(){if(!mockAudioUrl){toast('Chưa có bản ghi cho câu này.','bad');return}new Audio(mockAudioUrl).play()}
-function pushMockAnswer(score,extra={}){const q=mockQuestions[mockIndex];mockAnswers.push({question:q.text,topic:q.topic,level:mockLevel,speakingPart:q.speakingPart||((mockIndex%4)+1),score,...extra,transcript:liveTranscript||'',durationSec:mockDurationSec})}
-function skipMockQuestion(){pushMockAnswer(20,{pronunciation:20,fluency:20,content:20,languageBand:1,pronunciationBand:1,interactionBand:1,wordCount:0,feedback:'Em chưa làm câu này. Hãy thử trả lời đầy đủ hơn ở lần sau.',issues:['Bỏ qua câu hỏi.'],skipped:true});advanceMock()}
-function finishMockQuestion(){if(!mockBlob){toast('❌ Hãy ghi âm câu trả lời trước.','bad');return}const a=assessSpeech(liveTranscript,mockDurationSec);pushMockAnswer(a.score,{pronunciation:a.pronunciation,fluency:a.fluency,content:a.content,languageBand:a.languageBand,pronunciationBand:a.pronunciationBand,interactionBand:a.interactionBand,wordCount:a.wordCount,issues:a.issues||[],feedback:a.feedback});advanceMock()}
-async function advanceMock(){if(mockIndex<mockQuestions.length-1){mockIndex++;renderMockQuestion();return}
-  const avg=Math.round(mockAnswers.reduce((s,x)=>s+x.score,0)/Math.max(1,mockAnswers.length));
-  const rubric={language:Math.round(mockAnswers.reduce((s,x)=>s+(Number(x.languageBand)||0),0)/Math.max(1,mockAnswers.length)),pronunciation:Math.round(mockAnswers.reduce((s,x)=>s+(Number(x.pronunciationBand)||0),0)/Math.max(1,mockAnswers.length)),interaction:Math.round(mockAnswers.reduce((s,x)=>s+(Number(x.interactionBand)||0),0)/Math.max(1,mockAnswers.length))};
-  const shield=scoreToShields((rubric.language+rubric.pronunciation+rubric.interaction)/3);const shieldLabel=shieldText(shield);const fb=shieldMessage(shield);showCelebration(avg,shield,fb);
-  const byPart=[1,2,3,4].map(part=>{const rows=mockAnswers.filter(x=>Number(x.speakingPart)===part);return {part,score:rows.length?Math.round(rows.reduce((s,x)=>s+x.score,0)/rows.length):null}});
-  const issues=[...new Set(mockAnswers.flatMap(x=>x.issues||[]))].slice(0,6);
-  let id='mock-'+Date.now();try{id=await dbPushKey('submissions')}catch{}
-  const obj={id,studentId:studentProfile?.id,studentCode:studentProfile?.code,student:studentProfile?.name,classId:studentProfile?.classId,className:studentProfile?.className,level:mockLevel,questionId:'mock-test',question:`Speaking Mock Test · ${mockLevel}`,topic:'Mock Test',assignmentId:null,type:'mock',score:avg,predictedShields:shield,shieldPrediction:shieldLabel,pronunciation:rubric.pronunciation*20,fluency:rubric.interaction*20,content:rubric.language*20,languageBand:rubric.language,pronunciationBand:rubric.pronunciation,interactionBand:rubric.interaction,feedback:fb,status:'graded',submittedAt:now(),details:mockAnswers,partScores:byPart,issues,autoGraded:true,officialExam:false,scoringModel:'Cambridge-YL-inspired 3-criterion practice rubric'};
-  const res=await saveData('submissions',id,obj);await saveHistory('mock_test',{submissionId:id,student:obj.student,level:mockLevel,score:avg,predictedShields:shield,rubric});
-  $('mockResult').classList.remove('hidden');
-  $('mockResult').innerHTML=`<div class="shield-panel"><div class="shield-box"><div class="shield-title">ĐIỂM LUYỆN TẬP</div><div class="result-score" style="margin-top:8px">${avg}<span style="font-size:18px;color:#9e92bd"> /100</span></div><div style="margin-top:8px"><b>${esc(fb)}</b></div><div class="small muted" style="margin-top:6px">${esc(mockLevel)} · ${mockAnswers.length} câu · điểm quy đổi để theo dõi tiến bộ</div></div><div class="shield-box"><div class="shield-title">DỰ ĐOÁN KHIÊN SPEAKING</div><div class="result-shield-big" style="margin-top:10px">${shieldLabel}</div><div class="shield-row">${[1,2,3,4,5].map(i=>`<span class="shield ${i<=shield?'on':''}">${i<=shield?'🛡️':'☆'}</span>`).join('')}</div><div class="warning-note" style="margin-top:8px">Dự đoán nội bộ dựa trên 3 tiêu chí. Không phải điểm/khiên Cambridge chính thức.</div></div></div><div class="rubric-grid" style="margin-top:15px"><div class="rubric-card"><div class="rubric-label">${mockLevel==='Flyers'?'Ngôn ngữ':'Từ vựng + ngôn ngữ'}</div><div class="rubric-band">${rubric.language}/5</div><div class="rubric-stars">${bandStars(rubric.language)}</div></div><div class="rubric-card"><div class="rubric-label">Phát âm</div><div class="rubric-band">${rubric.pronunciation}/5</div><div class="rubric-stars">${bandStars(rubric.pronunciation)}</div></div><div class="rubric-card"><div class="rubric-label">Tương tác / trôi chảy</div><div class="rubric-band">${rubric.interaction}/5</div><div class="rubric-stars">${bandStars(rubric.interaction)}</div></div></div><div class="grid" style="margin-top:15px">${byPart.map(x=>`<div class="card"><div class="muted">Part ${x.part}</div><b>${x.score??'—'}/100</b></div>`).join('')}</div>${issues.length?`<div class="notice" style="margin-top:14px"><b>Điểm cần luyện:</b><div class="issue-list">${issues.map(x=>`<span class="issue-chip">⚠️ ${esc(x)}</span>`).join('')}</div></div>`:''}<div class="notice" style="margin-top:14px"><b>Gợi ý:</b> ${esc(fb)} ${res.firebase?'Kết quả đã lưu trên Firebase.':'Kết quả đã lưu trên thiết bị.'}</div>`;
-  toast(res.firebase?'✅ Mock Test đã lưu!':'✅ Mock Test đã lưu trên thiết bị!','ok');loadStudentStats();renderMockSteps()}
-function resetMockTest(){startMockTest(true)}
-
-function showCelebration(score,shield,message){
-  const overlay=$('celebrateOverlay');if(!overlay)return;
-  $('celebrateScore').textContent=score;
-  $('celebrateShields').textContent=[1,2,3,4,5].map(i=>i<=shield?'🛡️':'☆').join('');
-  $('celebrateMessage').textContent=message;
-  const box=$('celebrateConfetti');box.innerHTML='';
-  for(let i=0;i<44;i++){
-    const c=document.createElement('span');c.className='confetti';
-    c.style.left=(Math.random()*100)+'%';
-    c.style.setProperty('--dx',((Math.random()*2-1)*240)+'px');
-    c.style.animationDelay=(Math.random()*0.55)+'s';
-    c.style.transform=`rotate(${Math.random()*160}deg)`;
-    box.appendChild(c);
+async function toggleMockRecording(){
+  if(mockRec?.state==='recording'){
+    try{mockRec.stop()}catch{}
+    stopRecognition();
+    return;
   }
-  overlay.classList.add('show');
-  toast('🎉 Bé đã hoàn thành Mock Test!','ok');
+  mockBlob=null;
+  if(mockAudioUrl)URL.revokeObjectURL(mockAudioUrl);
+  mockAudioUrl=null;
+  liveTranscript=''; recognitionParts={}; recognitionConfidence=[];
+  if(location.protocol==='file:'){
+    $('mockStatus').textContent='❌ Chưa ghi âm được';
+    updateMockRecordingStatus('bad','Không thể ghi âm khi mở file trực tiếp','Chrome chặn microphone trên file://. Hãy chạy website bằng localhost hoặc HTTPS.');
+    toast('❌ Hãy chạy website bằng localhost hoặc HTTPS.','bad');
+    return;
+  }
+  if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia){
+    $('mockStatus').textContent='❌ Microphone chưa sẵn sàng';
+    updateMockRecordingStatus('bad','Microphone chưa sẵn sàng','Trang cần chạy trên HTTPS hoặc localhost.');
+    return;
+  }
+  let stream=null;
+  try{
+    $('mockStatus').textContent='⏳ Đang xin quyền microphone…';
+    updateMockRecordingStatus('warn','Đang xin quyền microphone','Hãy bấm Allow/Cho phép nếu Chrome hỏi.');
+    stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    const mime=getAudioMimeType();
+    const options=mime?{mimeType:mime,audioBitsPerSecond:64000}:undefined;
+    const chunks=[]; const started=Date.now();
+    mockRec=new MediaRecorder(stream,options);
+    mockRec.onstart=()=>{
+      $('mockMic').classList.add('recording'); $('mockMic').textContent='⏹️';
+      $('mockStatus').textContent='🔴 Đang ghi âm… bấm lần nữa để dừng';
+      updateMockRecordingStatus('warn','Đang ghi âm','Microphone đang hoạt động. Bé hãy nói tự nhiên.',`Câu ${mockIndex+1}`);
+    };
+    mockRec.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+    mockRec.onerror=e=>{
+      $('mockStatus').textContent='❌ Ghi âm gặp lỗi';
+      updateMockRecordingStatus('bad','Ghi âm gặp lỗi',recordingEnvironmentError(e.error||e));
+    };
+    mockRec.onstop=()=>{
+      const dur=(Date.now()-started)/1000;
+      const blob=new Blob(chunks,{type:mockRec.mimeType||mime||'audio/webm'});
+      stream?.getTracks().forEach(t=>t.stop());
+      $('mockMic').classList.remove('recording'); $('mockMic').textContent='🎤';
+      if(blob.size===0){
+        mockBlob=null;
+        $('mockStatus').textContent='❌ Bản ghi rỗng.';
+        updateMockRecordingStatus('bad','Chưa nhận được audio','Hãy kiểm tra microphone rồi thử lại.');
+        return;
+      }
+      mockBlob=blob;
+      mockAudioUrl=URL.createObjectURL(blob);
+      const a=assessSpeech(liveTranscript,dur,{level:mockLevel,question:mockQuestions[mockIndex]});
+      $('mockTranscript').innerHTML=`<b>Bé nói:</b> ${liveTranscript?esc(liveTranscript):'<span class="muted">Chưa nhận diện được lời nói.</span>'}<div style="margin-top:8px"><span class="pill">Điểm luyện: ${a.score}/100</span> <span class="small muted">${a.wordCount} từ · ${Math.round(dur)} giây</span></div><div class="small muted" style="margin-top:7px">${esc(a.feedback)}</div><div class="score-note">Ngôn ngữ ${a.languageBand}/5 · Phát âm ${a.pronunciationBand}/5 · Tương tác ${a.interactionBand}/5</div>`;
+      $('mockStatus').textContent=`✅ Đã ghi âm xong · ${Math.round(dur)} giây`;
+      updateMockRecordingStatus('ok','✅ Ghi âm thành công','Bản ghi của câu này đã sẵn sàng. Bé có thể nghe lại rồi lưu câu.',`${Math.round(dur)} giây`);
+    };
+    startRecognition();
+    mockRec.start(250);
+  }catch(e){
+    if(mockRec){try{mockRec.stop()}catch{}}
+    stream?.getTracks().forEach(t=>t.stop());
+    $('mockMic').classList.remove('recording'); $('mockMic').textContent='🎤';
+    const msg=recordingEnvironmentError(e);
+    $('mockStatus').textContent='❌ Không mở được microphone.';
+    updateMockRecordingStatus('bad','Không thể bắt đầu ghi âm',msg);
+    toast('❌ '+msg,'bad');
+  }
 }
-function closeCelebration(){const overlay=$('celebrateOverlay');if(overlay)overlay.classList.remove('show');$('mockResult')?.scrollIntoView({behavior:'smooth',block:'start'});}
-window.closeCelebration=closeCelebration;
 window.toggleMockRecording=toggleMockRecording;window.playMockLast=playMockLast;window.skipMockQuestion=skipMockQuestion;window.finishMockQuestion=finishMockQuestion;window.resetMockTest=resetMockTest;window.renderMockBlueprint=renderMockBlueprint;
 
 // Teacher data
