@@ -1,244 +1,511 @@
 from pathlib import Path
-import re
+import textwrap
 
-path = Path("/mnt/data/index.html")
-html = path.read_text(encoding="utf-8")
+html = r'''<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MS HÂN CLASS — Speaking Practice</title>
+<meta name="theme-color" content="#7c5cff">
+<style>
+:root{
+  --bg:#080b18;--panel:#10152a;--panel2:#151b34;--line:#252d4d;
+  --text:#f4f5ff;--muted:#9da6c4;--purple:#8b6cff;--purple2:#b48cff;
+  --blue:#4ea1ff;--pink:#ec79c9;--green:#48d597;--red:#ff667d;--yellow:#ffd166;
+  --shadow:0 16px 45px rgba(0,0,0,.28);--radius:18px
+}
+*{box-sizing:border-box}html,body{margin:0;background:radial-gradient(circle at 15% 0%,#1b1740 0,#080b18 36%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:13px}.tiny{font-size:11px}
+.container{max-width:1200px;margin:auto;padding:22px}
+.topbar{height:68px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;background:rgba(8,11,24,.86);backdrop-filter:blur(16px);z-index:20}
+.brand{display:flex;align-items:center;gap:11px;font-weight:750;letter-spacing:.2px}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;box-shadow:0 8px 25px #8b6cff33}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 68px)}.sidebar{border-right:1px solid rgba(255,255,255,.07);padding:18px 12px;background:#0b0f20}
+.nav{display:flex;flex-direction:column;gap:5px}.nav button{border:0;background:transparent;color:#b9c1dc;text-align:left;padding:11px 12px;border-radius:12px;display:flex;gap:10px;align-items:center;font-weight:560}.nav button:hover,.nav button.active{background:#1a1736;color:white}.nav button.active{box-shadow:inset 3px 0 var(--purple)}
+.main{min-width:0}.page{display:none}.page.active{display:block}
+.hero{padding:28px 0 18px}.hero h1{font-size:32px;line-height:1.1;margin:8px 0}.hero p{color:var(--muted);margin:8px 0}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:linear-gradient(180deg,#12182e,#0f1428);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.stat .label{color:var(--muted);font-size:13px}.stat .value{font-size:28px;font-weight:750;margin-top:7px}.num{font-size:30px;font-weight:750}.pill{display:inline-flex;align-items:center;gap:6px;background:#1c193c;border:1px solid #3a326c;color:#c9bcff;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:650}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.between{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.btn{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#151b32;color:#f4f5ff;font-weight:650}.btn:hover{filter:brightness(1.12)}.primary{background:linear-gradient(135deg,#795cff,#9d6dff);border-color:#8c71ff}.secondary{background:#141a30}.danger{background:#321526;border-color:#6e2944;color:#ffb5c1}.success{background:#122b27;border-color:#236a56;color:#9af0cf}
+input,select,textarea{width:100%;background:#0b1021;color:#f4f5ff;border:1px solid #293154;border-radius:11px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:#8066ff;box-shadow:0 0 0 3px #8066ff22}
+label{font-size:12px;color:#aab3d0;display:block;margin:0 0 6px}.field{margin-bottom:12px}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 9px;border-bottom:1px solid #232a48;text-align:left;font-size:13px}.table th{color:#9ea8c7;font-weight:600}.list{display:flex;flex-direction:column;gap:9px}.item{background:#0d1327;border:1px solid #232b4b;border-radius:13px;padding:12px}
+.score{font-size:42px;font-weight:800;line-height:1}.score.good{color:var(--green)}.score.mid{color:var(--yellow)}.score.low{color:var(--red)}
+.progress{height:8px;background:#202744;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:99px}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}.authbox{width:min(450px,100%);background:#10152aee;border:1px solid #2a3152;border-radius:24px;padding:26px;box-shadow:0 25px 80px #0008}.tabs{display:grid;grid-template-columns:1fr 1fr;background:#0a0f20;padding:4px;border-radius:12px;margin:16px 0}.tabs button{border:0;background:transparent;color:#9da6c4;padding:9px;border-radius:9px}.tabs button.active{background:#27204b;color:#fff}
+.question{font-size:24px;font-weight:680;line-height:1.3;margin:16px 0}.mic{width:74px;height:74px;border-radius:50%;border:0;background:linear-gradient(135deg,#795cff,#a25fff);color:#fff;font-size:29px;box-shadow:0 12px 35px #795cff45}.mic.recording{background:linear-gradient(135deg,#f05578,#a92e67);animation:pulse 1.2s infinite}@keyframes pulse{50%{transform:scale(1.05)}}
+.wave{height:62px;display:flex;align-items:center;justify-content:center;gap:3px;margin:14px 0}.wave i{display:block;width:3px;height:var(--h);background:linear-gradient(var(--purple2),var(--pink));border-radius:9px;opacity:.7}
+.auto-score{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}.mini{background:#0c1224;border:1px solid #252d4d;border-radius:12px;padding:11px}.mini strong{display:block;font-size:20px;margin-top:3px}.ai-note{border-left:3px solid var(--purple);padding:11px 13px;background:#1b1736;border-radius:0 10px 10px 0;margin-top:11px}
+.empty{text-align:center;padding:30px;color:var(--muted)}.toast{position:fixed;right:20px;bottom:20px;background:#171d35;border:1px solid #394266;padding:12px 15px;border-radius:12px;box-shadow:var(--shadow);z-index:50}
+.badge{padding:4px 8px;border-radius:999px;background:#202846;color:#b9c4e5;font-size:11px}.badge.ok{background:#12332c;color:#8fe7c7}.badge.wait{background:#322b18;color:#f1d38a}
+.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;padding:18px;z-index:40}.modal.show{display:grid}.modalbox{width:min(700px,100%);max-height:90vh;overflow:auto;background:#10152a;border:1px solid #2d3557;border-radius:20px;padding:20px}
+footer{color:#707b9f;text-align:center;padding:25px;font-size:12px}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{position:fixed;bottom:0;left:0;right:0;height:65px;padding:7px 8px;z-index:19;border-right:0;border-top:1px solid #232a48}.nav{flex-direction:row;justify-content:space-around}.nav button{font-size:11px;padding:7px;flex-direction:column;gap:2px}.nav button span{display:block}.main{padding-bottom:70px}.g4{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.container{padding:15px}.g2,.g3,.g4{grid-template-columns:1fr}.question{font-size:20px}.auto-score{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 14px}}
+</style>
+</head>
+<body>
 
-# 1) Add student navigation item
-old = '<button onclick="page(\'history\',this)">🕘 <span>Lịch sử</span></button>'
-new = old + '\n    <button onclick="page(\'mockTest\',this)">🏆 <span>Thi thử Speaking</span></button>'
-html = html.replace(old, new)
+<div id="authView" class="auth">
+  <div class="authbox">
+    <div class="brand"><div class="logo">🎤</div><div><div>MS HÂN CLASS</div><div class="tiny muted">Speaking Practice Room</div></div></div>
+    <h1 id="authTitle" style="margin:22px 0 4px">Đăng nhập</h1>
+    <div class="muted small">Luyện phản xạ Speaking · Nộp bài · Tự chấm · Theo dõi tiến bộ</div>
+    <div class="tabs">
+      <button id="studentTab" class="active" onclick="setRole('student')">👧 Học sinh</button>
+      <button id="teacherTab" onclick="setRole('teacher')">👩🏻‍🏫 Giáo viên</button>
+    </div>
+    <div id="nameField" class="field hidden"><label>Họ tên</label><input id="name" placeholder="Tên học sinh"></div>
+    <div class="field"><label>Email</label><input id="email" type="email" placeholder="email@example.com"></div>
+    <div class="field"><label>Mật khẩu</label><input id="password" type="password" placeholder="••••••••"></div>
+    <div id="teacherHint" class="item small hidden" style="margin-bottom:12px">🔐 Tài khoản giáo viên mặc định<br><b>Email:</b> teacher@mshanhclass.com<br><b>Password:</b> hanna126</div>
+    <div class="row">
+      <button class="btn primary" style="flex:1" onclick="login()">Đăng nhập</button>
+      <button id="signupBtn" class="btn secondary hidden" onclick="signupStudent()">Tạo tài khoản</button>
+    </div>
+    <div class="small muted" style="margin-top:14px">Nếu là lần đầu dùng tài khoản giáo viên, hãy tạo tài khoản này trong Firebase Authentication trước.</div>
+  </div>
+</div>
 
-# 2) Add mock-test page before teacher dashboard
-marker = '<section id="tdashboard" class="page">'
-mock_page = r'''
-<section id="mockTest" class="page">
- <div class="hero">
-   <div class="between">
-     <div>
-       <span class="pill">MOCK SPEAKING TEST</span>
-       <h1 style="margin-top:12px">🏆 Thi thử Speaking</h1>
-       <div class="muted">Làm bài như thi thật: nghe câu hỏi → chuẩn bị → trả lời → nhận điểm tổng.</div>
-     </div>
-     <div class="pill" id="mockTimer">10:00</div>
-   </div>
-   <div class="grid" style="grid-template-columns:repeat(3,1fr)">
-     <div class="card"><div class="muted">Part</div><div class="num" id="mockPart">1</div></div>
-     <div class="card"><div class="muted">Câu</div><div class="num" id="mockIndex">1/5</div></div>
-     <div class="card"><div class="muted">Điểm hiện tại</div><div class="num" id="mockLiveScore">—</div></div>
-   </div>
- </div>
- <div class="card" style="margin-top:15px">
-   <div class="pill" id="mockTopic">Warm-up</div>
-   <div class="question" id="mockQuestion">What is your name?</div>
-   <div class="muted small">Em hãy nói thành câu hoàn chỉnh. Hệ thống sẽ ghi âm và phân tích phản xạ sau khi em dừng nói.</div>
-   <div class="wave" id="mockWave"></div>
-   <div class="row">
-     <button id="mockMic" class="mic" onclick="toggleMockRecording()">🎤</button>
-     <button class="btn secondary" onclick="speakMockQuestion()">🔊 Nghe câu hỏi</button>
-     <button class="btn secondary" onclick="resetMock()">↺ Làm lại</button>
-   </div>
-   <div id="mockTranscript" class="item" style="margin-top:15px;min-height:65px"><span class="muted">Transcript sẽ xuất hiện ở đây…</span></div>
-   <div id="mockResult" class="item hidden" style="margin-top:12px"></div>
-   <div class="between" style="margin-top:15px">
-     <div class="small muted" id="mockHint">Nhấn microphone để bắt đầu.</div>
-     <button class="btn primary" id="mockNext" onclick="nextMockQuestion()" disabled>Tiếp theo →</button>
-   </div>
- </div>
- <div class="card" style="margin-top:15px">
-   <div class="between"><div><b>Cấu trúc đề thi thử</b><div class="small muted">Có thể mở rộng thành format riêng của lớp.</div></div></div>
-   <div class="list" style="margin-top:12px">
-     <div class="item"><b>Part 1 · Personal information</b><div class="small muted">Câu hỏi ngắn · kiểm tra phản xạ.</div></div>
-     <div class="item"><b>Part 2 · Topic</b><div class="small muted">Nói về một chủ đề quen thuộc.</div></div>
-     <div class="item"><b>Part 3 · Follow-up</b><div class="small muted">Câu hỏi mở rộng và lý do.</div></div>
-   </div>
+<div id="appView" class="hidden">
+<header class="topbar">
+  <div class="brand"><div class="logo">🎤</div><div>MS HÂN CLASS</div></div>
+  <div class="row"><span id="userLabel" class="small muted"></span><button class="btn secondary" onclick="logout()">Đăng xuất</button></div>
+</header>
+<div class="app">
+<aside class="sidebar"><div class="nav" id="nav"></div></aside>
+<main class="main"><div class="container">
+
+<!-- STUDENT -->
+<section id="sHome" class="page">
+  <div class="hero"><span class="pill">STUDENT ROOM</span><h1>Xin chào, <span id="studentName">bạn</span> 👋</h1><p>Luyện nói mỗi ngày một chút để phản xạ nhanh và tự tin hơn.</p></div>
+  <div class="grid g4">
+    <div class="card stat"><div class="label">Bài đã nộp</div><div class="value" id="stSubmitted">0</div></div>
+    <div class="card stat"><div class="label">Điểm trung bình</div><div class="value" id="stAverage">—</div></div>
+    <div class="card stat"><div class="label">Bài thi thử</div><div class="value" id="stMocks">0</div></div>
+    <div class="card stat"><div class="label">Chuỗi luyện tập</div><div class="value" id="stStreak">0 🔥</div></div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><div class="between"><div><b>📝 Bài cô Hân giao</b><div class="small muted">Luyện đúng bài đang cần.</div></div><button class="btn primary" onclick="go('sAssignments')">Xem bài →</button></div><div id="studentAssignmentPreview" class="list" style="margin-top:13px"></div></div>
+    <div class="card"><div class="between"><div><b>🏆 Thi thử Speaking</b><div class="small muted">Mô phỏng Part 1–3.</div></div><button class="btn primary" onclick="go('sMock')">Bắt đầu</button></div><div class="item" style="margin-top:13px">🤖 Sau mỗi câu hệ thống phân tích transcript, fluency, response và tạo nhận xét luyện tập.</div></div>
+  </div>
+</section>
+
+<section id="sAssignments" class="page">
+ <div class="hero"><span class="pill">ASSIGNMENTS</span><h1>Bài tập của em</h1><p>Cô giao bài theo lớp, chủ đề và thời hạn.</p></div>
+ <div id="assignmentList" class="list"></div>
+</section>
+
+<section id="sPractice" class="page">
+ <div class="hero"><span class="pill">PRACTICE</span><h1>Luyện Speaking</h1><p>Nói → dừng → nhận phản hồi tự động.</p></div>
+ <div class="card">
+  <div class="between"><div><span id="practiceTopic" class="pill">Practice</span><div id="practiceQuestion" class="question">What do you like doing after school?</div></div><span id="practiceCounter" class="small muted">1/1</span></div>
+  <div class="wave" id="practiceWave"></div>
+  <div class="row">
+    <button id="practiceMic" class="mic" onclick="togglePractice()">🎤</button>
+    <button class="btn secondary" onclick="speakCurrent()">🔊 Nghe câu hỏi</button>
+    <button class="btn secondary" onclick="retryPractice()">↺ Thử lại</button>
+  </div>
+  <div id="practiceTranscript" class="item" style="margin-top:14px"><span class="muted">Transcript sẽ xuất hiện ở đây…</span></div>
+  <div id="practiceFeedback" class="item hidden" style="margin-top:12px"></div>
+  <div class="between" style="margin-top:13px"><span id="practiceHint" class="small muted">Nhấn microphone để bắt đầu.</span><button class="btn primary" id="submitPracticeBtn" onclick="submitPractice()" disabled>Nộp bài</button></div>
  </div>
 </section>
 
-'''
-html = html.replace(marker, mock_page + marker)
+<section id="sMock" class="page">
+ <div class="hero"><span class="pill">MOCK TEST</span><h1>🏆 Thi thử Speaking</h1><p>Đề mẫu Part 1 → Part 2 → Part 3. Kết quả được lưu vào lịch sử.</p></div>
+ <div class="grid g3">
+  <div class="card stat"><div class="label">Part</div><div class="value" id="mockPart">1</div></div>
+  <div class="card stat"><div class="label">Câu</div><div class="value" id="mockIndex">1/8</div></div>
+  <div class="card stat"><div class="label">Thời gian</div><div class="value" id="mockTimer">10:00</div></div>
+ </div>
+ <div class="card" style="margin-top:14px">
+  <span id="mockTopic" class="pill">Part 1</span><div id="mockQuestion" class="question">What is your name?</div>
+  <div class="wave" id="mockWave"></div>
+  <div class="row"><button id="mockMic" class="mic" onclick="toggleMock()">🎤</button><button class="btn secondary" onclick="speakMock()">🔊 Nghe câu hỏi</button></div>
+  <div id="mockTranscript" class="item" style="margin-top:14px"><span class="muted">Transcript…</span></div>
+  <div id="mockFeedback" class="item hidden" style="margin-top:12px"></div>
+  <div class="between" style="margin-top:13px"><span id="mockHint" class="small muted">Nhấn microphone để trả lời.</span><button id="mockNext" class="btn primary" onclick="nextMock()" disabled>Tiếp theo →</button></div>
+ </div>
+</section>
 
-# 3) Add automatic scoring styles
-style_marker = '.score{font-size:40px;font-weight:800}'
-extra_css = r'''
-.auto-score{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
-.auto-score .mini{background:#0d1225;border:1px solid #293158;border-radius:12px;padding:11px}
-.mini strong{font-size:20px;display:block;margin-top:3px}
-.ai-note{border-left:3px solid var(--purple);padding:10px 12px;background:#191633;border-radius:0 10px 10px 0;margin-top:10px}
-'''
-html = html.replace(style_marker, style_marker + extra_css)
+<section id="sHistory" class="page">
+ <div class="hero"><span class="pill">HISTORY</span><h1>🕘 Lịch sử luyện tập</h1><p>Tất cả bài nộp và bài thi thử của em.</p></div>
+ <div id="studentHistory" class="list"></div>
+</section>
 
-# 4) Update page title map
-old_map = 'historyTeacher:"Lịch sử quản lý"})[id]||"MS HÂN CLASS";'
-new_map = 'historyTeacher:"Lịch sử quản lý",mockTest:"Thi thử Speaking"})[id]||"MS HÂN CLASS";'
-html = html.replace(old_map, new_map)
+<section id="sProgress" class="page">
+ <div class="hero"><span class="pill">PROGRESS</span><h1>📈 Tiến bộ của em</h1><p>Theo dõi điểm qua từng lần luyện.</p></div>
+ <div class="card"><div id="progressChart" style="height:230px;display:flex;align-items:end;gap:8px;border-bottom:1px solid #2a3150;padding:15px 4px"></div><div class="small muted" style="margin-top:10px">Mỗi cột là một lần nộp bài gần nhất.</div></div>
+</section>
 
-# 5) Add speech recognition + automatic scoring code before loadQuestions()
-insert_marker = 'loadQuestions();\n</script>'
-auto_js = r'''
-// ================= AUTOMATIC SPEAKING FEEDBACK =================
-// V2 uses the browser Speech Recognition API when available.
-// It gives an estimated practice score (fluency, response length, fillers).
-// It is NOT a certified phoneme-level pronunciation score.
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let speechRec=null, speechText="", mockRec=null, mockText="", mockStartedAt=0;
-const mockQuestions=[
- {part:1,topic:"Part 1 · Personal information",q:"What is your name?",keywords:["name"]},
- {part:1,topic:"Part 1 · Personal information",q:"How old are you?",keywords:["old","years"]},
- {part:1,topic:"Part 1 · Personal information",q:"What do you like doing after school?",keywords:["like","after","school"]},
- {part:2,topic:"Part 2 · Topic",q:"Tell me about your favourite school subject.",keywords:["subject","school","because"]},
- {part:2,topic:"Part 2 · Topic",q:"Describe your best friend.",keywords:["friend","because"]},
- {part:3,topic:"Part 3 · Follow-up",q:"Why is learning English important for you?",keywords:["English","important","because"]},
- {part:3,topic:"Part 3 · Follow-up",q:"What are you going to do next weekend?",keywords:["going","weekend"]},
- {part:3,topic:"Part 3 · Follow-up",q:"Do you prefer studying alone or with friends? Why?",keywords:["prefer","because"]}
-];
-let mockIndex=0,mockResults=[],mockTimerId=null,mockSeconds=600;
+<!-- TEACHER -->
+<section id="tHome" class="page">
+ <div class="hero"><span class="pill">TEACHER DASHBOARD</span><h1>Chào cô Hân 👩🏻‍🏫</h1><p>Quản lý lớp, bài học, bài giao và nhận xét trong một nơi.</p></div>
+ <div class="grid g4">
+  <div class="card stat"><div class="label">Học sinh</div><div class="value" id="tStudents">0</div></div>
+  <div class="card stat"><div class="label">Lớp</div><div class="value" id="tClasses">0</div></div>
+  <div class="card stat"><div class="label">Bài chờ chấm</div><div class="value" id="tPending">0</div></div>
+  <div class="card stat"><div class="label">Bài đã chấm</div><div class="value" id="tGraded">0</div></div>
+ </div>
+ <div class="grid g2" style="margin-top:14px">
+  <div class="card"><b>⚡ Làm nhanh</b><div class="row" style="margin-top:13px"><button class="btn primary" onclick="go('tAssignments')">+ Giao bài</button><button class="btn secondary" onclick="go('tQuestions')">+ Thêm câu hỏi</button><button class="btn secondary" onclick="go('tSubmissions')">Xem bài nộp</button></div></div>
+  <div class="card"><b>💡 Gợi ý quản lý</b><div class="small muted" style="margin-top:10px">Dùng tên bài học + deadline để lọc lịch sử dễ hơn. Có thể sửa điểm/nhận xét sau khi hệ thống tự chấm.</div></div>
+ </div>
+</section>
 
-function normalizeText(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w\s']/g," ")}
-function scoreSpeech(text,seconds,question=""){
- const words=normalizeText(text).split(/\s+/).filter(Boolean);
- const count=words.length;
- const fillers=(text.match(/\b(um|uh|er|like|you know)\b/gi)||[]).length;
- const unique=new Set(words).size;
- const pace=seconds>0 ? count/(seconds/60) : count;
- const target=(normalizeText(question).split(/\s+/).filter(x=>x.length>3));
- const hits=target.filter(w=>words.includes(w)).length;
- const relevance=target.length ? Math.min(100,Math.round((hits/Math.min(target.length,5))*100)) : 70;
- const fluency=Math.max(35,Math.min(100,Math.round(55+Math.min(count,55)*0.65-fillers*4+(pace>=45&&pace<=150?10:0))));
- const pronunciation=Math.max(45,Math.min(98,Math.round(68+(unique/Math.max(count,1))*25-(fillers*2))));
- const overall=Math.round(fluency*.4+pronunciation*.35+relevance*.25);
- let comment;
- if(overall>=90) comment="Excellent! Câu trả lời khá tự nhiên, rõ ý và có phản xạ tốt.";
- else if(overall>=80) comment="Very good! Em trả lời tốt. Hãy chú ý phát âm rõ và mở rộng thêm ý.";
- else if(overall>=70) comment="Good effort! Em đã trả lời được. Cố gắng nói dài hơn và hạn chế ngập ngừng.";
- else comment="Keep practising! Hãy nói thành câu đầy đủ, chậm và rõ hơn rồi thử lại.";
- return {overall,fluency,pronunciation,relevance,words:count,pace:Math.round(pace),comment};
+<section id="tClasses" class="page">
+ <div class="hero between"><div><span class="pill">CLASSES</span><h1>👥 Quản lý lớp</h1><p>Tạo lớp và mã lớp để học sinh tham gia.</p></div><button class="btn primary" onclick="openClassModal()">+ Tạo lớp</button></div>
+ <div id="classList" class="grid g2"></div>
+</section>
+
+<section id="tQuestions" class="page">
+ <div class="hero between"><div><span class="pill">QUESTION BANK</span><h1>📚 Ngân hàng câu hỏi</h1><p>Gắn câu hỏi với bài học/chủ đề.</p></div><button class="btn primary" onclick="openQuestionModal()">+ Thêm câu hỏi</button></div>
+ <div id="questionList" class="list"></div>
+</section>
+
+<section id="tAssignments" class="page">
+ <div class="hero between"><div><span class="pill">ASSIGNMENTS</span><h1>📝 Giao bài</h1><p>Giao theo lớp, chọn bài và deadline.</p></div><button class="btn primary" onclick="openAssignmentModal()">+ Giao bài</button></div>
+ <div id="teacherAssignmentList" class="list"></div>
+</section>
+
+<section id="tSubmissions" class="page">
+ <div class="hero"><span class="pill">SUBMISSIONS</span><h1>🎤 Bài học sinh nộp</h1><p>Nghe bài, xem AI feedback và chỉnh điểm/nhận xét.</p></div>
+ <div class="grid g3">
+  <div class="field"><label>Lọc lớp</label><select id="filterClass" onchange="renderSubmissions()"><option value="">Tất cả</option></select></div>
+  <div class="field"><label>Lọc bài</label><select id="filterAssignment" onchange="renderSubmissions()"><option value="">Tất cả</option></select></div>
+  <div class="field"><label>Trạng thái</label><select id="filterStatus" onchange="renderSubmissions()"><option value="">Tất cả</option><option value="pending">Chờ chấm</option><option value="graded">Đã chấm</option></select></div>
+ </div>
+ <div id="submissionList" class="list"></div>
+</section>
+
+<section id="tHistory" class="page">
+ <div class="hero"><span class="pill">HISTORY</span><h1>🕘 Lịch sử quản lý</h1><p>Tra cứu theo học sinh, lớp, bài học và thời gian.</p></div>
+ <div class="card">
+  <div class="grid g3"><div class="field"><label>Từ khóa</label><input id="historySearch" placeholder="Tên bé / bài học..." oninput="renderTeacherHistory()"></div><div class="field"><label>Từ ngày</label><input id="historyFrom" type="date" onchange="renderTeacherHistory()"></div><div class="field"><label>Đến ngày</label><input id="historyTo" type="date" onchange="renderTeacherHistory()"></div></div>
+ </div>
+ <div id="teacherHistory" class="list" style="margin-top:14px"></div>
+</section>
+<footer>MS HÂN CLASS · Speaking Practice Room · Firebase</footer>
+</div></main></div>
+</div>
+
+<!-- MODALS -->
+<div id="classModal" class="modal"><div class="modalbox"><div class="between"><h2>Tạo lớp</h2><button class="btn secondary" onclick="closeModal('classModal')">✕</button></div><div class="field"><label>Tên lớp</label><input id="className" placeholder="Flyers A"></div><div class="field"><label>Mô tả</label><input id="classDesc" placeholder="Lớp luyện Speaking"></div><button class="btn primary" onclick="createClass()">Lưu lớp</button></div></div>
+
+<div id="questionModal" class="modal"><div class="modalbox"><div class="between"><h2>Thêm câu hỏi</h2><button class="btn secondary" onclick="closeModal('questionModal')">✕</button></div><div class="grid g2"><div class="field"><label>Part</label><select id="qPart"><option>Part 1</option><option>Part 2</option><option>Part 3</option></select></div><div class="field"><label>Topic / bài học</label><input id="qTopic" placeholder="School life"></div></div><div class="field"><label>Câu hỏi</label><textarea id="qText" rows="3" placeholder="What do you like doing after school?"></textarea></div><button class="btn primary" onclick="createQuestion()">Lưu câu hỏi</button></div></div>
+
+<div id="assignmentModal" class="modal"><div class="modalbox"><div class="between"><h2>Giao bài</h2><button class="btn secondary" onclick="closeModal('assignmentModal')">✕</button></div><div class="grid g2"><div class="field"><label>Lớp</label><select id="aClass"></select></div><div class="field"><label>Câu hỏi</label><select id="aQuestion"></select></div></div><div class="grid g2"><div class="field"><label>Tên bài</label><input id="aTitle" placeholder="Speaking Practice 01"></div><div class="field"><label>Deadline</label><input id="aDeadline" type="date"></div></div><button class="btn primary" onclick="createAssignment()">Giao bài</button></div></div>
+
+<div id="gradeModal" class="modal"><div class="modalbox"><div class="between"><h2>Chấm & nhận xét</h2><button class="btn secondary" onclick="closeModal('gradeModal')">✕</button></div><div id="gradeContent"></div><input type="hidden" id="gradeId"><div class="grid g3"><div class="field"><label>Overall</label><input id="gradeOverall" type="number" min="0" max="100"></div><div class="field"><label>Fluency</label><input id="gradeFluency" type="number" min="0" max="100"></div><div class="field"><label>Pronunciation</label><input id="gradePron" type="number" min="0" max="100"></div></div><div class="field"><label>Nhận xét của cô</label><textarea id="gradeComment" rows="4"></textarea></div><button class="btn primary" onclick="saveGrade()">Lưu kết quả</button></div></div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,updateProfile,signOut} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {getDatabase,ref,set,get,push,onValue,update,remove} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import {getStorage,ref as sRef,uploadBytes,getDownloadURL} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyCA39PyvTlLtiqnPT3lkXUp0PgQ7rZmp74",
+ authDomain:"speaking-practice-room.firebaseapp.com",
+ projectId:"speaking-practice-room",
+ storageBucket:"speaking-practice-room.firebasestorage.app",
+ messagingSenderId:"840862279040",
+ appId:"1:840862279040:web:01a2d248d755ea8121cd65",
+ measurementId:"G-CFQKZS9MRD"
+};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app),storage=getStorage(app);
+const TEACHER_EMAIL="teacher@mshanhclass.com",TEACHER_PASSWORD="hanna126";
+let role="student",user=null,profile=null;
+let data={users:{},classes:{},questions:{},assignments:{},submissions:{},mockTests:{},studentActivity:{}};
+let unsub=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const fmt=d=>d?new Date(d).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}):"—";
+const today=()=>new Date().toISOString().slice(0,10);
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>$("toast").classList.add("hidden"),2800)}
+window.toast=toast;
+
+window.setRole=r=>{role=r;$("studentTab").classList.toggle("active",r==="student");$("teacherTab").classList.toggle("active",r==="teacher");$("nameField").classList.toggle("hidden",r!=="student");$("signupBtn").classList.toggle("hidden",r!=="student");$("teacherHint").classList.toggle("hidden",r!=="teacher");if(r==="teacher"){$("email").value=TEACHER_EMAIL;$("password").value=TEACHER_PASSWORD}};
+window.login=async()=>{
+ try{
+  const email=role==="teacher"?TEACHER_EMAIL:$("email").value.trim(),pw=role==="teacher"?TEACHER_PASSWORD:$("password").value;
+  if(!email||!pw)throw Error("Vui lòng nhập email và mật khẩu.");
+  await signInWithEmailAndPassword(auth,email,pw);
+ }catch(e){toast(authError(e))}
+};
+window.signupStudent=async()=>{
+ try{
+  const name=$("name").value.trim(),email=$("email").value.trim(),pw=$("password").value;
+  if(!name)throw Error("Vui lòng nhập họ tên.");
+  if(pw.length<6)throw Error("Mật khẩu cần ít nhất 6 ký tự.");
+  const c=await createUserWithEmailAndPassword(auth,email,pw);
+  await updateProfile(c.user,{displayName:name});
+  await set(ref(db,"users/"+c.user.uid),{uid:c.user.uid,name,email,role:"student",createdAt:new Date().toISOString()});
+  toast("Tạo tài khoản thành công!");
+ }catch(e){toast(authError(e))}
+};
+function authError(e){return e.code==="auth/invalid-credential"?"Sai email hoặc mật khẩu.":e.code==="auth/email-already-in-use"?"Email đã được dùng.":e.message||"Có lỗi xảy ra."}
+window.logout=()=>signOut(auth);
+onAuthStateChanged(auth,async u=>{
+ user=u;
+ if(!u){$("authView").classList.remove("hidden");$("appView").classList.add("hidden");return}
+ $("authView").classList.add("hidden");$("appView").classList.remove("hidden");
+ const snap=await get(ref(db,"users/"+u.uid));profile=snap.exists()?snap.val():{uid:u.uid,name:u.displayName||u.email,email:u.email,role:u.email===TEACHER_EMAIL?"teacher":"student"};
+ role=profile.role==="teacher"||u.email===TEACHER_EMAIL?"teacher":"student";
+ $("userLabel").textContent=(role==="teacher"?"👩🏻‍🏫 ":"👧 ")+(profile.name||u.displayName||u.email);
+ buildNav();startData();go(role==="teacher"?"tHome":"sHome");
+});
+
+function buildNav(){
+ const items=role==="teacher"?[
+  ["tHome","🏠","Tổng quan"],["tClasses","👥","Lớp học"],["tQuestions","📚","Ngân hàng đề"],["tAssignments","📝","Giao bài"],["tSubmissions","🎤","Bài đã nộp"],["tHistory","🕘","Lịch sử"]
+ ]:[
+  ["sHome","🏠","Trang chủ"],["sAssignments","📝","Bài được giao"],["sPractice","🎤","Luyện Speaking"],["sMock","🏆","Thi thử"],["sHistory","🕘","Lịch sử"],["sProgress","📈","Tiến bộ"]
+ ];
+ $("nav").innerHTML=items.map(x=>`<button onclick="go('${x[0]}')" id="nav-${x[0]}">${x[1]} <span>${x[2]}</span></button>`).join("");
 }
-function recognitionSupported(){return !!SpeechRecognition}
-function startRecognition(onFinal,onEnd){
- if(!SpeechRecognition){toast("Trình duyệt này chưa hỗ trợ nhận diện giọng nói. Chrome trên máy tính thường hoạt động tốt nhất.");return null}
- const r=new SpeechRecognition();r.lang="en-US";r.interimResults=true;r.continuous=true;
- let final="";
- r.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;if(e.results[i].isFinal)final+=" "+t;else interim+=" "+t}
- onFinal((final+" "+interim).trim(),final.trim())};
- r.onerror=e=>{if(e.error!=="no-speech")toast("Không nhận diện được giọng nói: "+e.error)};
- r.onend=()=>onEnd(final.trim());
- try{r.start()}catch(e){}
+window.go=id=>{
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id)?.classList.add("active");
+ document.querySelectorAll("#nav button").forEach(b=>b.classList.remove("active"));$("nav-"+id)?.classList.add("active");
+ if(id==="sHome")renderStudentHome();if(id==="sAssignments")renderStudentAssignments();if(id==="sHistory")renderStudentHistory();if(id==="sProgress")renderProgress();
+ if(id==="tHome")renderTeacherHome();if(id==="tClasses")renderClasses();if(id==="tQuestions")renderQuestions();if(id==="tAssignments")renderTeacherAssignments();if(id==="tSubmissions")renderSubmissions();if(id==="tHistory")renderTeacherHistory();
+ if(id==="sPractice")loadPracticeFromAssignments();
+ if(id==="sMock")initMock();
+};
+
+function startData(){
+ unsub.forEach(x=>x());unsub=[];
+ ["users","classes","questions","assignments","submissions","mockTests","studentActivity"].forEach(k=>{
+  unsub.push(onValue(ref(db,k),s=>{data[k]=s.val()||{};refreshCurrent()}));
+ });
+}
+function refreshCurrent(){
+ const active=document.querySelector(".page.active")?.id;
+ if(active==="sHome")renderStudentHome();if(active==="sAssignments")renderStudentAssignments();if(active==="sHistory")renderStudentHistory();if(active==="sProgress")renderProgress();
+ if(active==="tHome")renderTeacherHome();if(active==="tClasses")renderClasses();if(active==="tQuestions")renderQuestions();if(active==="tAssignments")renderTeacherAssignments();if(active==="tSubmissions")renderSubmissions();if(active==="tHistory")renderTeacherHistory();
+}
+
+function studentAssignments(){
+ return Object.values(data.assignments).filter(a=>a.active!==false&&(a.studentId===user?.uid||a.classId==="all"||data.users[user?.uid]?.classId===a.classId));
+}
+function renderStudentHome(){
+ $("studentName").textContent=profile?.name||user?.displayName||"bạn";
+ const subs=Object.values(data.submissions).filter(s=>s.studentId===user?.uid),mocks=Object.values(data.mockTests).filter(s=>s.studentId===user?.uid);
+ $("stSubmitted").textContent=subs.length;$("stMocks").textContent=mocks.length;
+ const graded=subs.filter(s=>s.status==="graded"&&Number.isFinite(+s.overall));$("stAverage").textContent=graded.length?Math.round(graded.reduce((a,b)=>a+(+b.overall),0)/graded.length):"—";
+ const days=[...new Set(subs.map(s=>(s.submittedAt||"").slice(0,10)).filter(Boolean))].sort().reverse();let streak=0,cur=new Date();for(const d of days){const x=new Date(d),diff=Math.round((new Date(cur.toDateString())-new Date(x.toDateString()))/86400000);if(diff===streak)streak++;else break}$("stStreak").textContent=streak+" 🔥";
+ const as=studentAssignments().slice(0,3);$("studentAssignmentPreview").innerHTML=as.length?as.map(assignmentCard).join(""):`<div class="empty">Chưa có bài được giao.</div>`;
+}
+function assignmentCard(a){
+ const q=data.questions[a.questionId]||{};const sub=Object.values(data.submissions).find(s=>s.assignmentId===a.id&&s.studentId===user?.uid);
+ return `<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted">${esc(q.part||"Speaking")} · ${esc(q.topic||"")} · Hạn ${esc(a.deadline||"—")}</div></div><span class="badge ${sub?"ok":"wait"}">${sub?`Đã nộp · ${sub.overall??"—"}`:"Chưa nộp"}</span></div>${!sub?`<button class="btn primary" style="margin-top:9px" onclick="startAssignment('${a.id}')">Làm bài →</button>`:""}</div>`;
+}
+window.startAssignment=id=>{window.currentAssignment=data.assignments[id];go("sPractice")};
+function loadPracticeFromAssignments(){
+ const a=window.currentAssignment||studentAssignments()[0];if(!a){$("practiceQuestion").textContent="Chưa có bài được giao.";return}
+ const q=data.questions[a.questionId]||{q:"Tell me about yourself.",topic:"Practice",part:"Part 1"};
+ window.practice={a,q};$("practiceTopic").textContent=(q.part||"Practice")+" · "+(q.topic||"");$("practiceQuestion").textContent=q.q||q.text||"";
+ $("practiceCounter").textContent="1/1";retryPractice();
+}
+function drawWave(id){const w=$(id);w.innerHTML="";for(let i=0;i<48;i++){const e=document.createElement("i");e.style.setProperty("--h",(8+Math.random()*45)+"px");w.appendChild(e)}}
+drawWave("practiceWave");
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let media=null,recognition=null,transcript="",startedAt=0,lastBlob=null;
+function beginRecognition(onLive,onFinal){
+ if(!SR)return null;const r=new SR();r.lang="en-US";r.continuous=true;r.interimResults=true;let final="";
+ r.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)final+=" "+t;else interim+=" "+t}onLive((final+" "+interim).trim());if(final.trim())onFinal(final.trim())};
+ r.onerror=e=>{if(e.error!=="no-speech")toast("Speech recognition: "+e.error)};try{r.start()}catch{}
  return r;
 }
-window.toggleRecording=async()=>{
- if(rec?.state==="recording"){rec.stop();return}
+function scoreText(text,seconds,question){
+ const words=(text||"").toLowerCase().replace(/[^a-z0-9'\s]/g," ").split(/\s+/).filter(Boolean),n=words.length,unique=new Set(words).size;
+ const fillers=(text.match(/\b(um|uh|er|like|you know)\b/gi)||[]).length,pace=seconds?Math.round(n/(seconds/60)):n;
+ const qWords=(question||"").toLowerCase().split(/\s+/).filter(x=>x.length>3),hits=qWords.filter(x=>words.includes(x)).length;
+ const response=qWords.length?Math.min(100,Math.round(hits/Math.min(qWords.length,5)*100)):70;
+ const fluency=Math.max(35,Math.min(100,Math.round(58+Math.min(n,55)*.65-fillers*4+(pace>=45&&pace<=150?9:0))));
+ const pronunciation=Math.max(45,Math.min(98,Math.round(65+(unique/Math.max(n,1))*30-fillers*2)));
+ const overall=Math.round(fluency*.4+pronunciation*.35+response*.25);
+ const comment=overall>=90?"Excellent! Em nói khá tự nhiên, rõ ý và có phản xạ tốt.":overall>=80?"Very good! Em trả lời tốt. Hãy tiếp tục chú ý phát âm rõ và mở rộng ý.":overall>=70?"Good effort! Em đã trả lời được. Cố gắng nói dài hơn và hạn chế ngập ngừng.":"Keep practising! Hãy nói chậm, rõ, đủ câu và thử lại.";
+ return {overall,fluency,pronunciation,response,words:n,pace,comment};
+}
+window.togglePractice=async()=>{
+ if(media?.state==="recording"){media.stop();return}
  try{
-  let stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];
-  rec=new MediaRecorder(stream);rec.ondataavailable=e=>chunks.push(e.data);
-  rec.onstop=async()=>{
-   lastBlob=new Blob(chunks,{type:"audio/webm"});audioUrl=URL.createObjectURL(lastBlob);
-   stream.getTracks().forEach(t=>t.stop());$("mic").classList.remove("recording");$("mic").textContent="🎤";
-   if(speechRec){try{speechRec.stop()}catch(e){}}
-   finishAutoPractice();
-  };
-  rec.start();$("mic").classList.add("recording");$("mic").textContent="⏹️";speechText="";speechRec=startRecognition((live)=>{speechText=live},()=>{});
-  window._practiceStart=Date.now();toast("Đang ghi âm + phân tích giọng nói...");
- }catch(e){toast("Hãy cho phép microphone trong trình duyệt.")}
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];startedAt=Date.now();transcript="";
+  media=new MediaRecorder(stream);media.ondataavailable=e=>chunks.push(e.data);
+  media.onstop=()=>{stream.getTracks().forEach(t=>t.stop());lastBlob=new Blob(chunks,{type:"audio/webm"});finishPractice()};
+  media.start();$("practiceMic").classList.add("recording");$("practiceMic").textContent="⏹️";$("practiceHint").textContent="Đang ghi âm…";recognition=beginRecognition(t=>{$("practiceTranscript").textContent=t;transcript=t},t=>transcript=t);
+ }catch(e){toast("Hãy cấp quyền microphone cho website.")}
 };
-function finishAutoPractice(){
- const sec=Math.max(1,Math.round((Date.now()-(window._practiceStart||Date.now()))/1000));
- const result=scoreSpeech(speechText,sec,$("question").textContent);
- let box=document.getElementById("autoPracticeResult");
- if(!box){box=document.createElement("div");box.id="autoPracticeResult";box.className="item";$("practice").querySelector(".card").appendChild(box)}
- box.innerHTML=`<b>🤖 Kết quả tự động</b><div class="auto-score">
- <div class="mini">Fluency<strong>${result.fluency}</strong></div>
- <div class="mini">Pronunciation*<strong>${result.pronunciation}</strong></div>
- <div class="mini">Response<strong>${result.relevance}</strong></div></div>
- <div class="ai-note">${esc(result.comment)}</div>
- <div class="small muted" style="margin-top:8px">📝 ${esc(speechText||"Chưa nhận diện được transcript.")} · ${result.words} từ · ${result.pace} từ/phút</div>
- <div class="small muted" style="margin-top:6px">* Pronunciation ở V2 là điểm luyện tập ước lượng từ transcript/độ ổn định bài nói, chưa phải chấm phát âm âm vị bằng AI chuyên dụng.</div>`;
+function finishPractice(){
+ if(recognition)try{recognition.stop()}catch{}
+ const sec=Math.max(1,Math.round((Date.now()-startedAt)/1000)),r=scoreText(transcript,sec,window.practice?.q?.q||"");
+ $("practiceMic").classList.remove("recording");$("practiceMic").textContent="🎤";$("practiceHint").textContent="Đã phân tích. Em có thể nộp bài hoặc thử lại.";
+ $("practiceFeedback").classList.remove("hidden");$("practiceFeedback").innerHTML=feedbackHTML(r)+"<div class='small muted' style='margin-top:8px'>📝 "+esc(transcript||"Chưa nhận diện được transcript.")+"</div><div class='tiny muted' style='margin-top:6px'>* Pronunciation là điểm luyện tập ước lượng từ transcript/tốc độ/phản xạ; chưa phải chấm âm vị chuyên sâu.</div>";
+ $("submitPracticeBtn").disabled=!lastBlob;window.practiceResult={...r,duration:sec};
 }
-function startMockTimer(){
- clearInterval(mockTimerId);mockSeconds=600;
- const el=$("mockTimer");mockTimerId=setInterval(()=>{mockSeconds--;let m=Math.floor(mockSeconds/60),s=mockSeconds%60;el.textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;if(mockSeconds<=0){clearInterval(mockTimerId);finishMock(true)}},1000)
-}
-function renderMock(){
- const q=mockQuestions[mockIndex];$("mockPart").textContent=q.part;$("mockIndex").textContent=`${mockIndex+1}/${mockQuestions.length}`;$("mockTopic").textContent=q.topic;$("mockQuestion").textContent=q.q;
- $("mockTranscript").innerHTML='<span class="muted">Transcript sẽ xuất hiện ở đây…</span>';$("mockResult").classList.add("hidden");$("mockNext").disabled=true;$("mockHint").textContent="Nhấn microphone để bắt đầu.";drawMockWave();
-}
-function drawMockWave(){let w=$("mockWave");w.innerHTML="";for(let i=0;i<55;i++){let e=document.createElement("i");e.style.setProperty("--h",(8+Math.random()*42)+"px");w.appendChild(e)}}
-window.speakMockQuestion=()=>{if(!("speechSynthesis" in window))return toast("Trình duyệt không hỗ trợ đọc câu hỏi.");let u=new SpeechSynthesisUtterance($("mockQuestion").textContent);u.lang="en-US";u.rate=.9;u.volume=+$("volume").value||1;speechSynthesis.cancel();speechSynthesis.speak(u)}
-window.toggleMockRecording=async()=>{
+function feedbackHTML(r){return `<b>🤖 Kết quả tự động</b><div class="auto-score"><div class="mini">Overall<strong>${r.overall}</strong></div><div class="mini">Fluency<strong>${r.fluency}</strong></div><div class="mini">Pronunciation<strong>${r.pronunciation}</strong></div><div class="mini">Response<strong>${r.response}</strong></div></div><div class="ai-note">${esc(r.comment)}</div>`}
+window.retryPractice=()=>{if(media?.state==="recording")return;$("practiceTranscript").innerHTML='<span class="muted">Transcript sẽ xuất hiện ở đây…</span>';$("practiceFeedback").classList.add("hidden");$("submitPracticeBtn").disabled=true;$("practiceHint").textContent="Nhấn microphone để bắt đầu.";drawWave("practiceWave");lastBlob=null};
+window.speakCurrent=()=>speak($("practiceQuestion").textContent);
+function speak(text){if(!speechSynthesis)return toast("Trình duyệt không hỗ trợ đọc câu hỏi.");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=.9;speechSynthesis.speak(u)}
+window.submitPractice=async()=>{
+ if(!lastBlob||!window.practice?.a)return;
+ try{
+  const path=`submissions/${user.uid}/${Date.now()}.webm`,sr=await uploadBytes(sRef(storage,path),lastBlob),url=await getDownloadURL(sr.ref),r=window.practiceResult,a=window.practice.a,q=window.practice.q;
+  const id=push(ref(db,"submissions")).key;await set(ref(db,"submissions/"+id),{id,assignmentId:a.id,studentId:user.uid,studentName:profile?.name||user.displayName||user.email,audioUrl:url,question:q.q,topic:q.topic||"",part:q.part||"",transcript,overall:r.overall,fluency:r.fluency,pronunciation:r.pronunciation,response:r.response,autoComment:r.comment,status:"pending",submittedAt:new Date().toISOString()});
+  toast("Đã nộp bài cho cô Hân!");window.currentAssignment=null;go("sHistory");
+ }catch(e){toast("Không thể nộp bài: "+(e.message||""))}
+};
+
+const mockQs=[
+ {part:"Part 1",topic:"Personal information",q:"What is your name?"},
+ {part:"Part 1",topic:"Personal information",q:"How old are you?"},
+ {part:"Part 1",topic:"School",q:"What is your favourite school subject?"},
+ {part:"Part 2",topic:"Topic",q:"Tell me about your favourite hobby."},
+ {part:"Part 2",topic:"Topic",q:"Describe your best friend."},
+ {part:"Part 3",topic:"Follow-up",q:"Why is learning English important for you?"},
+ {part:"Part 3",topic:"Follow-up",q:"What are you going to do next weekend?"},
+ {part:"Part 3",topic:"Follow-up",q:"Do you prefer studying alone or with friends? Why?"}
+];
+let mi=0,mockResults=[],mockRec=null,mockStart=0,mockTimer=null;
+function initMock(){mi=0;mockResults=[];clearInterval(mockTimer);mockTimer=setInterval(()=>{const start=window._mockStarted||Date.now();let sec=Math.max(0,600-Math.floor((Date.now()-start)/1000));$("mockTimer").textContent=`${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;if(sec<=0){clearInterval(mockTimer);finishMock()}},500);window._mockStarted=Date.now();renderMock()}
+function renderMock(){const q=mockQs[mi];$("mockPart").textContent=q.part;$("mockIndex").textContent=`${mi+1}/${mockQs.length}`;$("mockTopic").textContent=q.topic;$("mockQuestion").textContent=q.q;$("mockTranscript").innerHTML='<span class="muted">Transcript…</span>';$("mockFeedback").classList.add("hidden");$("mockNext").disabled=true;$("mockHint").textContent="Nhấn microphone để trả lời.";drawWave("mockWave")}
+window.speakMock=()=>speak($("mockQuestion").textContent);
+window.toggleMock=async()=>{
  if(mockRec?.state==="recording"){mockRec.stop();return}
- try{
-  let stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];mockText="";mockStartedAt=Date.now();
-  mockRec=new MediaRecorder(stream);mockRec.ondataavailable=e=>chunks.push(e.data);
-  mockRec.onstop=()=>{
-   stream.getTracks().forEach(t=>t.stop());$("mockMic").classList.remove("recording");$("mockMic").textContent="🎤";
-   let sec=Math.max(1,Math.round((Date.now()-mockStartedAt)/1000)),r=scoreSpeech(mockText,sec,$("mockQuestion").textContent);mockResults[mockIndex]=r;
-   $("mockResult").classList.remove("hidden");$("mockResult").innerHTML=`<b>🤖 Kết quả câu ${mockIndex+1}</b><div class="auto-score"><div class="mini">Overall<strong>${r.overall}</strong></div><div class="mini">Fluency<strong>${r.fluency}</strong></div><div class="mini">Pronunciation*<strong>${r.pronunciation}</strong></div></div><div class="ai-note">${esc(r.comment)}</div>`;
-   $("mockNext").disabled=false;$("mockHint").textContent="Đã chấm tự động. Em có thể thử lại hoặc sang câu tiếp.";
-  };
-  mockRec.start();$("mockMic").classList.add("recording");$("mockMic").textContent="⏹️";toast("Đang ghi âm...");
-  if(SpeechRecognition){let r=startRecognition(live=>{$("mockTranscript").textContent=live||"Đang nghe…";mockText=live},final=>{if(final)mockText=final})}
- }catch(e){toast("Hãy cho phép microphone.")}
+ try{const stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];mockStart=Date.now();let text="";
+  mockRec=new MediaRecorder(stream);mockRec.ondataavailable=e=>chunks.push(e.data);mockRec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const sec=Math.max(1,Math.round((Date.now()-mockStart)/1000)),r=scoreText(text,sec,$("mockQuestion").textContent);mockResults[mi]=r;$("mockFeedback").classList.remove("hidden");$("mockFeedback").innerHTML=feedbackHTML(r);$("mockNext").disabled=false;$("mockHint").textContent="Đã chấm tự động.";mockRec=null};
+  mockRec.start();$("mockMic").classList.add("recording");$("mockMic").textContent="⏹️";
+  mockRec._recognition=beginRecognition(t=>{$("mockTranscript").textContent=t;text=t},t=>text=t);
+  mockRec.addEventListener("stop",()=>{if(mockRec?._recognition)try{mockRec._recognition.stop()}catch{}});
+ }catch(e){toast("Hãy cấp quyền microphone.")}
 };
-window.nextMockQuestion=async()=>{
- if(mockIndex<mockQuestions.length-1){mockIndex++;renderMock()}
- else finishMock(false)
+window.nextMock=async()=>{if(mi<mockQs.length-1){mi++;renderMock()}else finishMock()};
+async function finishMock(){
+ clearInterval(mockTimer);const valid=mockResults.filter(Boolean);if(!valid.length)return;
+ const score=Math.round(valid.reduce((a,b)=>a+b.overall,0)/valid.length),id=push(ref(db,"mockTests")).key;
+ await set(ref(db,"mockTests/"+id),{id,studentId:user.uid,studentName:profile?.name||user.displayName||user.email,score,answers:mockResults,completedAt:new Date().toISOString()});
+ toast(`Hoàn thành thi thử · ${score}/100`);go("sHistory");
 };
-async function finishMock(timeUp){
- clearInterval(mockTimerId);
- const valid=mockResults.filter(Boolean),avg=valid.length?Math.round(valid.reduce((a,b)=>a+b.overall,0)/valid.length):0;
- $("mockLiveScore").textContent=avg||"—";
- if(user&&valid.length){
-  let id=push(ref(db,"mockTests")).key;
-  await set(ref(db,"mockTests/"+id),{id,studentId:user.uid,student:user.displayName||user.email,score:avg,answers:mockResults,completedAt:new Date().toISOString(),timeUp});
-  await logStudentActivity("mock_test",{testId:id,score:avg,completedAt:new Date().toISOString()});
- }
- $("mockResult").classList.remove("hidden");$("mockResult").innerHTML=`<b>🏆 Kết thúc bài thi thử</b><div class="score">${avg}/100</div><div class="ai-note">${avg>=85?"Excellent! Em đang có phản xạ rất tốt.":avg>=70?"Good job! Tiếp tục luyện fluency và phát âm.":"Hãy luyện từng câu ngắn, nói chậm và rõ rồi thử lại."}</div>`;
- $("mockNext").disabled=true;
+
+function renderStudentAssignments(){$("assignmentList").innerHTML=studentAssignments().length?studentAssignments().map(assignmentCard).join(""):`<div class="card empty">Chưa có bài được giao.</div>`}
+function renderStudentHistory(){
+ const subs=Object.values(data.submissions).filter(s=>s.studentId===user?.uid).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||"")),mocks=Object.values(data.mockTests).filter(s=>s.studentId===user?.uid).sort((a,b)=>(b.completedAt||"").localeCompare(a.completedAt||""));
+ let html=[...subs.map(s=>`<div class="item"><div class="between"><div><b>🎤 ${esc(s.topic||"Speaking")}</b><div class="small muted">${esc(s.part||"")} · ${fmt(s.submittedAt)}</div></div><span class="badge ${s.status==="graded"?"ok":"wait"}">${s.status==="graded"?"Đã chấm":"Chờ cô chấm"}</span></div><div class="row" style="margin-top:9px"><span>Overall <b>${s.overall??"—"}</b></span><span>Fluency <b>${s.fluency??"—"}</b></span><span>Pronunciation <b>${s.pronunciation??"—"}</b></span></div>${s.teacherComment?`<div class="ai-note">💬 ${esc(s.teacherComment)}</div>`:""}</div>`),...mocks.map(s=>`<div class="item"><div class="between"><div><b>🏆 Mock Speaking Test</b><div class="small muted">${fmt(s.completedAt)}</div></div><span class="score" style="font-size:25px">${s.score}/100</span></div></div>`)].join("");
+ $("studentHistory").innerHTML=html||`<div class="card empty">Chưa có lịch sử.</div>`;
 }
-window.resetMock=()=>{mockIndex=0;mockResults=[];startMockTimer();renderMock()};
-async function logStudentActivity(type,details){if(!user)return;let id=push(ref(db,"studentActivity")).key;await set(ref(db,"studentActivity/"+id),{id,type,details,studentId:user.uid,at:new Date().toISOString()})}
-const oldPage=window.page;
-window.page=function(id,btn){oldPage(id,btn);if(id==="mockTest"){if(!mockTimerId)startMockTimer();renderMock()}};
+function renderProgress(){
+ const arr=Object.values(data.submissions).filter(s=>s.studentId===user?.uid&&s.overall!=null).sort((a,b)=>(a.submittedAt||"").localeCompare(b.submittedAt||"")).slice(-10);
+ $("progressChart").innerHTML=arr.length?arr.map((s,i)=>`<div title="${s.overall}" style="flex:1;display:flex;flex-direction:column;justify-content:end;align-items:center;height:100%"><span class="tiny muted">${s.overall}</span><div style="width:min(42px,80%);height:${Math.max(8,s.overall*1.7)}px;background:linear-gradient(#8b6cff,#ec79c9);border-radius:8px 8px 0 0"></div><span class="tiny muted" style="margin-top:5px">${i+1}</span></div>`).join(""):`<div class="empty" style="width:100%">Chưa đủ dữ liệu để tạo biểu đồ.</div>`;
+}
 
-loadQuestions();
-</script>'''
-# Replace final loadQuestions occurrence before closing script.
-html = html.replace(insert_marker, auto_js)
+function renderTeacherHome(){const students=Object.values(data.users).filter(x=>x.role==="student"),subs=Object.values(data.submissions),graded=subs.filter(x=>x.status==="graded");$("tStudents").textContent=students.length;$("tClasses").textContent=Object.keys(data.classes).length;$("tPending").textContent=subs.filter(x=>x.status!=="graded").length;$("tGraded").textContent=graded.length}
+function renderClasses(){$("classList").innerHTML=Object.values(data.classes).map(c=>{const n=Object.values(data.users).filter(u=>u.classId===c.id&&u.role==="student").length;return `<div class="card"><div class="between"><div><b>${esc(c.name)}</b><div class="small muted">${esc(c.desc||"")}</div></div><span class="pill">${esc(c.code||"")}</span></div><div class="small muted" style="margin-top:13px">${n} học sinh</div></div>`}).join("")||`<div class="card empty">Chưa có lớp.</div>`}
+window.openClassModal=()=>{$("classModal").classList.add("show")};window.openQuestionModal=()=>{$("questionModal").classList.add("show")};
+window.openAssignmentModal=()=>{fillAssignmentOptions();$("assignmentModal").classList.add("show")};window.closeModal=id=>$(id).classList.remove("show");
+window.createClass=async()=>{const id=push(ref(db,"classes")).key,name=$("className").value.trim(),desc=$("classDesc").value.trim();if(!name)return toast("Nhập tên lớp.");const code=(""+Math.random().toString(36).slice(2,7)).toUpperCase();await set(ref(db,"classes/"+id),{id,name,desc,code,createdAt:new Date().toISOString(),teacherId:user.uid});closeModal("classModal");toast("Đã tạo lớp.");$("className").value="";$("classDesc").value=""}
+window.createQuestion=async()=>{const id=push(ref(db,"questions")).key,q={id,part:$("qPart").value,topic:$("qTopic").value.trim(),q:$("qText").value.trim(),createdAt:new Date().toISOString(),teacherId:user.uid};if(!q.q)return toast("Nhập câu hỏi.");await set(ref(db,"questions/"+id),q);closeModal("questionModal");toast("Đã thêm câu hỏi.");$("qText").value=""}
+function fillAssignmentOptions(){$("aClass").innerHTML=Object.values(data.classes).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");$("aQuestion").innerHTML=Object.values(data.questions).map(q=>`<option value="${q.id}">${esc(q.part)} · ${esc(q.topic)} · ${esc(q.q)}</option>`).join("")}
+window.createAssignment=async()=>{const id=push(ref(db,"assignments")).key,a={id,title:$("aTitle").value.trim()||"Speaking Practice",classId:$("aClass").value,questionId:$("aQuestion").value,deadline:$("aDeadline").value,teacherId:user.uid,active:true,createdAt:new Date().toISOString()};if(!a.classId||!a.questionId)return toast("Hãy tạo lớp và câu hỏi trước.");await set(ref(db,"assignments/"+id),a);closeModal("assignmentModal");toast("Đã giao bài.")}
+function renderQuestions(){$("questionList").innerHTML=Object.values(data.questions).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(q=>`<div class="item"><div class="between"><div><span class="pill">${esc(q.part)}</span> <b>${esc(q.topic||"General")}</b><div style="margin-top:7px">${esc(q.q)}</div></div><button class="btn danger" onclick="deleteQuestion('${q.id}')">Xóa</button></div></div>`).join("")||`<div class="card empty">Chưa có câu hỏi.</div>`}
+window.deleteQuestion=async id=>{if(confirm("Xóa câu hỏi này?"))await remove(ref(db,"questions/"+id))}
+function renderTeacherAssignments(){$("teacherAssignmentList").innerHTML=Object.values(data.assignments).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(a=>{const c=data.classes[a.classId]||{},q=data.questions[a.questionId]||{};const count=Object.values(data.submissions).filter(s=>s.assignmentId===a.id).length;return `<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="small muted">${esc(c.name||"")} · ${esc(q.part||"")} · ${esc(q.topic||"")} · Hạn ${esc(a.deadline||"—")}</div></div><span class="badge">${count} bài nộp</span></div></div>`}).join("")||`<div class="card empty">Chưa có bài giao.</div>`}
+function renderSubmissions(){
+ const fc=$("filterClass").value,fa=$("filterAssignment").value,fs=$("filterStatus").value;
+ $("filterClass").innerHTML='<option value="">Tất cả lớp</option>'+Object.values(data.classes).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");$("filterClass").value=fc;
+ $("filterAssignment").innerHTML='<option value="">Tất cả bài</option>'+Object.values(data.assignments).map(a=>`<option value="${a.id}">${esc(a.title)}</option>`).join("");$("filterAssignment").value=fa;
+ let arr=Object.values(data.submissions).filter(s=>(!fs||s.status===fs)&&(!fa||s.assignmentId===fa)&&(!fc||data.assignments[s.assignmentId]?.classId===fc)).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
+ $("submissionList").innerHTML=arr.map(s=>`<div class="item"><div class="between"><div><b>${esc(s.studentName||"Học sinh")}</b><div class="small muted">${esc(s.topic||"Speaking")} · ${fmt(s.submittedAt)}</div></div><span class="badge ${s.status==="graded"?"ok":"wait"}">${s.status==="graded"?"Đã chấm":"Chờ chấm"}</span></div><div class="row" style="margin-top:10px"><span>Overall <b>${s.overall??"—"}</b></span><span>Fluency <b>${s.fluency??"—"}</b></span><span>Pronunciation <b>${s.pronunciation??"—"}</b></span><button class="btn secondary" onclick="listenAudio('${esc(s.audioUrl||"")}')">▶ Nghe bài</button><button class="btn primary" onclick="openGrade('${s.id}')">Chấm / sửa</button></div>${s.transcript?`<div class="small muted" style="margin-top:9px">📝 ${esc(s.transcript)}</div>`:""}</div>`).join("")||`<div class="card empty">Chưa có bài nộp.</div>`;
+}
+window.listenAudio=url=>{if(!url)return toast("Không có file ghi âm.");const a=new Audio(url);a.controls=true;a.volume=.9;const box=document.createElement("div");box.className="toast";box.innerHTML="▶ Đang mở audio";box.appendChild(a);document.body.appendChild(box);a.play();setTimeout(()=>box.remove(),15000)}
+window.openGrade=id=>{const s=data.submissions[id];if(!s)return;$("gradeId").value=id;$("gradeOverall").value=s.overall??"";$("gradeFluency").value=s.fluency??"";$("gradePron").value=s.pronunciation??"";$("gradeComment").value=s.teacherComment||s.autoComment||"";$("gradeContent").innerHTML=`<div class="item"><b>${esc(s.studentName)}</b><div class="small muted">${esc(s.question||"")} · ${fmt(s.submittedAt)}</div><div class="ai-note" style="margin-top:9px">AI feedback: ${esc(s.autoComment||"Chưa có")}</div></div>`;$("gradeModal").classList.add("show")}
+window.saveGrade=async()=>{const id=$("gradeId").value,s=data.submissions[id];if(!s)return;const overall=Math.max(0,Math.min(100,+$("gradeOverall").value||0)),fluency=Math.max(0,Math.min(100,+$("gradeFluency").value||0)),pronunciation=Math.max(0,Math.min(100,+$("gradePron").value||0)),teacherComment=$("gradeComment").value.trim();await update(ref(db,"submissions/"+id),{overall,fluency,pronunciation,teacherComment,status:"graded",gradedAt:new Date().toISOString(),gradedBy:user.uid});closeModal("gradeModal");toast("Đã lưu điểm và nhận xét.")}
+function renderTeacherHistory(){
+ const q=($("historySearch").value||"").toLowerCase(),from=$("historyFrom").value,to=$("historyTo").value;
+ let arr=Object.values(data.submissions).filter(s=>{const text=((s.studentName||"")+" "+(s.topic||"")+" "+(s.question||"")).toLowerCase(),d=(s.submittedAt||"").slice(0,10);return (!q||text.includes(q))&&(!from||d>=from)&&(!to||d<=to)}).sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
+ $("teacherHistory").innerHTML=arr.map(s=>`<div class="item"><div class="between"><div><b>${esc(s.studentName)}</b> · ${esc(s.topic||"Speaking")}<div class="small muted">${fmt(s.submittedAt)}</div></div><b>${s.overall??"—"}/100</b></div><div class="small muted" style="margin-top:7px">${esc(s.teacherComment||s.autoComment||"Chưa có nhận xét")}</div></div>`).join("")||`<div class="card empty">Không tìm thấy lịch sử.</div>`;
+}
+</script>
+</body>
+</html>'''
 
-# 6) README companion
-readme_path = Path("/mnt/data/README.md")
-readme = readme_path.read_text(encoding="utf-8")
-readme += r'''
+readme = r'''# 💜 MS HÂN CLASS — Speaking Practice Room V3
 
-## 🤖 V1.5/V2 – Tự động chấm Speaking
+Web luyện Speaking cho học sinh: luyện phản xạ, ghi âm, transcript, feedback tự động, nộp bài, chấm/sửa điểm, giao bài, quản lý lớp và lịch sử.
 
-Website có thêm chế độ chấm luyện tập ngay sau khi học sinh dừng ghi âm:
+## 1. Công nghệ
+- HTML/CSS/JavaScript
+- Firebase Authentication
+- Firebase Realtime Database
+- Firebase Storage
+- Web Speech API / Speech Recognition của trình duyệt
 
-- Speech-to-Text bằng Web Speech API của trình duyệt.
-- Ước lượng Fluency.
-- Ước lượng Pronunciation.
-- Kiểm tra mức độ đáp ứng câu hỏi.
-- Đếm số từ và tốc độ nói.
-- Tạo nhận xét tự động.
-- Lưu kết quả thi thử vào Realtime Database.
+## 2. Firebase project
+Project: `speaking-practice-room`
 
-> Lưu ý: điểm Pronunciation trong phiên bản này là **điểm luyện tập ước lượng**, chưa phải chấm phát âm âm vị chuyên sâu. Muốn chấm từng âm /s/, /ʃ/, /θ/, trọng âm, intonation... cần tích hợp một speech/AI scoring API chuyên dụng.
+Config đã được chèn trong `index.html`.
 
-## 🏆 Thi thử Speaking
+## 3. Tài khoản giáo viên
+Tài khoản mặc định trong giao diện:
+- Email: `teacher@mshanhclass.com`
+- Password: `hanna126`
 
-Học sinh có menu **Thi thử Speaking** với:
-- Part 1 – Personal information
-- Part 2 – Topic
-- Part 3 – Follow-up
-- Đồng hồ đếm ngược
-- Ghi âm từng câu
-- Chấm tự động sau mỗi câu
-- Điểm tổng cuối bài
-- Lưu lịch sử bài thi
+**Quan trọng:** Firebase Authentication vẫn cần có user này. Vào Firebase Console → Authentication → Users → Add user và tạo đúng email/password trên.
 
-Có thể thay toàn bộ bộ câu hỏi mẫu bằng đề Cambridge/Flyers hoặc format riêng của Ms Hân.
-'''
-readme_path.write_text(readme, encoding="utf-8")
+Không nên giữ mật khẩu cố định trong mã nguồn nếu website được dùng ở quy mô lớn. Khi đưa vào sử dụng thật, nên đổi sang tài khoản giáo viên riêng và dùng Firebase Security Rules.
 
-path.write_text(html, encoding="utf-8")
-print("Đã cập nhật /mnt/data/index.html và /mnt/data/README.md thành bản V2 với tự động chấm luyện tập + thi thử Speaking.")
+## 4. Học sinh
+Học sinh có thể:
+- Đăng ký / đăng nhập
+- Xem bài được giao
+- Ghi âm câu trả lời
+- Nhận transcript
+- Nhận điểm luyện tập tự động
+- Xem feedback tự động
+- Nộp audio
+- Xem lịch sử
+- Làm Mock Speaking Test
+- Xem biểu đồ tiến bộ
+
+## 5. Giáo viên
+Giáo viên có:
+- Dashboard
+- Quản lý lớp
+- Ngân hàng câu hỏi
+- Giao bài theo lớp
+- Theo dõi bài đã nộp
+- Nghe audio
+- Chấm/sửa Overall, Fluency, Pronunciation
+- Viết nhận xét
+- Lịch sử theo từ khóa/ngày
+
+## 6. Tự động chấm
+V3 tạo feedback luyện tập dựa trên:
+- transcript
+- số từ
+- tốc độ nói
+- filler words
+- mức độ khớp với câu hỏi
+
+**Lưu ý:** Pronunciation trong V3 là điểm luyện tập ước lượng, chưa phải AI chấm âm vị chuyên sâu. Nếu muốn chấm từng âm, trọng âm, intonation và lỗi phát âm cụ thể, V4 nên tích hợp speech-scoring API chuyên dụng.
+
+## 7. Thi thử
+Mock Test gồm:
+- Part 1 — Personal information
+- Part 2 — Topic
+- Part 3 — Follow-up
+
+Kết quả tổng được lưu vào `mockTests`.
+
+## 8. Deploy GitHub → Vercel
+Repository tối thiểu:
+```text
+Speaking-Practice-Web/
+├── index.html
+└── README.md
