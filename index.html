@@ -116,13 +116,69 @@ window.openAssignmentForm=openAssignmentForm;window.editAssignment=id=>openAssig
 async function saveAssignment(id){const title=$('afTitle').value.trim(),classId=$('afClass').value,ids=[...document.querySelectorAll('.pickQ:checked')].map(x=>x.value);if(!title||!classId||!ids.length)return toast('Chọn lớp, tên bài và ít nhất một câu.','err');try{const obj={...(id?state.assignments[id]:{}),title,classId,questionIds:ids,dueAt:$('afDeadline').value?new Date($('afDeadline').value).toISOString():null,createdAt:id?(state.assignments[id].createdAt||Date.now()):Date.now(),active:true};await write('assignments/'+(id||key()),obj);toast('Đã giao bài cho '+(state.classes[classId]?.name||'lớp'));closeModal('modal');refreshTeacher()}catch(e){toast('Không thể giao bài: '+e.message,'err')}}
 async function deleteAssignment(id){if(!confirm('Xóa bài giao?'))return;await db.ref('assignments/'+id).remove();toast('Đã xóa bài giao');refreshTeacher()}
 function renderAssignments(){const arr=Object.entries(state.assignments);$('assignmentsArea').innerHTML=arr.length?'<div class="list">'+arr.map(([id,a])=>`<div class="item"><div class="between"><div><b>${esc(a.title)}</b><div class="muted">${esc(state.classes[a.classId]?.name||a.classId||'')} · ${(a.questionIds||[]).length} câu · Hạn ${a.dueAt?fmt(a.dueAt):'—'}</div></div><div class="actions"><button class="btn small" onclick="editAssignment('${id}')">Sửa</button><button class="btn danger small" onclick="deleteAssignment('${id}')">Xóa</button></div></div></div>`).join('')+'</div>':'<div class="empty">Chưa có bài giao.</div>'}
-function renderSubmissions(){const fc=$('subClassFilter').value,fa=$('subAssignFilter').value,fs=$('subStatusFilter').value;const arr=Object.entries(state.submissions).filter(([id,s])=>(!fc||s.classId===fc)&&(!fa||s.assignmentId===fa)&&(!fs||s.status===fs)).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));$('submissionsArea').innerHTML=arr.length?'<div class="table-wrap"><table class="table"><thead><tr><th>Học sinh</th><th>Bài</th><th>AI</th><th>Cô</th><th>Thời gian</th><th></th></tr></thead><tbody>'+arr.map(([id,s])=>`<tr><td><b>${esc(s.studentName||s.studentCode)}</b><br><span class="muted">${esc(state.classes[s.classId]?.name||'')}</span></td><td>${esc(s.taskTitle||s.assignmentId)}</td><td>${esc(s.score??'—')}</td><td>${esc(s.teacherScore??'—')}</td><td>${fmt(s.createdAt)}</td><td><div class="actions"><button class="btn small" onclick="reviewSubmission('${id}')">Xem / chấm</button></div></td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Chưa có bài phù hợp.</div>'}
-function reviewSubmission(id){const s=state.submissions[id]||{};$('modalBox').innerHTML=`<div class="modalhead"><h3>🎤 ${esc(s.studentName||'Học sinh')}</h3><button class="close" onclick="closeModal('modal')">×</button></div><div class="item"><b>${esc(s.taskTitle||'Speaking')}</b><p class="muted">${esc(s.question||'')}</p>${s.audioUrl?`<audio controls style="width:100%" src="${esc(s.audioUrl)}"></audio>`:''}<div class="notice" style="margin-top:10px">AI estimate: ${esc(s.score??'—')}/15 · Đúng chủ đề ${esc(s.topic??s.language??'—')}/5 · Độ trôi chảy ${esc(s.fluency??s.interaction??'—')}/5 · Phát âm ${esc(s.pronunciation??'—')}/5</div><p class="muted">${esc(s.aiComment||'')}</p></div><div class="score-grid"><div class="score-box">Overall / 15<input id="gs" class="input" value="${esc(s.teacherScore??s.score??'')}" type="number" step="1" min="0" max="15"></div><div class="score-box">Đúng chủ đề<input id="gl" class="input" value="${esc(s.teacherTopic??s.topic??s.language??'')}" type="number" min="0" max="5"></div><div class="score-box">Pronunciation<input id="gp" class="input" value="${esc(s.teacherPronunciation??s.pronunciation??'')}" type="number" min="0" max="5"></div><div class="score-box">Độ trôi chảy<input id="gi" class="input" value="${esc(s.teacherFluency??s.fluency??s.interaction??'')}" type="number" min="0" max="5"></div></div><div class="field"><label>💬 Nhận xét cô Hân dành cho bé</label><textarea id="gc" class="textarea">${esc(s.teacherComment||s.aiComment||'')}</textarea></div><button class="btn primary" style="width:100%" onclick="saveReview('${id}')">LƯU ĐIỂM & NHẬN XÉT</button>`;openModal('modal')}
+
+function renderSubmissions(){
+  const fc=$('subClassFilter').value,fa=$('subAssignFilter').value,fs=$('subStatusFilter').value;
+  const arr=Object.entries(state.submissions)
+    .filter(([id,s])=>(!fc||s.classId===fc)&&(!fa||s.assignmentId===fa)&&(!fs||s.status===fs))
+    .sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+
+  $('submissionsArea').innerHTML=arr.length
+    ? '<div class="table-wrap"><table class="table"><thead><tr><th>Học sinh</th><th>Bài</th><th>Audio</th><th>AI</th><th>Cô</th><th>Thời gian</th><th></th></tr></thead><tbody>'
+    +arr.map(([id,s])=>{
+      const audio=s.audioUrl
+        ? `<audio controls preload="metadata" style="width:190px;max-width:100%" src="${esc(s.audioUrl)}"></audio>`
+        : `<span class="muted">⚠️ Chưa có audio</span>`;
+      return `<tr>
+        <td><b>${esc(s.studentName||s.studentCode)}</b><br><span class="muted">${esc(state.classes[s.classId]?.name||'')}</span></td>
+        <td>${esc(s.taskTitle||s.assignmentId)}</td>
+        <td>${audio}</td>
+        <td>${esc(s.score??'—')}</td>
+        <td>${esc(s.teacherScore??'—')}</td>
+        <td>${fmt(s.createdAt)}</td>
+        <td><div class="actions"><button class="btn small" type="button" onclick="reviewSubmission('${id}')">🎧 Xem / chấm</button></div></td>
+      </tr>`;
+    }).join('')
+    +'</tbody></table></div>'
+    : '<div class="empty">Chưa có bài phù hợp.</div>';
+}
+
+function reviewSubmission(id){
+  const s=state.submissions[id]||{};
+  const audioBlock=s.audioUrl
+    ? `<div style="margin-top:10px"><div class="muted small" style="margin-bottom:6px">🎧 Audio bé đã nộp</div><audio controls preload="metadata" style="width:100%" src="${esc(s.audioUrl)}"></audio></div>`
+    : `<div class="notice" style="margin-top:10px;border-color:#7a5b2a;color:#ffdca0">⚠️ Bài này chưa có audio được lưu. Cô chưa nên chấm phát âm dựa trên bài nghe.</div>`;
+
+  $('modalBox').innerHTML=`<div class="modalhead"><h3>🎤 ${esc(s.studentName||'Học sinh')}</h3><button class="close" onclick="closeModal('modal')">×</button></div>
+  <div class="item">
+    <b>${esc(s.taskTitle||'Speaking')}</b>
+    <p class="muted">${esc(s.question||'')}</p>
+    ${audioBlock}
+    <div class="notice" style="margin-top:10px">Điểm tham khảo: ${esc(s.score??'—')}/15 · Đúng chủ đề ${esc(s.topic??s.language??'—')}/5 · Độ trôi chảy ${esc(s.fluency??s.interaction??'—')}/5 · Phát âm ${esc(s.pronunciation??'—')}/5</div>
+    <p class="muted" style="line-height:1.55">${esc(s.aiComment||'')}</p>
+  </div>
+  <div class="score-grid">
+    <div class="score-box">Overall / 15<input id="gs" class="input" value="${esc(s.teacherScore??s.score??'')}" type="number" step="1" min="0" max="15"></div>
+    <div class="score-box">Đúng chủ đề<input id="gl" class="input" value="${esc(s.teacherTopic??s.topic??s.language??'')}" type="number" min="0" max="5"></div>
+    <div class="score-box">Độ trôi chảy<input id="gi" class="input" value="${esc(s.teacherFluency??s.fluency??s.interaction??'')}" type="number" min="0" max="5"></div>
+    <div class="score-box">Phát âm<input id="gp" class="input" value="${esc(s.teacherPronunciation??s.pronunciation??'')}" type="number" min="0" max="5"></div>
+  </div>
+  <div class="field"><label>💬 Nhận xét cô Hân dành cho bé</label><textarea id="gc" class="textarea" rows="4" placeholder="Ví dụ: Bé trả lời đúng chủ đề, nói khá rõ. Con chú ý nói chậm hơn ở từ ... nhé.">${esc(s.teacherComment||'')}</textarea></div>
+  <button class="btn primary" style="width:100%" type="button" onclick="saveReview('${id}')">LƯU ĐIỂM & NHẬN XÉT</button>`;
+  openModal('modal');
+}
+
 async function saveReview(id){
   const topic=Number($('gl').value)||0, fluency=Number($('gi').value)||0, pronunciation=Number($('gp').value)||0;
-  const teacherScore=Math.max(0,Math.min(15,topic+fluency+pronunciation));
+  const typedOverall=$('gs').value.trim();
+  const teacherScore=typedOverall===''?topic+fluency+pronunciation:Math.max(0,Math.min(15,Number(typedOverall)||0));
+  if(topic>5||fluency>5||pronunciation>5)return toast('Mỗi tiêu chí chỉ từ 0 đến 5 điểm.','err');
+  if(teacherScore!==topic+fluency+pronunciation){
+    toast('Tổng điểm đã được đưa về đúng tổng 3 tiêu chí.','info');
+  }
+  const fixedTotal=topic+fluency+pronunciation;
   const obj={
-    teacherScore,
+    teacherScore:fixedTotal,
     teacherTopic:topic,
     teacherFluency:fluency,
     teacherPronunciation:pronunciation,
@@ -343,26 +399,63 @@ function getSuggestedAnswer(q){
   ];
 }
 
-function buildBetterAnswer(q,r){
-  const text=String(q?.text||'').toLowerCase();
-  const topic=q?.topic||'this topic';
-  if(/difference/.test(text)) return 'In the first picture, I can see …, but in the second picture, …. Another difference is ….';
-  if(/story|continue/.test(text)) return 'First, … Then, … After that, … Finally, ….';
-  if(/why/.test(text)) return 'I think … because …. For example, ….';
-  if(/what .* like|favourite|favorite/.test(text)) return 'My favourite … is …. I like it because ….';
-  if((r?.topic||0)<4) return `Trả lời đúng câu hỏi trước, rồi thêm một chi tiết nhỏ.`;
-  if((r?.fluency||0)<4) return 'Try 2–3 short sentences instead of one long sentence. Speak → pause → continue.';
-  if((r?.pronunciation||0)<4) return 'Use familiar words that you can pronounce clearly, and slow down on difficult words.';
-  return 'Answer the question directly, then add one reason, example, or personal detail.';
-}
 
+function buildBetterAnswer(q,r){
+  const qObj=q||{};
+  const qText=String(qObj.text||'').trim();
+  const topic=String(qObj.topic||'').toLowerCase();
+  const level=String(qObj.level||'').toLowerCase();
+  const t=qText.toLowerCase();
+
+  // Câu trả lời thay thế phải là một câu trả lời cụ thể cho đúng câu hỏi.
+  if(/family|my family|tell me about your family/.test(topic+' '+t)){
+    return 'There are four people in my family. My mum, my dad, my brother and me. We love spending time together.';
+  }
+  if(/school|favourite subject|favorite subject/.test(topic+' '+t)){
+    return 'My favourite subject is English. I like it because it is fun, and I enjoy speaking with my friends.';
+  }
+  if(/usually do after school|daily routine/.test(t+' '+topic)){
+    return 'After school, I usually go home, have a snack and do my homework. Then I play with my friends.';
+  }
+  if(/best friend|friends?/.test(topic+' '+t)){
+    return 'My best friend is Anna. She is kind and funny, and we often play together after school.';
+  }
+  if(/weekend|past activities|last weekend/.test(topic+' '+t)){
+    return 'Last weekend, I went to the park with my family. We played games, had lunch and had a great time.';
+  }
+  if(/future|in the future|would you like to be/.test(topic+' '+t)){
+    return 'In the future, I would like to be a doctor because I want to help people.';
+  }
+  if(/food|what food do you like|favourite food|favorite food/.test(topic+' '+t)){
+    return 'I like pizza because it is delicious. I usually eat it with my family.';
+  }
+  if(/favourite place|favorite place|place/.test(topic+' '+t)){
+    return 'My favourite place is the park. I go there with my family and I like playing outside.';
+  }
+  if(/why/.test(t)){
+    return 'I think … because …. For example, ….';
+  }
+  if(/difference/.test(t)){
+    return 'In picture one, I can see …, but in picture two, …. Another difference is ….';
+  }
+  if(/story|continue/.test(t)){
+    return 'First, …. Then, …. After that, …. Finally, ….';
+  }
+  if(/how many/.test(t)){
+    return 'There are … .';
+  }
+
+  // Fallback: give a useful sentence frame with the actual topic.
+  const niceTopic=qObj.topic||'this topic';
+  return `Start with one clear sentence about ${niceTopic}, then add one simple detail or reason.`;
+}
 function toggleSuggestedAnswer(){
   const panel=$('betterAnswerPanel') || $('suggestionPanel');
   if(!panel)return;
   const q=currentSpokenQuestion(), r=practiceTask?.lastScore||{};
   panel.classList.toggle('show');
-  panel.innerHTML=`<h4>💡 Cách trả lời tốt hơn</h4>
-  <div class="muted small">Đây là mẫu tham khảo để bé học cách mở rộng câu trả lời, không phải đáp án bắt buộc.</div>
+  panel.innerHTML=`<h4>💡 Một cách trả lời khác</h4>
+  <div class="muted small">Đây là một mẫu trả lời khác cho chính câu hỏi này. Bé có thể nói theo ý của mình, không cần học thuộc.</div>
   <div style="margin-top:9px;padding:10px 12px;border:1px solid #4a3b82;border-radius:10px;background:#0b1027;line-height:1.55">${esc(buildBetterAnswer(q,r))}</div>`;
 }
 function resetStudentRecording(){
@@ -593,45 +686,100 @@ function pauseStats(text,duration){
   return {fillers,repeats,pace};
 }
 
+
+function topicKeywords(q){
+  const topic=String(q?.topic||'').toLowerCase();
+  const text=String(q?.text||'').toLowerCase();
+  const map={
+    family:['family','mother','mum','mom','father','dad','brother','sister','parents','grandma','grandfather','home'],
+    'my family':['family','mother','mum','mom','father','dad','brother','sister','parents','grandma','grandfather','home'],
+    school:['school','teacher','class','classroom','subject','lesson','student','friend','homework','book','bus'],
+    'daily routines':['wake','morning','school','homework','play','eat','dinner','sleep','bed','usually','get up','go to school'],
+    people:['boy','girl','man','woman','friend','person','people','family','brother','sister'],
+    'free time':['play','football','game','watch','read','music','weekend','swim','ride','hobby'],
+    'past activities':['yesterday','last','weekend','went','did','played','visited','watched','ate','saw'],
+    future:['future','want','will','going','dream','job','become','would like'],
+    food:['food','eat','like','favourite','favorite','pizza','rice','fruit','drink','meal'],
+    places:['place','park','school','home','shop','beach','city','town','restaurant'],
+    animals:['animal','dog','cat','bird','fish','horse','zoo','pet'],
+    friends:['friend','best friend','play','together','boy','girl'],
+    birthday:['birthday','party','present','cake','candles','age'],
+    holidays:['holiday','vacation','travel','trip','visit','beach','mountain'],
+    hobbies:['hobby','play','read','draw','sing','dance','swim','football','music']
+  };
+  const bag=new Set();
+  Object.keys(map).forEach(k=>{if(topic.includes(k)||text.includes(k))map[k].forEach(x=>bag.add(x))});
+  return [...bag];
+}
+
+function pauseStats(text,duration){
+  const fillers=(text.match(/\b(um|uh|er|hmm|you know|like)\b/gi)||[]).length;
+  const repeats=(text.match(/\b([A-Za-z']+)(?:\s+\1\b)+/gi)||[]).length;
+  const pace=duration?wordTokens(text).length/(duration/60):0;
+  return {fillers,repeats,pace};
+}
+
 function autoScore(text,duration,analysis,q){
   const a=analyzeTranscript(text), n=a.count, lower=text.toLowerCase().trim();
   const stats=pauseStats(text,duration);
-  const keys=topicKeywords(q);
+  const qObj=q||{};
+  const keys=topicKeywords(qObj);
 
-  // Không đủ câu trả lời: không được "ăn điểm" chỉ vì nói được một từ.
+  // A one-word greeting/acknowledgement is not a task response.
   const genericShort=/^(hello|hi|hey|ok|okay|yes|no|bye|thanks|thank you)$/i.test(lower);
-  const insufficient=n===0 || (n<=2 && genericShort);
-  if(insufficient){
+  if(n===0 || (n<=2 && genericShort)){
     return {
       overall:1, topic:0, fluency:0, pronunciation:1,
       volume:analysis?.volume||0, pace:Math.round(stats.pace||0),
-      comment:'Bé đã bật micro và nói được một chút, nhưng câu trả lời chưa đủ để đánh giá nội dung của bài. Bé hãy trả lời đúng câu hỏi trước nhé.',
+      comment:'Bé đã ghi âm nhưng câu trả lời chưa đủ để thực hiện nhiệm vụ. Mình thử trả lời đúng câu hỏi nhé.',
       words:n,fillers:stats.fillers,repeats:stats.repeats,errors:a.errors,
-      confidence:Math.round((recognitionConfidence.map(x=>Number(x.confidence)||0).filter(Boolean).reduce((s,x)=>s+x,0)/(recognitionConfidence.map(x=>Number(x.confidence)||0).filter(Boolean).length||1))*100),
-      topicComment:'Chưa đủ nội dung để đánh giá đúng chủ đề.',
+      confidence:0,topicComment:'Chưa đủ nội dung để đánh giá chủ đề.',
       fluencyComment:'Chưa đủ lời nói để đánh giá độ trôi chảy.',
-      pronComment:'Có tín hiệu giọng nói nhưng chưa đủ bằng chứng để đánh giá phát âm chắc chắn.'
+      pronComment:'Chưa đủ dữ liệu để đánh giá phát âm chắc chắn.'
     };
   }
 
   const hits=keys.filter(k=>lower.includes(k.toLowerCase())).length;
-  const topicEvidence=keys.length?hits:0;
+  const qText=String(qObj.text||'').toLowerCase();
 
-  // Bé nhỏ có thể trả lời ngắn. Đúng chủ đề thì 4–5 điểm, không cần nói dài.
+  // Topic scoring is the most important gate: answering a different topic
+  // should not receive a high overall score even when speech sounds smooth.
   let topicScore=5;
-  const clearlyOffTopic=keys.length && topicEvidence===0;
-  if(clearlyOffTopic) topicScore=2;
-  else if(n<=2) topicScore=4;
-  if(/\bwhy\b/.test(String(q?.text||'').toLowerCase()) && /\bbecause\b/.test(lower)) topicScore=5;
+  let offTopic=false;
 
-  // Trôi chảy: chỉ trừ khi lặp/ngập ngừng thấy rõ.
+  if(keys.length){
+    if(hits===0){
+      offTopic=true;
+      topicScore = n>=5 ? 1 : 2;
+    } else if(hits===1){
+      topicScore=4;
+    } else {
+      topicScore=5;
+    }
+  } else {
+    // When the question is free-form and has no known topic map,
+    // give a neutral score rather than falsely claiming a match.
+    topicScore=4;
+  }
+
+  // Task-specific evidence can help, but never replaces the actual topic match.
+  if(/\bwhy\b/.test(qText) && /\bbecause\b/.test(lower) && !offTopic) topicScore=5;
+  if(/difference/.test(qText) && /\b(but|whereas|while|different)\b/.test(lower) && !offTopic) topicScore=Math.min(5,topicScore+0);
+  if(/story|continue/.test(qText) && /\b(first|then|next|after|finally)\b/.test(lower) && !offTopic) topicScore=5;
+
+  // Gentle fluency scoring: normal child hesitation is okay.
   let fluencyScore=5;
   const roughness=stats.repeats*2+stats.fillers;
   if(roughness>=6) fluencyScore=3;
   else if(roughness>=3) fluencyScore=4;
   if(stats.pace>0 && (stats.pace<18 || stats.pace>200)) fluencyScore=Math.max(3,fluencyScore-1);
+  if(n<5) fluencyScore=Math.min(fluencyScore,4);
+  // Off-topic but fluent speech can still receive credit for fluency,
+  // but not a perfect score when the sample is short.
+  if(offTopic) fluencyScore=Math.min(fluencyScore,4);
 
-  // Phát âm: dùng confidence chỉ như tín hiệu hỗ trợ, không lấy âm lượng để suy ra phát âm.
+  // Pronunciation uses recognition confidence only as supporting evidence.
+  // It is intentionally conservative on very short samples.
   const confs=recognitionConfidence.map(x=>Number(x.confidence)||0).filter(x=>x>0);
   const confAvg=confs.length?confs.reduce((s,x)=>s+x,0)/confs.length:0.72;
   const lowCount=recognitionConfidence.filter(x=>Number(x.confidence)>0&&Number(x.confidence)<0.45).length;
@@ -639,15 +787,19 @@ function autoScore(text,duration,analysis,q){
   if(confAvg<0.48 || lowCount>=3) pronunciationScore=3;
   else if(confAvg<0.58 || lowCount>=1) pronunciationScore=4;
   if(Number(analysis?.volume||60)<32) pronunciationScore=Math.min(pronunciationScore,3);
+  if(n<5) pronunciationScore=Math.min(pronunciationScore,4);
 
-  const overall=topicScore+fluencyScore+pronunciationScore;
+  let overall=topicScore+fluencyScore+pronunciationScore;
+  // A clearly off-topic response should not look like a near-perfect result.
+  if(offTopic) overall=Math.min(overall,9);
 
   const topicComment=topicScore>=5?'Bé trả lời đúng chủ đề và đáp ứng câu hỏi.'
-    :topicScore===4?'Bé trả lời đúng chủ đề; câu ngắn như vậy là hoàn toàn ổn.'
-    :'Bé cần tập trung trả lời đúng câu hỏi/chủ đề hơn một chút.';
+    :topicScore===4?'Bé trả lời đúng hướng của chủ đề; như vậy là tốt rồi.'
+    :topicScore===2?'Bé nói được nhưng nội dung chưa bám sát chủ đề của câu hỏi.'
+    :'Bé đang trả lời sang chủ đề khác. Mình đọc kỹ câu hỏi rồi nói lại nhé.';
 
   const fluencyComment=fluencyScore>=5?'Bé nói khá tự nhiên và trôi chảy.'
-    :fluencyScore===4?'Bé nói khá ổn; chỉ cần giảm một vài chỗ lặp hoặc ngập ngừng.'
+    :fluencyScore===4?'Bé nói khá ổn; chỉ cần giảm nhẹ một vài chỗ lặp hoặc ngập ngừng.'
     :'Bé còn ngập ngừng/lặp từ khá nhiều; mình thử nói từng câu ngắn nhé.';
 
   const pronComment=pronunciationScore>=5?'Phát âm nhìn chung rõ và dễ nhận diện.'
@@ -690,7 +842,7 @@ function renderStudentResult(){
   const plan=improvementPlan(r);
   el.innerHTML=`<h3 style="margin-top:0">🤖 Kết quả luyện tập</h3>
   <div class="score-total">${r.overall}/15</div>
-  <div class="score-note">3 tiêu chí phù hợp với bài nói của bé · mỗi tiêu chí tối đa 5 điểm</div>
+  <div class="score-note">Đánh giá bé theo 3 điều: đúng chủ đề · trôi chảy · phát âm · mỗi tiêu chí tối đa 5 điểm</div>
   <div class="rubric-grid">
     <div class="rubric-box"><b>${r.topic}/5</b><span>🎯 Đúng chủ đề</span></div>
     <div class="rubric-box"><b>${r.fluency}/5</b><span>🌿 Độ trôi chảy</span></div>
@@ -701,7 +853,7 @@ function renderStudentResult(){
     <div class="script-text">${flagTranscriptHTML(transcript||'Chưa nhận diện được lời nói.',r)}</div>
     ${errs.length?`<div class="error-list">${errs.map(e=>`<button class="error-chip" type="button" onclick="editTranscriptWord(${Math.max(0,wordTokens(transcript).findIndex(w=>w.toLowerCase()===e.word.toLowerCase()))})">${esc(e.word)} · ${esc(e.reason)}</button>`).join('')}</div>`:''}
     ${Object.keys(practiceTask.wordFixes||{}).length?`<div class="corrected-line"><b>✅ Bản đã sửa:</b> ${esc(correctedTranscript())}</div>`:''}
-    <div class="script-actions"><span class="muted small">🔴 Đỏ = từ đệm/lặp · 🟠 Cam = từ nhận diện chưa chắc · bấm từ để sửa.</span></div>
+    <div class="script-actions"><span class="muted small">🔴 Đỏ = từ đệm/lặp · 🟠 Cam = từ nhận diện chưa chắc · bấm từ để sửa. Không trừ điểm chỉ vì bé nói ngắn.</span></div>
   </div>
   <div class="feedback" style="margin-top:10px"><b>💬 Nhận xét theo chính bài nói:</b><br>${esc(r.comment)}</div>
   <div class="feedback" style="margin-top:10px"><b>🌟 Gợi ý nhỏ cho lần sau:</b><ul style="margin:7px 0 0 18px;padding:0">${plan.map(x=>`<li style="margin:5px 0;line-height:1.45">${esc(x)}</li>`).join('')}</ul></div>
@@ -715,7 +867,7 @@ function renderStudentResult(){
 }
 function finishStudentRecord(){const blob=new Blob(chunks,{type:'audio/webm'});currentRecord=blob;
  $('studentAudio').src=URL.createObjectURL(blob);$('studentAudio').style.display='block';$('recordBtn').textContent='🎙️';$('stopBtn').disabled=true;$('recState').className='record-status success';$('recState').textContent='✅ Ghi âm thành công. Đang phân tích…';$('rerecordBtn')?.classList.remove('hidden');
- analyseBlob(blob).then(a=>{const q=practiceTask.mockQuestions?practiceTask.mockQuestions[practiceTask.index]:(state.questions[practiceTask.questionIds[practiceTask.index]]||{});const r=autoScore(transcript,Math.max(1,(Date.now()-recordStart)/1000),a,q.text||'');practiceTask.lastScore=r;practiceTask.wordFixes=practiceTask.wordFixes||{};renderStudentResult();$('submitSpeaking').disabled=false;$('recState').className='record-status success';$('recState').textContent='✅ Phân tích xong. Bạn có thể nộp. Bé có thể ghi âm lại nếu muốn.';if($('submitSpeaking'))$('submitSpeaking').textContent=practiceTask?.isMock?'✅ LƯU CÂU & TIẾP TỤC':'📤 LƯU & NỘP'});}
+ analyseBlob(blob).then(a=>{const q=practiceTask.mockQuestions?practiceTask.mockQuestions[practiceTask.index]:(state.questions[practiceTask.questionIds[practiceTask.index]]||{});const r=autoScore(transcript,Math.max(1,(Date.now()-recordStart)/1000),a,q);practiceTask.lastScore=r;practiceTask.wordFixes=practiceTask.wordFixes||{};renderStudentResult();$('submitSpeaking').disabled=false;$('recState').className='record-status success';$('recState').textContent='✅ Phân tích xong. Bạn có thể nộp. Bé có thể ghi âm lại nếu muốn.';if($('submitSpeaking'))$('submitSpeaking').textContent=practiceTask?.isMock?'✅ LƯU CÂU & TIẾP TỤC':'📤 LƯU & NỘP'});}
 async function submitPracticeRecording(){if(!currentRecord||!practiceTask?.lastScore)return;const q=practiceTask.mockQuestions? (practiceTask.mockQuestions[practiceTask.index]||{}):(state.questions[practiceTask.questionIds[practiceTask.index]]||{});let audioUrl='';try{const name=`audio/${currentStudent.uid}/${Date.now()}.webm`,snap=await storage.ref(name).put(currentRecord,{contentType:'audio/webm'});audioUrl=await snap.ref.getDownloadURL()}catch(e){toast('Không tải được audio lên Storage, bài vẫn sẽ lưu điểm.','info')}const id=key(),r=practiceTask.lastScore,a=practiceTask;const obj={studentId:currentStudent.uid,studentCode:currentStudent.studentCode,studentName:currentStudent.name,classId:currentStudent.classId,assignmentId:a.id||'',taskTitle:a.title||'Practice',question:q.text,level:q.level,part:q.part,topic:q.topic,audioUrl,transcript,score:r.overall,topic:r.topic,fluency:r.fluency,pronunciation:r.pronunciation,language:r.topic,interaction:r.fluency,teacherScore:null,aiComment:r.comment,transcriptOriginal:transcript,transcriptCorrected:correctedTranscript(),wordFixes:practiceTask.wordFixes||{},status:'pending',createdAt:Date.now()};try{await db.ref('submissions/'+id).set(obj);await db.ref('history/'+key()).set({...obj,action:'Học sinh nộp bài',time:Date.now(),timeDate:new Date().toISOString().slice(0,10)});toast('Đã nộp bài thành công!');$('submitSpeaking').disabled=true;$('nextSpeaking').classList.remove('hidden');if(practiceTask.index===practiceTask.questionIds.length-1){setTimeout(()=>showCelebrate(obj.score,0,'Hoàn thành bài luyện!'),450)}}catch(e){toast('Không thể lưu bài: '+e.message,'err'); throw e }}
 function nextPracticeQuestion(){if(practiceTask.index<practiceTask.questionIds.length-1)renderPracticeQuestion(practiceTask.index+1);else renderStudent()}
 function buildMockQuestionItems(m){
