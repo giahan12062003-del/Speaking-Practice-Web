@@ -1,166 +1,244 @@
 from pathlib import Path
+import re
 
-html = r'''<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ms Hân Class | Speaking Lab</title>
-<style>
-:root{--bg:#080d20;--card:#121a35;--card2:#182145;--purple:#765cff;--cyan:#35d5ff;--text:#f5f7ff;--muted:#9ba6c7;--danger:#ff6b8a}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 80% 0%,#27205b 0,#080d20 42%);color:var(--text);min-height:100vh}
-button,input,textarea,select{font:inherit}button{cursor:pointer}
-.app{display:flex;min-height:100vh}.sidebar{width:250px;background:#0b1128;border-right:1px solid #202a4d;padding:26px 18px;position:fixed;inset:0 auto 0 0}.brand{font-weight:800;font-size:20px}.brand small{display:block;color:#8f9bc0;font-size:11px;margin-top:4px}.nav{margin-top:35px;display:grid;gap:8px}.nav button{border:0;background:transparent;color:#aeb8d6;text-align:left;padding:13px 14px;border-radius:12px}.nav button.active,.nav button:hover{background:#1b2450;color:white}.main{margin-left:250px;width:calc(100% - 250px);padding:30px;max-width:1500px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}.pill{padding:9px 13px;background:#171f43;border:1px solid #29345c;border-radius:999px;color:#cbd4f1;font-size:13px}.hero{padding:28px;border:1px solid #2a3560;border-radius:24px;background:linear-gradient(135deg,#171f45cc,#10182fdd);box-shadow:0 20px 70px #0005}.hero h1{margin:0 0 8px;font-size:32px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}.card{background:linear-gradient(145deg,#151e3d,#10172e);border:1px solid #27335c;border-radius:18px;padding:20px}.stat b{display:block;font-size:28px;margin-top:7px}.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:20px}.action{border:1px solid #303b68;background:#151d3d;color:white;border-radius:16px;padding:20px;text-align:left}.action strong{display:block;margin-bottom:5px}.section{display:none}.section.active{display:block}.question{font-size:30px;line-height:1.3;margin:25px 0}.record{display:flex;align-items:center;gap:15px;flex-wrap:wrap}.mic{width:72px;height:72px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--purple),#a34dff);color:white;font-size:28px;box-shadow:0 10px 35px #765cff55}.primary{border:0;background:linear-gradient(135deg,var(--purple),#4d8dff);color:white;border-radius:12px;padding:12px 18px;font-weight:700}.secondary{border:1px solid #33406e;background:#151d3d;color:white;border-radius:12px;padding:11px 16px}.wave{height:65px;display:flex;align-items:center;gap:4px;margin:15px 0}.wave i{width:4px;background:linear-gradient(#6d5cff,#36d5ff);border-radius:8px;height:var(--h)}.score{font-size:46px;font-weight:800}.bar{height:8px;background:#252f52;border-radius:10px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:10px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:14px 10px;border-bottom:1px solid #27335a;text-align:left}.form{display:grid;gap:12px}.form input,.form textarea,.form select{width:100%;padding:12px;background:#0d1430;border:1px solid #303b65;color:white;border-radius:10px}.toast{position:fixed;right:24px;bottom:24px;background:#182447;border:1px solid #3b4c83;padding:14px 18px;border-radius:12px;display:none}
-@media(max-width:850px){.sidebar{width:72px;padding:20px 10px}.brand{font-size:0}.brand:after{content:"MH";font-size:18px}.brand small,.nav button span{display:none}.main{margin-left:72px;width:calc(100% - 72px);padding:18px}.grid{grid-template-columns:repeat(2,1fr)}}
-</style>
-</head>
-<body>
-<div class="app">
-<aside class="sidebar">
-  <div class="brand">MS HÂN CLASS<small>Speaking Practice Lab</small></div>
-  <div class="nav">
-    <button class="active" onclick="show('home',this)">🏠 <span>Dashboard</span></button>
-    <button onclick="show('practice',this)">🎤 <span>Practice</span></button>
-    <button onclick="show('assignments',this)">📝 <span>Assignments</span></button>
-    <button onclick="show('results',this)">📊 <span>My Results</span></button>
-    <button onclick="show('teacher',this)">👩🏻‍🏫 <span>Teacher</span></button>
-  </div>
-</aside>
-<main class="main">
-<div class="top"><div><b>Speaking Lab</b><div class="muted" id="status">Your speaking practice space</div></div><div class="pill">💜 Ms Hân Class</div></div>
+path = Path("/mnt/data/index.html")
+html = path.read_text(encoding="utf-8")
 
-<section id="home" class="section active">
-  <div class="hero"><h1>👋 Hello, Student!</h1><div class="muted">Ready to practise your speaking today?</div>
-    <div class="actions">
-      <button class="action" onclick="show('practice')"><strong>🎯 Practice Speaking</strong><span class="muted">Train your reaction & pronunciation</span></button>
-      <button class="action" onclick="show('assignments')"><strong>📝 My Assignments</strong><span class="muted">Complete and submit homework</span></button>
-    </div>
-  </div>
-  <div class="grid">
-    <div class="card stat">🔥 Streak<b id="streak">0 days</b></div>
-    <div class="card stat">🎤 Practices<b id="practiceCount">0</b></div>
-    <div class="card stat">⭐ Best score<b id="bestScore">—</b></div>
-    <div class="card stat">📤 Submissions<b id="submissionCount">0</b></div>
-  </div>
-</section>
+# 1) Add student navigation item
+old = '<button onclick="page(\'history\',this)">🕘 <span>Lịch sử</span></button>'
+new = old + '\n    <button onclick="page(\'mockTest\',this)">🏆 <span>Thi thử Speaking</span></button>'
+html = html.replace(old, new)
 
-<section id="practice" class="section">
- <div class="card">
-  <div class="pill">RANDOM QUESTION • <span id="qNo">1</span>/10</div>
-  <div class="question" id="question">What do you usually do after school?</div>
-  <div class="muted">Prepare your answer, then tap the microphone. You can listen and try again before submitting.</div>
-  <div class="wave" id="wave"></div>
-  <div class="record">
-    <button class="mic" id="mic" onclick="toggleRecording()">🎤</button>
-    <button class="secondary" onclick="playLast()">▶ Play answer</button>
-    <label class="muted">Volume <input id="volume" type="range" min="0" max="1" value="1" step=".05"></label>
-    <label class="muted">Speed <select id="speed"><option value=".75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option></select></label>
-  </div>
-  <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-    <button class="secondary" onclick="newQuestion()">🔄 New question</button>
-    <button class="primary" onclick="submitPractice()">📤 Submit</button>
-  </div>
+# 2) Add mock-test page before teacher dashboard
+marker = '<section id="tdashboard" class="page">'
+mock_page = r'''
+<section id="mockTest" class="page">
+ <div class="hero">
+   <div class="between">
+     <div>
+       <span class="pill">MOCK SPEAKING TEST</span>
+       <h1 style="margin-top:12px">🏆 Thi thử Speaking</h1>
+       <div class="muted">Làm bài như thi thật: nghe câu hỏi → chuẩn bị → trả lời → nhận điểm tổng.</div>
+     </div>
+     <div class="pill" id="mockTimer">10:00</div>
+   </div>
+   <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+     <div class="card"><div class="muted">Part</div><div class="num" id="mockPart">1</div></div>
+     <div class="card"><div class="muted">Câu</div><div class="num" id="mockIndex">1/5</div></div>
+     <div class="card"><div class="muted">Điểm hiện tại</div><div class="num" id="mockLiveScore">—</div></div>
+   </div>
+ </div>
+ <div class="card" style="margin-top:15px">
+   <div class="pill" id="mockTopic">Warm-up</div>
+   <div class="question" id="mockQuestion">What is your name?</div>
+   <div class="muted small">Em hãy nói thành câu hoàn chỉnh. Hệ thống sẽ ghi âm và phân tích phản xạ sau khi em dừng nói.</div>
+   <div class="wave" id="mockWave"></div>
+   <div class="row">
+     <button id="mockMic" class="mic" onclick="toggleMockRecording()">🎤</button>
+     <button class="btn secondary" onclick="speakMockQuestion()">🔊 Nghe câu hỏi</button>
+     <button class="btn secondary" onclick="resetMock()">↺ Làm lại</button>
+   </div>
+   <div id="mockTranscript" class="item" style="margin-top:15px;min-height:65px"><span class="muted">Transcript sẽ xuất hiện ở đây…</span></div>
+   <div id="mockResult" class="item hidden" style="margin-top:12px"></div>
+   <div class="between" style="margin-top:15px">
+     <div class="small muted" id="mockHint">Nhấn microphone để bắt đầu.</div>
+     <button class="btn primary" id="mockNext" onclick="nextMockQuestion()" disabled>Tiếp theo →</button>
+   </div>
+ </div>
+ <div class="card" style="margin-top:15px">
+   <div class="between"><div><b>Cấu trúc đề thi thử</b><div class="small muted">Có thể mở rộng thành format riêng của lớp.</div></div></div>
+   <div class="list" style="margin-top:12px">
+     <div class="item"><b>Part 1 · Personal information</b><div class="small muted">Câu hỏi ngắn · kiểm tra phản xạ.</div></div>
+     <div class="item"><b>Part 2 · Topic</b><div class="small muted">Nói về một chủ đề quen thuộc.</div></div>
+     <div class="item"><b>Part 3 · Follow-up</b><div class="small muted">Câu hỏi mở rộng và lý do.</div></div>
+   </div>
  </div>
 </section>
 
-<section id="assignments" class="section">
- <div class="card"><h2>📝 Speaking Assignments</h2>
-  <table class="table"><thead><tr><th>Assignment</th><th>Questions</th><th>Status</th><th></th></tr></thead>
-  <tbody id="assignmentRows"></tbody></table>
- </div>
-</section>
+'''
+html = html.replace(marker, mock_page + marker)
 
-<section id="results" class="section">
- <div class="grid">
-  <div class="card"><div class="muted">Latest Score</div><div class="score" id="latestScore">—</div></div>
-  <div class="card"><div class="muted">Pronunciation</div><div class="score" id="pronScore">—</div></div>
-  <div class="card"><div class="muted">Fluency</div><div class="score" id="fluScore">—</div></div>
- </div>
- <div class="card" style="margin-top:18px"><h2>💡 Teacher feedback</h2><p id="feedback" class="muted">Submit a practice to see your saved result here.</p></div>
-</section>
+# 3) Add automatic scoring styles
+style_marker = '.score{font-size:40px;font-weight:800}'
+extra_css = r'''
+.auto-score{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.auto-score .mini{background:#0d1225;border:1px solid #293158;border-radius:12px;padding:11px}
+.mini strong{font-size:20px;display:block;margin-top:3px}
+.ai-note{border-left:3px solid var(--purple);padding:10px 12px;background:#191633;border-radius:0 10px 10px 0;margin-top:10px}
+'''
+html = html.replace(style_marker, style_marker + extra_css)
 
-<section id="teacher" class="section">
- <div class="grid">
-  <div class="card"><div class="muted">Students</div><div class="score" id="studentCount">—</div></div>
-  <div class="card"><div class="muted">Submissions</div><div class="score" id="teacherSubs">—</div></div>
- </div>
- <div class="card" style="margin-top:18px">
-  <h2>👩🏻‍🏫 Quick score</h2>
-  <div class="form">
-   <input id="studentName" placeholder="Student name">
-   <input id="teacherScore" type="number" min="0" max="100" placeholder="Score / 100">
-   <textarea id="teacherFeedback" placeholder="Teacher feedback"></textarea>
-   <button class="primary" onclick="saveTeacherScore()">Save score</button>
-  </div>
- </div>
-</section>
-</main></div><div class="toast" id="toast"></div>
+# 4) Update page title map
+old_map = 'historyTeacher:"Lịch sử quản lý"})[id]||"MS HÂN CLASS";'
+new_map = 'historyTeacher:"Lịch sử quản lý",mockTest:"Thi thử Speaking"})[id]||"MS HÂN CLASS";'
+html = html.replace(old_map, new_map)
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-
-const firebaseConfig={
- apiKey:"AIzaSyCwU4RcKdEUxarn90pdrin4XVo1DeXRmEc",
- authDomain:"student-mangenent.firebaseapp.com",
- databaseURL:"https://student-mangenent-default-rtdb.firebaseio.com",
- projectId:"student-mangenent",
- storageBucket:"student-mangenent.firebasestorage.app",
- messagingSenderId:"556588294302",
- appId:"1:556588294302:web:9b51a007c9bd93d1219b8f",
- measurementId:"G-PSEYJE6JRN"
-};
-const app=initializeApp(firebaseConfig), db=getDatabase(app);
-const questions=[
-"What do you usually do after school?","Tell me about your best friend.","What did you do last weekend?",
-"What is your favourite subject at school?","What are you going to do this Sunday?","Describe your favourite place.",
-"What food do you like? Why?","What do you do at the weekend?","What would you like to be in the future?","Tell me about your family."
+# 5) Add speech recognition + automatic scoring code before loadQuestions()
+insert_marker = 'loadQuestions();\n</script>'
+auto_js = r'''
+// ================= AUTOMATIC SPEAKING FEEDBACK =================
+// V2 uses the browser Speech Recognition API when available.
+// It gives an estimated practice score (fluency, response length, fillers).
+// It is NOT a certified phoneme-level pronunciation score.
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let speechRec=null, speechText="", mockRec=null, mockText="", mockStartedAt=0;
+const mockQuestions=[
+ {part:1,topic:"Part 1 · Personal information",q:"What is your name?",keywords:["name"]},
+ {part:1,topic:"Part 1 · Personal information",q:"How old are you?",keywords:["old","years"]},
+ {part:1,topic:"Part 1 · Personal information",q:"What do you like doing after school?",keywords:["like","after","school"]},
+ {part:2,topic:"Part 2 · Topic",q:"Tell me about your favourite school subject.",keywords:["subject","school","because"]},
+ {part:2,topic:"Part 2 · Topic",q:"Describe your best friend.",keywords:["friend","because"]},
+ {part:3,topic:"Part 3 · Follow-up",q:"Why is learning English important for you?",keywords:["English","important","because"]},
+ {part:3,topic:"Part 3 · Follow-up",q:"What are you going to do next weekend?",keywords:["going","weekend"]},
+ {part:3,topic:"Part 3 · Follow-up",q:"Do you prefer studying alone or with friends? Why?",keywords:["prefer","because"]}
 ];
-let current=0, mediaRecorder=null, chunks=[], audioUrl=null, lastBlob=null;
+let mockIndex=0,mockResults=[],mockTimerId=null,mockSeconds=600;
 
-window.show=(id,btn)=>{
- document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');
- document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
-};
-window.newQuestion=()=>{current=Math.floor(Math.random()*questions.length);document.getElementById('question').textContent=questions[current];document.getElementById('qNo').textContent=current+1};
-function toast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2200)}
-function drawWave(){const w=document.getElementById('wave');w.innerHTML='';for(let i=0;i<55;i++){const e=document.createElement('i');e.style.setProperty('--h',(8+Math.random()*50)+'px');w.appendChild(e)}}
-drawWave();
-
+function normalizeText(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w\s']/g," ")}
+function scoreSpeech(text,seconds,question=""){
+ const words=normalizeText(text).split(/\s+/).filter(Boolean);
+ const count=words.length;
+ const fillers=(text.match(/\b(um|uh|er|like|you know)\b/gi)||[]).length;
+ const unique=new Set(words).size;
+ const pace=seconds>0 ? count/(seconds/60) : count;
+ const target=(normalizeText(question).split(/\s+/).filter(x=>x.length>3));
+ const hits=target.filter(w=>words.includes(w)).length;
+ const relevance=target.length ? Math.min(100,Math.round((hits/Math.min(target.length,5))*100)) : 70;
+ const fluency=Math.max(35,Math.min(100,Math.round(55+Math.min(count,55)*0.65-fillers*4+(pace>=45&&pace<=150?10:0))));
+ const pronunciation=Math.max(45,Math.min(98,Math.round(68+(unique/Math.max(count,1))*25-(fillers*2))));
+ const overall=Math.round(fluency*.4+pronunciation*.35+relevance*.25);
+ let comment;
+ if(overall>=90) comment="Excellent! Câu trả lời khá tự nhiên, rõ ý và có phản xạ tốt.";
+ else if(overall>=80) comment="Very good! Em trả lời tốt. Hãy chú ý phát âm rõ và mở rộng thêm ý.";
+ else if(overall>=70) comment="Good effort! Em đã trả lời được. Cố gắng nói dài hơn và hạn chế ngập ngừng.";
+ else comment="Keep practising! Hãy nói thành câu đầy đủ, chậm và rõ hơn rồi thử lại.";
+ return {overall,fluency,pronunciation,relevance,words:count,pace:Math.round(pace),comment};
+}
+function recognitionSupported(){return !!SpeechRecognition}
+function startRecognition(onFinal,onEnd){
+ if(!SpeechRecognition){toast("Trình duyệt này chưa hỗ trợ nhận diện giọng nói. Chrome trên máy tính thường hoạt động tốt nhất.");return null}
+ const r=new SpeechRecognition();r.lang="en-US";r.interimResults=true;r.continuous=true;
+ let final="";
+ r.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;if(e.results[i].isFinal)final+=" "+t;else interim+=" "+t}
+ onFinal((final+" "+interim).trim(),final.trim())};
+ r.onerror=e=>{if(e.error!=="no-speech")toast("Không nhận diện được giọng nói: "+e.error)};
+ r.onend=()=>onEnd(final.trim());
+ try{r.start()}catch(e){}
+ return r;
+}
 window.toggleRecording=async()=>{
- if(mediaRecorder?.state==='recording'){mediaRecorder.stop();return}
+ if(rec?.state==="recording"){rec.stop();return}
  try{
-  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-  chunks=[];mediaRecorder=new MediaRecorder(stream);
-  mediaRecorder.ondataavailable=e=>chunks.push(e.data);
-  mediaRecorder.onstop=()=>{lastBlob=new Blob(chunks,{type:'audio/webm'});audioUrl=URL.createObjectURL(lastBlob);stream.getTracks().forEach(t=>t.stop());document.getElementById('mic').textContent='🎤';toast('Đã ghi âm xong!')};
-  mediaRecorder.start();document.getElementById('mic').textContent='⏹️';toast('Đang ghi âm...');
- }catch(e){toast('Hãy cho phép trình duyệt dùng microphone.')}
+  let stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];
+  rec=new MediaRecorder(stream);rec.ondataavailable=e=>chunks.push(e.data);
+  rec.onstop=async()=>{
+   lastBlob=new Blob(chunks,{type:"audio/webm"});audioUrl=URL.createObjectURL(lastBlob);
+   stream.getTracks().forEach(t=>t.stop());$("mic").classList.remove("recording");$("mic").textContent="🎤";
+   if(speechRec){try{speechRec.stop()}catch(e){}}
+   finishAutoPractice();
+  };
+  rec.start();$("mic").classList.add("recording");$("mic").textContent="⏹️";speechText="";speechRec=startRecognition((live)=>{speechText=live},()=>{});
+  window._practiceStart=Date.now();toast("Đang ghi âm + phân tích giọng nói...");
+ }catch(e){toast("Hãy cho phép microphone trong trình duyệt.")}
 };
-window.playLast=()=>{if(!audioUrl)return toast('Bạn chưa có bản ghi.');const a=new Audio(audioUrl);a.volume=+document.getElementById('volume').value;a.playbackRate=+document.getElementById('speed').value;a.play()};
-window.submitPractice=async()=>{
- const score=Math.floor(72+Math.random()*24), pron=Math.floor(score-5+Math.random()*8), flu=Math.floor(score-3+Math.random()*8);
- try{await push(ref(db,'submissions'),{student:"Demo Student",question:questions[current],questionIndex:current,score,pronunciation:pron,fluency:flu,submittedAt:new Date().toISOString(),hasRecording:!!lastBlob});toast('Đã lưu bài vào Firebase!')}catch(e){toast('Không thể lưu. Kiểm tra Firebase Rules.')}
- document.getElementById('latestScore').textContent=score;document.getElementById('pronScore').textContent=pron;document.getElementById('fluScore').textContent=flu;document.getElementById('feedback').textContent=score>=85?'Excellent! Keep speaking clearly and confidently.':'Good effort! Try to speak louder and practise the highlighted words again.';
- document.getElementById('practiceCount').textContent=+document.getElementById('practiceCount').textContent+1;document.getElementById('submissionCount').textContent=+document.getElementById('submissionCount').textContent+1;
+function finishAutoPractice(){
+ const sec=Math.max(1,Math.round((Date.now()-(window._practiceStart||Date.now()))/1000));
+ const result=scoreSpeech(speechText,sec,$("question").textContent);
+ let box=document.getElementById("autoPracticeResult");
+ if(!box){box=document.createElement("div");box.id="autoPracticeResult";box.className="item";$("practice").querySelector(".card").appendChild(box)}
+ box.innerHTML=`<b>🤖 Kết quả tự động</b><div class="auto-score">
+ <div class="mini">Fluency<strong>${result.fluency}</strong></div>
+ <div class="mini">Pronunciation*<strong>${result.pronunciation}</strong></div>
+ <div class="mini">Response<strong>${result.relevance}</strong></div></div>
+ <div class="ai-note">${esc(result.comment)}</div>
+ <div class="small muted" style="margin-top:8px">📝 ${esc(speechText||"Chưa nhận diện được transcript.")} · ${result.words} từ · ${result.pace} từ/phút</div>
+ <div class="small muted" style="margin-top:6px">* Pronunciation ở V2 là điểm luyện tập ước lượng từ transcript/độ ổn định bài nói, chưa phải chấm phát âm âm vị bằng AI chuyên dụng.</div>`;
+}
+function startMockTimer(){
+ clearInterval(mockTimerId);mockSeconds=600;
+ const el=$("mockTimer");mockTimerId=setInterval(()=>{mockSeconds--;let m=Math.floor(mockSeconds/60),s=mockSeconds%60;el.textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;if(mockSeconds<=0){clearInterval(mockTimerId);finishMock(true)}},1000)
+}
+function renderMock(){
+ const q=mockQuestions[mockIndex];$("mockPart").textContent=q.part;$("mockIndex").textContent=`${mockIndex+1}/${mockQuestions.length}`;$("mockTopic").textContent=q.topic;$("mockQuestion").textContent=q.q;
+ $("mockTranscript").innerHTML='<span class="muted">Transcript sẽ xuất hiện ở đây…</span>';$("mockResult").classList.add("hidden");$("mockNext").disabled=true;$("mockHint").textContent="Nhấn microphone để bắt đầu.";drawMockWave();
+}
+function drawMockWave(){let w=$("mockWave");w.innerHTML="";for(let i=0;i<55;i++){let e=document.createElement("i");e.style.setProperty("--h",(8+Math.random()*42)+"px");w.appendChild(e)}}
+window.speakMockQuestion=()=>{if(!("speechSynthesis" in window))return toast("Trình duyệt không hỗ trợ đọc câu hỏi.");let u=new SpeechSynthesisUtterance($("mockQuestion").textContent);u.lang="en-US";u.rate=.9;u.volume=+$("volume").value||1;speechSynthesis.cancel();speechSynthesis.speak(u)}
+window.toggleMockRecording=async()=>{
+ if(mockRec?.state==="recording"){mockRec.stop();return}
+ try{
+  let stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];mockText="";mockStartedAt=Date.now();
+  mockRec=new MediaRecorder(stream);mockRec.ondataavailable=e=>chunks.push(e.data);
+  mockRec.onstop=()=>{
+   stream.getTracks().forEach(t=>t.stop());$("mockMic").classList.remove("recording");$("mockMic").textContent="🎤";
+   let sec=Math.max(1,Math.round((Date.now()-mockStartedAt)/1000)),r=scoreSpeech(mockText,sec,$("mockQuestion").textContent);mockResults[mockIndex]=r;
+   $("mockResult").classList.remove("hidden");$("mockResult").innerHTML=`<b>🤖 Kết quả câu ${mockIndex+1}</b><div class="auto-score"><div class="mini">Overall<strong>${r.overall}</strong></div><div class="mini">Fluency<strong>${r.fluency}</strong></div><div class="mini">Pronunciation*<strong>${r.pronunciation}</strong></div></div><div class="ai-note">${esc(r.comment)}</div>`;
+   $("mockNext").disabled=false;$("mockHint").textContent="Đã chấm tự động. Em có thể thử lại hoặc sang câu tiếp.";
+  };
+  mockRec.start();$("mockMic").classList.add("recording");$("mockMic").textContent="⏹️";toast("Đang ghi âm...");
+  if(SpeechRecognition){let r=startRecognition(live=>{$("mockTranscript").textContent=live||"Đang nghe…";mockText=live},final=>{if(final)mockText=final})}
+ }catch(e){toast("Hãy cho phép microphone.")}
 };
+window.nextMockQuestion=async()=>{
+ if(mockIndex<mockQuestions.length-1){mockIndex++;renderMock()}
+ else finishMock(false)
+};
+async function finishMock(timeUp){
+ clearInterval(mockTimerId);
+ const valid=mockResults.filter(Boolean),avg=valid.length?Math.round(valid.reduce((a,b)=>a+b.overall,0)/valid.length):0;
+ $("mockLiveScore").textContent=avg||"—";
+ if(user&&valid.length){
+  let id=push(ref(db,"mockTests")).key;
+  await set(ref(db,"mockTests/"+id),{id,studentId:user.uid,student:user.displayName||user.email,score:avg,answers:mockResults,completedAt:new Date().toISOString(),timeUp});
+  await logStudentActivity("mock_test",{testId:id,score:avg,completedAt:new Date().toISOString()});
+ }
+ $("mockResult").classList.remove("hidden");$("mockResult").innerHTML=`<b>🏆 Kết thúc bài thi thử</b><div class="score">${avg}/100</div><div class="ai-note">${avg>=85?"Excellent! Em đang có phản xạ rất tốt.":avg>=70?"Good job! Tiếp tục luyện fluency và phát âm.":"Hãy luyện từng câu ngắn, nói chậm và rõ rồi thử lại."}</div>`;
+ $("mockNext").disabled=true;
+}
+window.resetMock=()=>{mockIndex=0;mockResults=[];startMockTimer();renderMock()};
+async function logStudentActivity(type,details){if(!user)return;let id=push(ref(db,"studentActivity")).key;await set(ref(db,"studentActivity/"+id),{id,type,details,studentId:user.uid,at:new Date().toISOString()})}
+const oldPage=window.page;
+window.page=function(id,btn){oldPage(id,btn);if(id==="mockTest"){if(!mockTimerId)startMockTimer();renderMock()}};
 
-window.saveTeacherScore=async()=>{
- const name=document.getElementById('studentName').value.trim()||'Unnamed student',score=Math.max(0,Math.min(100,+document.getElementById('teacherScore').value||0)),feedback=document.getElementById('teacherFeedback').value.trim();
- await push(ref(db,'teacherScores'),{student:name,score,feedback,createdAt:new Date().toISOString()});toast('Đã lưu điểm giáo viên!');
-};
-onValue(ref(db,'submissions'),snap=>{
- const d=snap.val()||{}, rows=Object.values(d), latest=rows[rows.length-1];
- document.getElementById('teacherSubs').textContent=rows.length;
- document.getElementById('submissionCount').textContent=rows.length;
- if(latest){document.getElementById('latestScore').textContent=latest.score??'—';document.getElementById('pronScore').textContent=latest.pronunciation??'—';document.getElementById('fluScore').textContent=latest.fluency??'—';}
-});
-const assignments=[['Speaking Homework #01',10,'Open'],['Quick Response #01',10,'Open'],['Mock Speaking Test #01',10,'Coming soon']];
-document.getElementById('assignmentRows').innerHTML=assignments.map((a,i)=>`<tr><td>${a[0]}</td><td>${a[1]}</td><td>${a[2]}</td><td><button class="secondary" onclick="show('practice')">${i===2?'View':'Start'}</button></td></tr>`).join('');
-document.getElementById('studentCount').textContent='—';
-</script>
-</body>
-</html>'''
-path=Path("/mnt/data/ms_han_class_speaking_v1.html")
-path.write_text(html,encoding="utf-8")
-print(path)
+loadQuestions();
+</script>'''
+# Replace final loadQuestions occurrence before closing script.
+html = html.replace(insert_marker, auto_js)
+
+# 6) README companion
+readme_path = Path("/mnt/data/README.md")
+readme = readme_path.read_text(encoding="utf-8")
+readme += r'''
+
+## 🤖 V1.5/V2 – Tự động chấm Speaking
+
+Website có thêm chế độ chấm luyện tập ngay sau khi học sinh dừng ghi âm:
+
+- Speech-to-Text bằng Web Speech API của trình duyệt.
+- Ước lượng Fluency.
+- Ước lượng Pronunciation.
+- Kiểm tra mức độ đáp ứng câu hỏi.
+- Đếm số từ và tốc độ nói.
+- Tạo nhận xét tự động.
+- Lưu kết quả thi thử vào Realtime Database.
+
+> Lưu ý: điểm Pronunciation trong phiên bản này là **điểm luyện tập ước lượng**, chưa phải chấm phát âm âm vị chuyên sâu. Muốn chấm từng âm /s/, /ʃ/, /θ/, trọng âm, intonation... cần tích hợp một speech/AI scoring API chuyên dụng.
+
+## 🏆 Thi thử Speaking
+
+Học sinh có menu **Thi thử Speaking** với:
+- Part 1 – Personal information
+- Part 2 – Topic
+- Part 3 – Follow-up
+- Đồng hồ đếm ngược
+- Ghi âm từng câu
+- Chấm tự động sau mỗi câu
+- Điểm tổng cuối bài
+- Lưu lịch sử bài thi
+
+Có thể thay toàn bộ bộ câu hỏi mẫu bằng đề Cambridge/Flyers hoặc format riêng của Ms Hân.
+'''
+readme_path.write_text(readme, encoding="utf-8")
+
+path.write_text(html, encoding="utf-8")
+print("Đã cập nhật /mnt/data/index.html và /mnt/data/README.md thành bản V2 với tự động chấm luyện tập + thi thử Speaking.")
