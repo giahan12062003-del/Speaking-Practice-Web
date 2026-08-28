@@ -907,6 +907,7 @@ async function submitPracticeRecording(){
     part:q.part||'',
     topic:q.topic||'',
     audioUrl:'',
+    audioPending:true,
     transcript,
     score:r.overall,
     topic:r.topic,
@@ -1028,15 +1029,49 @@ async function startStudentMock(mockId){
   </div>`;
 }
 
+
 async function openStudentMockById(mockId){
   const m=state.mockTests[mockId];
   if(!m){toast('Không tìm thấy Mock Test này.','err');return}
   const items=buildMockQuestionItems(m);
   if(!items.length){toast('Đề chưa có câu hỏi.','err');return}
 
-  const attempts=Object.values(await read('mockAttempts'));
+  const [attemptData, submissionData]=await Promise.all([
+    read('mockAttempts'),
+    db.ref('submissions').orderByChild('mockId').equalTo(mockId).once('value').then(s=>{
+      const o={};s.forEach(c=>{const v=c.val();if(v && v.studentId===currentStudent.uid)o[c.key]=v});return o;
+    }).catch(()=>({}))
+  ]);
+
+  const attempts=Object.values(attemptData||{});
   const previous=attempts.filter(x=>x.studentId===currentStudent.uid&&x.mockId===mockId)
     .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+
+  // Prefer per-question submissions because they contain the latest audioUrl.
+  const subByIndex={};
+  Object.values(submissionData||{}).forEach(s=>{
+    const idx=Number(s.mockQuestionIndex);
+    if(Number.isInteger(idx)){
+      const old=subByIndex[idx];
+      if(!old || (s.createdAt||0)>(old.createdAt||0)) subByIndex[idx]=s;
+    }
+  });
+
+  let previousAnswers=(previous?.answers||[]).slice();
+  Object.keys(subByIndex).forEach(k=>{
+    const idx=Number(k), s=subByIndex[idx];
+    previousAnswers[idx]={
+      ...(previousAnswers[idx]||{}),
+      overall:Number(s.score ?? previousAnswers[idx]?.overall ?? 0),
+      topic:Number(s.topic ?? s.language ?? previousAnswers[idx]?.topic ?? 0),
+      fluency:Number(s.fluency ?? s.interaction ?? previousAnswers[idx]?.fluency ?? 0),
+      pronunciation:Number(s.pronunciation ?? previousAnswers[idx]?.pronunciation ?? 0),
+      comment:s.aiComment||previousAnswers[idx]?.comment||'',
+      transcript:s.transcript||previousAnswers[idx]?.transcript||'',
+      audioUrl:s.audioUrl||previousAnswers[idx]?.audioUrl||'',
+      audioPending:s.audioPending===true
+    };
+  });
 
   practiceTask={
     id:mockId,
@@ -1051,13 +1086,11 @@ async function openStudentMockById(mockId){
     mockSaved:[],
     wordFixes:{},
     previousAttempt:previous||null,
-    previousAnswers:previous?.answers||[]
+    previousAnswers
   };
 
   renderMockStudentQuestion(0);
 }
-
-
 function renderMockStudentQuestion(i){
   practiceTask.index=i;
   practiceTask.wordFixes={};
@@ -1137,6 +1170,7 @@ function openMockQuestionByIndex(i){
 }
 
 
+
 async function showSavedMockAnswer(i,silent=false){
   const prev=practiceTask?.mockSaved?.[i] || practiceTask?.previousAnswers?.[i];
   if(!prev){
@@ -1145,6 +1179,12 @@ async function showSavedMockAnswer(i,silent=false){
   }
   const p=$('studentResult');
   if(!p)return;
+
+  const audioHtml=prev.audioUrl
+    ? `<div class="saved-audio-box"><div class="script-title">🎧 Bài ghi âm của bé</div><audio controls preload="metadata" style="width:100%;margin-top:8px" src="${esc(prev.audioUrl)}"></audio></div>`
+    : (prev.audioPending
+      ? `<div class="notice info" style="margin-top:10px">⏳ Audio đang được tải lên hệ thống. Bé có thể xem điểm ngay; mở lại sau ít phút sẽ nghe được bản ghi.</div>`
+      : `<div class="notice" style="margin-top:10px">⚠️ Audio của lần làm này chưa được lưu lên hệ thống.</div>`);
 
   p.classList.remove('hidden');
   p.innerHTML=`<h3 style="margin:0 0 10px">✅ Kết quả câu ${i+1}</h3>
@@ -1156,7 +1196,7 @@ async function showSavedMockAnswer(i,silent=false){
     </div>
     <div class="feedback" style="margin-top:10px"><b>💬 Nhận xét:</b><br>${esc(prev.comment||'Chưa có nhận xét.')}</div>
     ${prev.transcript?`<div class="script-panel" style="margin-top:10px"><div class="script-title">📝 Bé đã nói</div><div class="script-text">${esc(prev.transcript)}</div></div>`:''}
-    ${prev.audioUrl?`<div class="saved-audio-box"><div class="script-title">🎧 Bài ghi âm của bé</div><audio controls preload="metadata" style="width:100%;margin-top:8px" src="${esc(prev.audioUrl)}"></audio></div>`:`<div class="notice" style="margin-top:10px">⚠️ Audio của lần làm này chưa được lưu lên hệ thống.</div>`}
+    ${audioHtml}
     <div class="record-actions" style="margin-top:10px">
       <button class="btn secondary" type="button" onclick="resetStudentRecording()">🔄 Ghi âm lại câu này</button>
     </div>`;
@@ -1301,10 +1341,22 @@ async function submitMockAnswer(){
           const name=`audio/${studentUid}/mock/${mockId}/${idForAudio}.webm`;
           const snap=await storage.ref(name).put(audioBlob,{contentType:'audio/webm'});
           const audioUrl=await snap.ref.getDownloadURL();
-          await db.ref('submissions/'+idForAudio).update({audioUrl});
-          if(practiceTask?.mockSaved?.[answerIndex]) practiceTask.mockSaved[answerIndex].audioUrl=audioUrl;
+          await db.ref('submissions/'+idForAudio).update({audioUrl,audioPending:false});
+          if(practiceTask?.mockSaved?.[answerIndex]){
+            practiceTask.mockSaved[answerIndex].audioUrl=audioUrl;
+            practiceTask.mockSaved[answerIndex].audioPending=false;
+          }
+          const latest=Object.entries((await read('mockAttempts'))||{})
+            .filter(([_,x])=>x.studentId===studentUid&&x.mockId===mockId)
+            .sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0))[0];
+          if(latest){
+            const answers=Array.isArray(latest[1].answers)?latest[1].answers.slice():[];
+            answers[answerIndex]={...(answers[answerIndex]||{}),audioUrl,audioPending:false};
+            await db.ref('mockAttempts/'+latest[0]+'/answers').set(answers);
+          }
         }catch(e){
-          // Keep the score/result even if the audio upload is temporarily unavailable.
+          try{await db.ref('submissions/'+idForAudio).update({audioPending:false,audioUploadError:true})}catch(_){}
+          if(practiceTask?.mockSaved?.[answerIndex]) practiceTask.mockSaved[answerIndex].audioPending=false;
         }
       },0);
     }
